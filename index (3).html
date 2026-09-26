@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Mobile Site</title>
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  min-height:100%;
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+  background:#fff;
+}
+body{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100dvh;
+}
+#viewport{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  background:#fff;
+}
+#app{
+  position:relative;
+  width:390px;
+  height:780px;
+  flex:0 0 auto;
+  transform-origin:top center;
+}
+.el{position:absolute}
+.button,.text,.image{display:flex;align-items:center}
+.button,.image{justify-content:center}
+.input input{
+  width:100%;
+  height:100%;
+  padding:10px;
+  border:1px solid #bbb;
+  border-radius:inherit;
+  font:inherit;
+}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="app"></div></div>
+<script>
+const DESIGN_W=390;
+const DESIGN_H=780;
+const screens=[{"id":"screen_1","name":"Home","elements":[{"id":"el_xp3mdss","type":"card","x":0,"y":0,"radius":8,"fontSize":16,"action":"","w":390,"h":253,"text":"","bg":"#3921b0","color":"#111"},{"id":"el_c7p4bw7","type":"button","x":0,"y":228,"radius":8,"fontSize":16,"action":"","w":390,"h":48,"text":"Гей порно открить ","bg":"#000000","color":"#fff","fontWeight":"600"}]},{"id":"screen_q0tbf3o","name":"Screen 2","elements":[]}];
+const viewport=document.getElementById('viewport');
+const app=document.getElementById('app');
+
+function fitDesign(){
+  const vw=window.innerWidth;
+  const vh=window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+  // Масштаб по ширині — головне, щоб макет займав реальну ширину телефона.
+  const scale=vw/DESIGN_W;
+
+  app.style.transform='scale('+scale+')';
+  viewport.style.height=vh+'px';
+
+  // Після масштабування висота макета теж змінюється пропорційно.
+  app.style.marginTop='0px';
+}
+
+function render(id){
+  app.innerHTML='';
+  const s=screens.find(x=>x.id===id)||screens[0];
+
+  s.elements.forEach(e=>{
+    const n=document.createElement('div');
+    n.className='el '+e.type;
+
+    Object.assign(n.style,{
+      left:e.x+'px',
+      top:e.y+'px',
+      width:e.w+'px',
+      height:e.h+'px',
+      borderRadius:(e.radius||8)+'px',
+      background:e.bg||'transparent',
+      color:e.color||'#111',
+      fontSize:(e.fontSize||16)+'px',
+      fontWeight:e.fontWeight||'500'
+    });
+
+    if(['button','text','image'].includes(e.type)) n.textContent=e.text||'';
+
+    if(e.type==='input'){
+      const i=document.createElement('input');
+      i.placeholder=e.text||'';
+      n.appendChild(i);
+    }
+
+    if(e.action&&e.action.startsWith('goto:')){
+      n.onclick=()=>render(e.action.split(':')[1]);
+    }
+
+    app.appendChild(n);
+  });
+}
+
+window.addEventListener('resize',fitDesign);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',fitDesign);
+}
+fitDesign();
+render(screens[0].id);
+</script>
+</body>
+</html>
