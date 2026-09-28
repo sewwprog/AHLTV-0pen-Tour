@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="uk">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17212b"><title>AHLTV — Подати заявку</title><link rel="stylesheet" href="styles.css?v=20260928-5"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17212b"><title>AHLTV — Подати заявку</title><link rel="stylesheet" href="styles.css?v=20260928-6"></head>
 <body>
 <header class="site-header"><div class="shell header-inner">
   <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
@@ -14,6 +14,21 @@
   <nav><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Увійти</a></nav>
 </aside>
 <main class="shell apply-page">
+  <section id="authGate" class="panel auth-gate hidden">
+    <div class="auth-gate-icon">A</div>
+    <div>
+      <h2>Потрібен акаунт</h2>
+      <p>Щоб зареєструвати команду на турнір, спочатку увійди або створи акаунт.</p>
+    </div>
+    <a class="primary-btn" href="admin.html?next=apply.html">Увійти / Зареєструватися</a>
+  </section>
+
+  <div id="applicationContent" class="hidden">
+  <div class="apply-account-bar">
+    <span>Ви увійшли як <b id="applyUserEmail"></b></span>
+    <a href="admin.html">Акаунт</a>
+  </div>
+
   <div class="page-title compact"><div><small>TEAM APPLICATION</small><h1>Подати заявку</h1><p>Обери турнір з відкритою реєстрацією та заповни склад.</p></div></div>
   <section class="panel apply-panel"><div class="panel-head"><span>ВИБІР ТУРНІРУ</span><strong id="selectedTournamentStatus"></strong></div><div class="tournament-select-wrap"><label>Турнір<select id="tournamentSelect" required><option value="">Завантаження...</option></select></label><div id="tournamentHint" class="tournament-hint"></div></div></section>
   <section class="panel"><div class="panel-head"><span>ЗАЯВКА КОМАНДИ</span></div>
@@ -25,6 +40,7 @@
       <div class="submit-line"><button class="primary-btn" type="submit" id="submitBtn">Відправити заявку</button><p id="formMessage"></p></div>
     </form>
   </section>
+  </div>
 </main>
-<script type="module" src="ui.js?v=20260928-5"></script><script type="module" src="apply.js?v=20260928-5"></script>
+<script type="module" src="ui.js?v=20260928-6"></script><script type="module" src="apply.js?v=20260928-6"></script>
 </body></html>
