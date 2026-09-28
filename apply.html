@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="uk">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17212b"><title>AHLTV — Подати заявку</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="site-header"><div class="shell header-inner">
+  <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
+  <nav class="main-nav"><a href="./">Турніри</a><a class="active" href="apply.html">Подати заявку</a></nav>
+  <a class="account-btn desktop-only" href="admin.html">Увійти</a>
+  <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
+</div></header>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose">×</button></div>
+  <nav><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Увійти</a></nav>
+</aside>
+<main class="shell apply-page">
+  <div class="page-title compact"><div><small>TEAM APPLICATION</small><h1>Подати заявку</h1><p>Обери турнір з відкритою реєстрацією та заповни склад.</p></div></div>
+  <section class="panel apply-panel"><div class="panel-head"><span>ВИБІР ТУРНІРУ</span><strong id="selectedTournamentStatus"></strong></div><div class="tournament-select-wrap"><label>Турнір<select id="tournamentSelect" required><option value="">Завантаження...</option></select></label><div id="tournamentHint" class="tournament-hint"></div></div></section>
+  <section class="panel"><div class="panel-head"><span>ЗАЯВКА КОМАНДИ</span></div>
+    <form id="teamForm" class="team-form">
+      <fieldset><legend>Команда</legend><div class="form-grid"><label>Назва команди<input name="team_name" maxlength="40" required></label><label>Тег<input name="team_tag" maxlength="8" required></label><label>Капітан / нік<input name="captain_nick" maxlength="32" required></label><label>Email капітана<input name="captain_email" type="email" required></label><label>Telegram або Discord<input name="contact" maxlength="80" required></label><label>FACEIT / профіль<input name="captain_profile" type="url" placeholder="https://..."></label></div></fieldset>
+      <fieldset><legend>Основний склад</legend><div class="form-grid"><label>Гравець 1<input name="player_1" required maxlength="32"></label><label>Гравець 2<input name="player_2" required maxlength="32"></label><label>Гравець 3<input name="player_3" required maxlength="32"></label><label>Гравець 4<input name="player_4" required maxlength="32"></label><label>Гравець 5<input name="player_5" required maxlength="32"></label><label>Заміна <span class="muted">(необов'язково)</span><input name="substitute" maxlength="32"></label></div></fieldset>
+      <fieldset><legend>Додатково</legend><label>Коментар<textarea name="note" maxlength="500" rows="4"></textarea></label></fieldset>
+      <label class="agreement"><input type="checkbox" required><span>Підтверджую правильність даних і згоду з правилами турніру.</span></label>
+      <div class="submit-line"><button class="primary-btn" type="submit" id="submitBtn">Відправити заявку</button><p id="formMessage"></p></div>
+    </form>
+  </section>
+</main>
+<script type="module" src="ui.js"></script><script type="module" src="apply.js"></script>
+</body></html>
