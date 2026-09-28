@@ -1,121 +1,88 @@
 <!doctype html>
 <html lang="uk">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#17212b">
-  <title>AHLTV Open Tour — Керування</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17212b"><title>AHLTV — Admin</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="shell header-inner">
-      <a class="brand" href="./">
-        <span class="brand-mark">A</span>
-        <span class="brand-copy"><strong>AHLTV</strong><small>OPEN TOUR</small></span>
-      </a>
-      <nav class="main-nav"><a href="./">На сайт</a></nav>
-      <a class="account-btn" href="./">Головна</a>
+<header class="site-header"><div class="shell header-inner">
+  <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>ADMIN</small></span></a>
+  <nav class="main-nav"><a href="./">На сайт</a><a href="apply.html">Подати заявку</a></nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
+</div></header>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose">×</button></div>
+  <nav><a href="./">На сайт</a><a href="apply.html">Подати заявку</a></nav>
+</aside>
+<main class="shell admin-shell">
+  <section id="loginView" class="panel login-panel">
+    <div class="panel-head"><span>ВХІД</span><strong>AHLTV ACCOUNT</strong></div>
+    <div class="login-body"><div class="login-logo"><span class="brand-mark large">A</span><div><h1>AHLTV Admin</h1><p>Керування турнірами.</p></div></div>
+      <form id="loginForm" class="team-form login-form">
+        <label>Email<input id="email" type="email" autocomplete="username" required></label>
+        <label>Пароль<input id="password" type="password" autocomplete="current-password" required></label>
+        <button class="primary-btn full" type="submit" id="authBtn">Увійти</button><p id="loginMessage"></p>
+      </form>
     </div>
-  </header>
-
-  <main class="shell admin-shell">
-    <section id="loginView" class="panel login-panel">
-      <div class="panel-head"><span>ВХІД</span><strong>AHLTV ACCOUNT</strong></div>
-      <div class="login-body">
-        <div class="login-logo">
-          <span class="brand-mark large">A</span>
-          <div><h1>AHLTV Account</h1><p>Увійди до керування турніром.</p></div>
-        </div>
-
-        <form id="loginForm" class="team-form login-form">
-          <label>Email<input id="email" type="email" autocomplete="username" required></label>
-          <label>Пароль<input id="password" type="password" autocomplete="current-password" required></label>
-          <button class="primary-btn full" type="submit" id="authBtn">Увійти</button>
-          <p id="loginMessage" aria-live="polite"></p>
+  </section>
+  <section id="dashboardView" class="dashboard hidden">
+    <div class="admin-top panel"><div><small>ADMIN CONTROL</small><h1>Керування AHLTV</h1></div><div class="admin-account"><span id="adminEmail"></span><button id="logoutBtn" class="secondary-btn">Вийти</button></div></div>
+    <nav class="admin-tabs">
+      <button class="active" data-tab="tournamentsTab">Турніри</button>
+      <button data-tab="applicationsTab">Заявки <span id="pendingBadge"></span></button>
+      <button data-tab="usersTab">Користувачі</button>
+      <button data-tab="matchesTab">Матчі</button>
+    </nav>
+    <section id="tournamentsTab" class="admin-tab">
+      <section class="panel"><div class="panel-head"><span id="tournamentFormTitle">ДОДАТИ ТУРНІР</span></div>
+        <form id="tournamentForm" class="team-form compact-form">
+          <div class="form-grid">
+            <label>Назва<input name="name" required maxlength="80" placeholder="AHLTV Open Tour"></label>
+            <label>Коротка назва<input name="short_name" maxlength="24" placeholder="OPEN TOUR"></label>
+            <label>Гра<input name="game" value="CS2" required maxlength="30"></label>
+            <label>Формат<input name="format" value="BO3" required maxlength="20"></label>
+            <label>Макс. команд<input name="max_teams" type="number" min="2" max="128" value="16" required></label>
+            <label>Статус<select name="status"><option value="upcoming">Upcoming</option><option value="registration" selected>Registration</option><option value="live">Live</option><option value="finished">Finished</option></select></label>
+            <label>Дата старту<input name="starts_at" type="datetime-local"></label>
+          </div>
+          <label>Опис<textarea name="description" maxlength="500" rows="3"></textarea></label>
+          <div class="checkbox-grid">
+            <label class="check-inline"><input name="registration_open" type="checkbox" checked> Реєстрація відкрита</label>
+            <label class="check-inline"><input name="is_visible" type="checkbox" checked> Показувати на сайті</label>
+          </div>
+          <div class="form-actions"><button class="primary-btn" type="submit" id="saveTournamentBtn">Створити турнір</button><button class="secondary-btn hidden" type="button" id="cancelTournamentEdit">Скасувати</button><p id="tournamentMessage"></p></div>
         </form>
-      </div>
+      </section>
+      <div id="tournamentsAdminList" class="admin-card-list"></div>
     </section>
-
-    <section id="dashboardView" class="dashboard hidden">
-      <div class="admin-top panel">
-        <div>
-          <small>ADMIN CONTROL</small>
-          <h1>Open Tour</h1>
-        </div>
-        <div class="admin-account">
-          <span id="adminEmail"></span>
-          <button id="logoutBtn" class="secondary-btn">Вийти</button>
-        </div>
-      </div>
-
-      <nav class="admin-tabs" aria-label="Admin navigation">
-        <button class="active" data-tab="applicationsTab">Заявки <span id="pendingBadge"></span></button>
-        <button data-tab="usersTab">Користувачі</button>
-        <button data-tab="matchesTab">Матчі</button>
-      </nav>
-
-      <section id="applicationsTab" class="admin-tab">
-        <section class="panel">
-          <div class="panel-head"><span>ЗАЯВКИ КОМАНД</span></div>
-          <div id="stats" class="admin-stats"></div>
-        </section>
-        <div id="applications" class="applications"></div>
-        <p id="emptyState" class="panel empty hidden">Заявок поки немає.</p>
-      </section>
-
-      <section id="usersTab" class="admin-tab hidden">
-        <section class="panel">
-          <div class="panel-head">
-            <span>ЗАРЕЄСТРОВАНІ АКАУНТИ</span>
-            <strong id="usersCount"></strong>
-          </div>
-          <div id="usersList" class="users-list">
-            <div class="empty-state">Завантаження...</div>
-          </div>
-        </section>
-      </section>
-
-      <section id="matchesTab" class="admin-tab hidden">
-        <section class="panel">
-          <div class="panel-head"><span>ДОДАТИ МАТЧ</span></div>
-          <form id="matchForm" class="team-form compact-form">
-            <div class="form-grid">
-              <label>Команда 1<input name="team_one" list="approvedTeams" required placeholder="Team One"></label>
-              <label>Команда 2<input name="team_two" list="approvedTeams" required placeholder="Team Two"></label>
-              <label>Дата та час<input name="starts_at" type="datetime-local"></label>
-              <label>Стадія<input name="stage" maxlength="80" placeholder="Round 1 / Quarterfinal"></label>
-              <label>Формат
-                <select name="best_of">
-                  <option value="1">BO1</option>
-                  <option value="3" selected>BO3</option>
-                  <option value="5">BO5</option>
-                </select>
-              </label>
-              <label>Статус
-                <select name="status">
-                  <option value="scheduled" selected>Scheduled</option>
-                  <option value="live">Live</option>
-                  <option value="finished">Finished</option>
-                </select>
-              </label>
-            </div>
-            <button class="primary-btn" type="submit">Додати матч</button>
-            <p id="matchMessage"></p>
-          </form>
-          <datalist id="approvedTeams"></datalist>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head"><span>МАТЧІ НА САЙТІ</span><strong id="adminMatchesCount"></strong></div>
-          <div id="adminMatchesList" class="admin-matches-list">
-            <div class="empty-state">Матчів ще немає.</div>
-          </div>
-        </section>
-      </section>
+    <section id="applicationsTab" class="admin-tab hidden">
+      <section class="panel"><div class="panel-head"><span>ЗАЯВКИ КОМАНД</span></div><div id="stats" class="admin-stats"></div></section>
+      <div id="applications" class="applications"></div><p id="emptyState" class="panel empty hidden">Заявок поки немає.</p>
     </section>
-  </main>
-
-  <script type="module" src="admin.js"></script>
-</body>
-</html>
+    <section id="usersTab" class="admin-tab hidden">
+      <section class="panel"><div class="panel-head"><span>ЗАРЕЄСТРОВАНІ АКАУНТИ</span><strong id="usersCount"></strong></div><div id="usersList" class="users-list"><div class="empty-state">Завантаження...</div></div></section>
+    </section>
+    <section id="matchesTab" class="admin-tab hidden">
+      <section class="panel"><div class="panel-head"><span>ДОДАТИ МАТЧ</span></div>
+        <form id="matchForm" class="team-form compact-form">
+          <div class="form-grid">
+            <label>Турнір<select name="tournament_id" id="matchTournament" required></select></label>
+            <label>Стадія<input name="stage" maxlength="80" placeholder="Quarterfinal"></label>
+            <label>Команда 1<input name="team_one" list="approvedTeams" required></label>
+            <label>Команда 2<input name="team_two" list="approvedTeams" required></label>
+            <label>Дата та час<input name="starts_at" type="datetime-local"></label>
+            <label>Формат<select name="best_of"><option value="1">BO1</option><option value="3" selected>BO3</option><option value="5">BO5</option></select></label>
+            <label>Статус<select name="status"><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="finished">Finished</option></select></label>
+          </div>
+          <button class="primary-btn" type="submit">Додати матч</button><p id="matchMessage"></p>
+        </form><datalist id="approvedTeams"></datalist>
+      </section>
+      <section class="panel"><div class="panel-head"><span>МАТЧІ</span><strong id="adminMatchesCount"></strong></div><div id="adminMatchesList"></div></section>
+    </section>
+  </section>
+</main>
+<script type="module" src="ui.js"></script>
+<script type="module" src="admin.js"></script>
+</body></html>
