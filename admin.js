@@ -129,20 +129,37 @@ loginForm.addEventListener("submit", async (event) => {
 
   if (!hasAdmin) {
     loginMessage.textContent = "Створюємо перший акаунт...";
-    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    const response = await fetch(
+      "https://hfxzdifqcjbslmxffvlf.supabase.co/functions/v1/register-first-admin",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      }
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      if (result.error === "admin_exists") {
+        await refreshAuthButton();
+        loginMessage.textContent = "Адмін уже створений. Увійди в акаунт.";
+      } else {
+        loginMessage.textContent = "Не вдалося зареєструватися.";
+      }
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      loginMessage.textContent = "Не вдалося зареєструватися: " + error.message;
+      loginMessage.textContent = "Акаунт створено, але автоматичний вхід не вдався. Спробуй увійти ще раз.";
+      await refreshAuthButton();
       return;
     }
 
-    if (data.session?.user) {
-      await openDashboard(data.session.user);
-      return;
-    }
-
-    loginMessage.textContent = "Акаунт створено. Якщо потрібно підтвердження пошти — підтвердь email, потім увійди.";
-    await refreshAuthButton();
+    await openDashboard(data.user);
     return;
   }
 
