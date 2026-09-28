@@ -9,6 +9,8 @@ const applications = document.querySelector("#applications");
 const stats = document.querySelector("#stats");
 const emptyState = document.querySelector("#emptyState");
 const adminEmail = document.querySelector("#adminEmail");
+const createAdminBtn = document.querySelector("#createAdminBtn");
+const ALLOWED_ADMIN_EMAIL = "tisvitalij05@gmail.com";
 
 const configured = !SUPABASE_URL.includes("REPLACE_") && !SUPABASE_PUBLISHABLE_KEY.includes("REPLACE_");
 const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
@@ -130,3 +132,40 @@ if (!configured) {
   const { data:{ session } } = await supabase.auth.getSession();
   if (session?.user) await openDashboard(session.user);
 }
+
+
+createAdminBtn?.addEventListener("click", async () => {
+  if (!configured) {
+    loginMessage.textContent = "Supabase ще не підключений.";
+    return;
+  }
+
+  const email = document.querySelector("#email").value.trim().toLowerCase();
+  const password = document.querySelector("#password").value;
+
+  if (email !== ALLOWED_ADMIN_EMAIL) {
+    loginMessage.textContent = "Ця пошта не дозволена для створення адмін-акаунта.";
+    return;
+  }
+
+  if (password.length < 6) {
+    loginMessage.textContent = "Пароль має містити щонайменше 6 символів.";
+    return;
+  }
+
+  loginMessage.textContent = "Створюємо акаунт...";
+  const { data, error } = await supabase.auth.signUp({ email, password });
+
+  if (error) {
+    loginMessage.textContent = error.message.includes("already")
+      ? "Акаунт уже існує. Натисни «Увійти»."
+      : "Не вдалося створити акаунт: " + error.message;
+    return;
+  }
+
+  if (data.session && data.user) {
+    await openDashboard(data.user);
+  } else {
+    loginMessage.textContent = "Акаунт створено. Якщо Supabase попросить підтвердити email — відкрий лист, а потім увійди.";
+  }
+});
