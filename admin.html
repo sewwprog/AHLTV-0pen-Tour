@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#171513"><title>AHLTV — Account</title>
-  <link rel="stylesheet" href="styles.css?v=20260928-16">
+  <link rel="stylesheet" href="styles.css?v=20260928-17">
 </head>
 <body>
 <header class="site-header"><div class="shell header-inner">
@@ -124,36 +124,35 @@
     </section>
     <section id="matchesTab" class="admin-tab hidden">
       <section class="panel">
-        <div class="panel-head"><span>ТУРНІРНА СІТКА</span><strong>BRACKET</strong></div>
-        <div class="bracket-tools">
-          <label>Турнір<select id="bracketTournament"></select></label>
-          <button class="primary-btn" id="generateBracketBtn" type="button"><i data-lucide="git-branch"></i><span>Створити сітку з команд</span></button>
-          <p id="bracketMessage"></p>
+        <div class="panel-head"><span><i data-lucide="image"></i> СІТКА ТУРНІРУ</span><strong>IMAGE</strong></div>
+        <div class="bracket-image-editor">
+          <div class="bracket-image-controls">
+            <label>Турнір
+              <select id="bracketTournament"></select>
+            </label>
+
+            <label>Фото сітки
+              <input id="bracketImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+            </label>
+
+            <div class="form-actions">
+              <button class="primary-btn" id="saveBracketImageBtn" type="button"><i data-lucide="upload"></i><span>Завантажити сітку</span></button>
+              <button class="secondary-btn" id="removeBracketImageBtn" type="button"><i data-lucide="trash-2"></i><span>Прибрати фото</span></button>
+            </div>
+
+            <p id="bracketMessage"></p>
+          </div>
+
+          <div class="bracket-image-preview" id="bracketImagePreview">
+            <div class="empty-bracket-preview">
+              <i data-lucide="image"></i>
+              <span>Обери турнір і завантаж фото сітки</span>
+            </div>
+          </div>
         </div>
       </section>
-
-      <section class="panel"><div class="panel-head"><span>ДОДАТИ МАТЧ У СІТКУ</span></div>
-        <form id="matchForm" class="team-form compact-form">
-          <div class="form-grid">
-            <label>Турнір<select name="tournament_id" id="matchTournament" required></select></label>
-            <label>Стадія<input name="stage" maxlength="80" placeholder="Quarterfinal"></label>
-            <label>Команда 1<input name="team_one" list="approvedTeams" required></label>
-            <label>Команда 2<input name="team_two" list="approvedTeams" required></label>
-            <label>Дата та час<input name="starts_at" type="datetime-local"></label>
-            <label>Формат<select name="best_of"><option value="1">BO1</option><option value="3" selected>BO3</option><option value="5">BO5</option></select></label>
-            <label>Статус<select name="status"><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="finished">Finished</option></select></label>
-            <label>Раунд сітки<input name="bracket_round" type="number" min="1" max="16" placeholder="1"></label>
-            <label>Позиція в раунді<input name="bracket_position" type="number" min="1" max="1024" placeholder="1"></label>
-            <label>Рахунок команди 1<input name="team_one_score" type="number" min="0" placeholder="0"></label>
-            <label>Рахунок команди 2<input name="team_two_score" type="number" min="0" placeholder="0"></label>
-          </div>
-          <button class="primary-btn" type="submit"><i data-lucide="plus"></i><span>Додати матч</span></button><p id="matchMessage"></p>
-        </form><datalist id="approvedTeams"></datalist>
-      </section>
-      <section class="panel"><div class="panel-head"><span>МАТЧІ СІТКИ</span><strong id="adminMatchesCount"></strong></div><div id="adminMatchesList"></div></section>
-    </section>
-  </section>
+    </section>  </section>
 </main>
 <script type="module" src="ui.js?v=20260928-14"></script>
-<script type="module" src="account.js?v=20260928-16"></script>
+<script type="module" src="account.js?v=20260928-17"></script>
 </body></html>
