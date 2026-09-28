@@ -1,4 +1,2 @@
-// Заповниться реальними значеннями після створення окремого Supabase-проєкту.
-// Publishable key безпечно використовувати у браузері разом з правильно налаштованим RLS.
-export const SUPABASE_URL = "REPLACE_WITH_SUPABASE_URL";
-export const SUPABASE_PUBLISHABLE_KEY = "REPLACE_WITH_SUPABASE_PUBLISHABLE_KEY";
+export const SUPABASE_URL = "https://hfxzdifqcjbslmxffvlf.supabase.co";
+export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi";
