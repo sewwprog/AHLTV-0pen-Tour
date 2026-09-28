@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#171513"><title>AHLTV Open Tour</title>
-  <link rel="stylesheet" href="styles.css?v=20260928-20">
+  <link rel="stylesheet" href="styles.css?v=20260928-21">
 </head>
 <body>
 <header class="site-header">
@@ -22,9 +22,24 @@
 </aside>
 
 <main class="shell home-page">
-  <section class="page-title">
-    <div><small>AHLTV TOURNAMENT PLATFORM</small><h1 id="homeTitle">Турніри</h1><p id="homeDescription">Тут показуються тільки турніри, які створені адміністрацією.</p></div>
-    <a class="primary-btn" href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>
+  <section class="page-title home-hero">
+    <div class="home-hero-main">
+      <div class="hero-kicker"><i data-lucide="trophy"></i><span>AHLTV TOURNAMENT PLATFORM</span></div>
+      <h1 id="homeTitle">Турніри</h1>
+      <p id="homeDescription">Тут показуються тільки турніри, які створені адміністрацією.</p>
+      <div class="hero-actions">
+        <a class="primary-btn hero-primary" href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>
+        <a class="secondary-btn hero-secondary" href="#tournamentsList"><i data-lucide="list-checks"></i><span>Переглянути турніри</span></a>
+      </div>
+    </div>
+
+    <div class="home-hero-side" aria-hidden="true">
+      <div class="hero-emblem"><i data-lucide="trophy"></i></div>
+      <div class="hero-side-copy">
+        <span>TOURNAMENT HUB</span>
+        <b>OPEN • REGISTER • PLAY</b>
+      </div>
+    </div>
   </section>
 
   <div id="tournamentsList" class="tournaments-list">
