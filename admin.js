@@ -2,6 +2,7 @@ import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.4";
 const SUPABASE_URL="https://hfxzdifqcjbslmxffvlf.supabase.co";
 const SUPABASE_KEY="sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi";
 const USERS_URL=SUPABASE_URL+"/functions/v1/admin-users";
+const ASSET_BUCKET="ahltv-assets";
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const $=s=>document.querySelector(s);
@@ -9,13 +10,50 @@ const esc=(v="")=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"
 const safeUrl=v=>{try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)?u.href:null}catch{return null}};
 const statusLabel=s=>({upcoming:"UPCOMING",registration:"REGISTRATION",live:"LIVE",finished:"FINISHED"}[s]||String(s).toUpperCase());
 
+function previewImage(container,url,fallback="A"){
+  if(!container)return;
+  container.innerHTML="";
+  const safe=safeUrl(url);
+  if(safe){
+    const img=document.createElement("img");
+    img.src=safe;
+    img.alt="Logo preview";
+    container.classList.add("has-image");
+    container.appendChild(img);
+  }else{
+    container.classList.remove("has-image");
+    const span=document.createElement("span");
+    span.textContent=(fallback||"A").slice(0,1).toUpperCase();
+    container.appendChild(span);
+  }
+}
+
+async function uploadAsset(file,folder){
+  if(!file)return null;
+  if(file.size>5*1024*1024)throw new Error("Файл завеликий. Максимум 5 МБ.");
+  if(!file.type.startsWith("image/"))throw new Error("Можна завантажувати тільки зображення.");
+
+  const ext=(file.name.split(".").pop()||"img").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,8)||"img";
+  const path=`${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+
+  const {error}=await supabase.storage
+    .from(ASSET_BUCKET)
+    .upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+
+  if(error)throw error;
+
+  const {data}=supabase.storage.from(ASSET_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
 const loginView=$("#loginView"),dashboardView=$("#dashboardView"),loginForm=$("#loginForm"),loginMessage=$("#loginMessage"),adminEmail=$("#adminEmail");
-const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle");
+const siteSettingsForm=$("#siteSettingsForm"),siteLogoFile=$("#siteLogoFile"),siteLogoPreview=$("#siteLogoPreview"),siteSettingsMessage=$("#siteSettingsMessage"),saveSiteSettingsBtn=$("#saveSiteSettingsBtn"),removeSiteLogo=$("#removeSiteLogo");
+const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview");
 const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge");
 const usersList=$("#usersList"),usersCount=$("#usersCount");
 const matchForm=$("#matchForm"),matchTournament=$("#matchTournament"),approvedTeams=$("#approvedTeams"),matchMessage=$("#matchMessage"),adminMatchesList=$("#adminMatchesList"),adminMatchesCount=$("#adminMatchesCount");
 
-let tournaments=[],registrations=[],editingTournamentId=null,tabsReady=false;
+let tournaments=[],registrations=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
 
 function showLogin(message=""){loginView.classList.remove("hidden");dashboardView.classList.add("hidden");loginMessage.textContent=message}
 
@@ -36,8 +74,82 @@ function setupTabs(){
 async function openDashboard(user){
   if(!(await isAdmin(user.id))){await supabase.auth.signOut();showLogin("Цей акаунт не має прав адміністратора.");return}
   loginView.classList.add("hidden");dashboardView.classList.remove("hidden");adminEmail.textContent=user.email||"";setupTabs();
-  await loadTournaments();await loadApplications();renderTournaments();await Promise.all([loadUsers(),loadMatches()]);
+  await loadSiteSettings();await loadTournaments();await loadApplications();renderTournaments();await Promise.all([loadUsers(),loadMatches()]);
 }
+
+async function loadSiteSettings(){
+  const {data,error}=await supabase.from("site_settings").select("*").eq("id",1).single();
+  if(error){
+    console.error(error);
+    siteSettingsMessage.textContent="Не вдалося завантажити налаштування сайту.";
+    siteSettingsMessage.className="error";
+    return;
+  }
+
+  siteSettings=data;
+  const f=siteSettingsForm.elements;
+  f.site_name.value=data.site_name||"AHLTV";
+  f.site_subtitle.value=data.site_subtitle||"TOURNAMENTS";
+  f.home_title.value=data.home_title||"Турніри";
+  f.home_description.value=data.home_description||"";
+  f.footer_text.value=data.footer_text||"Tournament Platform";
+  siteLogoRemoved=false;
+  if(siteLogoFile)siteLogoFile.value="";
+  previewImage(siteLogoPreview,data.logo_url,data.site_name||"A");
+}
+
+siteLogoFile?.addEventListener("change",()=>{
+  const file=siteLogoFile.files?.[0];
+  siteLogoRemoved=false;
+  if(file)previewImage(siteLogoPreview,URL.createObjectURL(file),siteSettingsForm.elements.site_name.value||"A");
+});
+
+removeSiteLogo?.addEventListener("click",()=>{
+  siteLogoRemoved=true;
+  if(siteLogoFile)siteLogoFile.value="";
+  previewImage(siteLogoPreview,null,siteSettingsForm.elements.site_name.value||"A");
+});
+
+siteSettingsForm?.addEventListener("submit",async e=>{
+  e.preventDefault();
+  saveSiteSettingsBtn.disabled=true;
+  siteSettingsMessage.textContent="Зберігаємо...";
+  siteSettingsMessage.className="";
+
+  try{
+    const d=Object.fromEntries(new FormData(siteSettingsForm).entries());
+    let logoUrl=siteLogoRemoved?null:(siteSettings?.logo_url||null);
+    const file=siteLogoFile.files?.[0];
+
+    if(file){
+      siteSettingsMessage.textContent="Завантажуємо логотип...";
+      logoUrl=await uploadAsset(file,"site");
+    }
+
+    const payload={
+      site_name:d.site_name.trim(),
+      site_subtitle:d.site_subtitle.trim(),
+      home_title:d.home_title.trim(),
+      home_description:d.home_description.trim(),
+      footer_text:d.footer_text.trim(),
+      logo_url:logoUrl,
+      updated_at:new Date().toISOString()
+    };
+
+    const {error}=await supabase.from("site_settings").update(payload).eq("id",1);
+    if(error)throw error;
+
+    siteSettingsMessage.textContent="Налаштування сайту збережено.";
+    siteSettingsMessage.className="success";
+    await loadSiteSettings();
+  }catch(error){
+    console.error(error);
+    siteSettingsMessage.textContent=error?.message||"Не вдалося зберегти налаштування.";
+    siteSettingsMessage.className="error";
+  }finally{
+    saveSiteSettingsBtn.disabled=false;
+  }
+});
 
 function tournamentPayload(form){
   const d=Object.fromEntries(new FormData(form).entries());
@@ -53,16 +165,56 @@ function resetTournamentForm(){
   editingTournamentId=null;tournamentForm.reset();
   tournamentForm.elements.game.value="CS2";tournamentForm.elements.format.value="BO3";tournamentForm.elements.max_teams.value="16";
   tournamentForm.elements.status.value="registration";tournamentForm.elements.registration_open.checked=true;tournamentForm.elements.is_visible.checked=true;
+  previewImage(tournamentLogoPreview,null,"A");
   saveTournamentBtn.textContent="Створити турнір";cancelTournamentEdit.classList.add("hidden");tournamentFormTitle.textContent="ДОДАТИ ТУРНІР";tournamentMessage.textContent="";
 }
 
+tournamentLogoFile?.addEventListener("change",()=>{
+  const file=tournamentLogoFile.files?.[0];
+  if(file)previewImage(tournamentLogoPreview,URL.createObjectURL(file),tournamentForm.elements.short_name.value||tournamentForm.elements.name.value||"A");
+});
+
 tournamentForm.addEventListener("submit",async e=>{
-  e.preventDefault();const payload=tournamentPayload(tournamentForm);saveTournamentBtn.disabled=true;tournamentMessage.textContent="Зберігаємо...";
-  const q=editingTournamentId?supabase.from("tournaments").update(payload).eq("id",editingTournamentId):supabase.from("tournaments").insert(payload);
-  const {error}=await q;saveTournamentBtn.disabled=false;
-  if(error){console.error(error);tournamentMessage.textContent="Не вдалося зберегти турнір.";tournamentMessage.className="error";return}
-  tournamentMessage.textContent=editingTournamentId?"Турнір оновлено.":"Турнір створено.";tournamentMessage.className="success";
-  resetTournamentForm();await loadTournaments();
+  e.preventDefault();
+  const payload=tournamentPayload(tournamentForm);
+  const wasEditing=!!editingTournamentId;
+  saveTournamentBtn.disabled=true;
+  tournamentMessage.textContent="Зберігаємо...";
+  tournamentMessage.className="";
+
+  try{
+    let saved;
+
+    if(editingTournamentId){
+      const {data,error}=await supabase.from("tournaments").update(payload).eq("id",editingTournamentId).select("id,logo_url").single();
+      if(error)throw error;
+      saved=data;
+    }else{
+      const {data,error}=await supabase.from("tournaments").insert(payload).select("id,logo_url").single();
+      if(error)throw error;
+      saved=data;
+    }
+
+    const logoFile=tournamentLogoFile.files?.[0];
+
+    if(logoFile){
+      tournamentMessage.textContent="Завантажуємо лого...";
+      const logoUrl=await uploadAsset(logoFile,`tournaments/${saved.id}`);
+      const {error:logoError}=await supabase.from("tournaments").update({logo_url:logoUrl}).eq("id",saved.id);
+      if(logoError)throw logoError;
+    }
+
+    tournamentMessage.textContent=wasEditing?"Турнір оновлено.":"Турнір створено.";
+    tournamentMessage.className="success";
+    resetTournamentForm();
+    await loadTournaments();
+  }catch(error){
+    console.error(error);
+    tournamentMessage.textContent=error?.message||"Не вдалося зберегти турнір.";
+    tournamentMessage.className="error";
+  }finally{
+    saveTournamentBtn.disabled=false;
+  }
 });
 cancelTournamentEdit.addEventListener("click",resetTournamentForm);
 
@@ -76,9 +228,10 @@ function renderTournaments(){
   if(!tournaments.length){tournamentList.innerHTML='<section class="panel empty">Турнірів ще немає. Створи перший вище.</section>';return}
   tournamentList.innerHTML=tournaments.map(t=>{
     const approved=registrations.filter(r=>r.tournament_id===t.id&&r.status==="approved").length;
+    const logo=safeUrl(t.logo_url);
     return `<article class="panel admin-tournament-card">
       <div class="admin-tournament-main">
-        <div class="tournament-icon small">${esc((t.short_name||t.name).slice(0,1).toUpperCase())}</div>
+        <div class="tournament-icon small ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="${esc(t.name)} logo">`:esc((t.short_name||t.name).slice(0,1).toUpperCase())}</div>
         <div><small>${esc(t.game)} · ${esc(t.format)}</small><h3>${esc(t.name)}</h3><p>${approved} / ${t.max_teams} команд · ${t.registration_open?"реєстрація відкрита":"реєстрація закрита"} · ${t.is_visible?"видимий":"прихований"}</p></div>
         <span class="status-badge status-${t.status}">${statusLabel(t.status)}</span>
       </div>
@@ -105,6 +258,8 @@ function renderTournaments(){
     editingTournamentId=t.id;const f=tournamentForm.elements;
     f.name.value=t.name;f.short_name.value=t.short_name||"";f.description.value=t.description||"";f.game.value=t.game;f.format.value=t.format;f.max_teams.value=t.max_teams;f.status.value=t.status;f.registration_open.checked=t.registration_open;f.is_visible.checked=t.is_visible;
     f.starts_at.value=t.starts_at?new Date(new Date(t.starts_at).getTime()-new Date(t.starts_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
+    if(tournamentLogoFile)tournamentLogoFile.value="";
+    previewImage(tournamentLogoPreview,t.logo_url,t.short_name||t.name||"A");
     saveTournamentBtn.textContent="Зберегти зміни";cancelTournamentEdit.classList.remove("hidden");tournamentFormTitle.textContent="РЕДАГУВАТИ ТУРНІР";tournamentForm.scrollIntoView({behavior:"smooth",block:"start"});
   }));
   tournamentList.querySelectorAll("[data-toggle-registration]").forEach(btn=>btn.addEventListener("click",async()=>{
