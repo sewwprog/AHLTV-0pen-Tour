@@ -58,6 +58,12 @@ const matchForm=$("#matchForm"),matchTournament=$("#matchTournament"),bracketTou
 
 let tournaments=[],registrations=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
 
+function setButtonContent(button,icon,label){
+  if(!button)return;
+  button.innerHTML=`<i data-lucide="${icon}"></i><span>${label}</span>`;
+  window.refreshIcons?.();
+}
+
 function showLogin(message=""){
   loginView.classList.remove("hidden");
   userView?.classList.add("hidden");
@@ -196,7 +202,7 @@ function resetTournamentForm(){
   tournamentForm.elements.game.value="CS2";tournamentForm.elements.format.value="BO3";tournamentForm.elements.max_teams.value="16";
   tournamentForm.elements.status.value="registration";tournamentForm.elements.registration_open.checked=true;tournamentForm.elements.is_visible.checked=true;
   previewImage(tournamentLogoPreview,null,"A");
-  saveTournamentBtn.textContent="Створити турнір";cancelTournamentEdit.classList.add("hidden");tournamentFormTitle.textContent="ДОДАТИ ТУРНІР";tournamentMessage.textContent="";
+  setButtonContent(saveTournamentBtn,"plus","Створити турнір");cancelTournamentEdit.classList.add("hidden");tournamentFormTitle.textContent="ДОДАТИ ТУРНІР";tournamentMessage.textContent="";
 }
 
 tournamentLogoFile?.addEventListener("change",()=>{
@@ -272,14 +278,15 @@ function renderTournaments(){
           <option value="live" ${t.status==="live"?"selected":""}>Live</option>
           <option value="finished" ${t.status==="finished"?"selected":""}>Finished</option>
         </select>
-        <button class="btn" data-edit-tournament="${t.id}">Редагувати</button>
-        <button class="btn" data-toggle-registration="${t.id}">${t.registration_open?"Закрити реєстрацію":"Відкрити реєстрацію"}</button>
-        <button class="btn" data-toggle-visible="${t.id}">${t.is_visible?"Сховати":"Показати"}</button>
-        <button class="btn reject" data-delete-tournament="${t.id}">Видалити</button>
+        <button class="btn" data-edit-tournament="${t.id}"><i data-lucide="pencil"></i><span>Редагувати</span></button>
+        <button class="btn" data-toggle-registration="${t.id}"><i data-lucide="${t.registration_open?"x-circle":"check"}"></i><span>${t.registration_open?"Закрити реєстрацію":"Відкрити реєстрацію"}</span></button>
+        <button class="btn" data-toggle-visible="${t.id}"><i data-lucide="${t.is_visible?"eye-off":"eye"}"></i><span>${t.is_visible?"Сховати":"Показати"}</span></button>
+        <button class="btn reject" data-delete-tournament="${t.id}"><i data-lucide="trash-2"></i><span>Видалити</span></button>
       </div>
     </article>`;
   }).join("");
 
+  window.refreshIcons?.();
   tournamentList.querySelectorAll("[data-status-id]").forEach(el=>el.addEventListener("change",async()=>{
     await supabase.from("tournaments").update({status:el.value}).eq("id",Number(el.dataset.statusId));await loadTournaments();
   }));
@@ -290,7 +297,7 @@ function renderTournaments(){
     f.starts_at.value=t.starts_at?new Date(new Date(t.starts_at).getTime()-new Date(t.starts_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
     if(tournamentLogoFile)tournamentLogoFile.value="";
     previewImage(tournamentLogoPreview,t.logo_url,t.short_name||t.name||"A");
-    saveTournamentBtn.textContent="Зберегти зміни";cancelTournamentEdit.classList.remove("hidden");tournamentFormTitle.textContent="РЕДАГУВАТИ ТУРНІР";tournamentForm.scrollIntoView({behavior:"smooth",block:"start"});
+    setButtonContent(saveTournamentBtn,"save","Зберегти зміни");cancelTournamentEdit.classList.remove("hidden");tournamentFormTitle.textContent="РЕДАГУВАТИ ТУРНІР";tournamentForm.scrollIntoView({behavior:"smooth",block:"start"});
   }));
   tournamentList.querySelectorAll("[data-toggle-registration]").forEach(btn=>btn.addEventListener("click",async()=>{
     const t=tournaments.find(x=>x.id===Number(btn.dataset.toggleRegistration));if(!t)return;
@@ -335,6 +342,7 @@ async function loadApplications(){
   stats.innerHTML=`<div><b>${registrations.length}</b><span>всього</span></div><div><b>${pending}</b><span>очікують</span></div><div><b>${approved}</b><span>підтверджені</span></div>`;
   emptyState.classList.toggle("hidden",registrations.length!==0);
   applications.innerHTML=registrations.map(renderApplication).join("");
+  window.refreshIcons?.();
   applications.querySelectorAll("[data-app-action]").forEach(btn=>btn.addEventListener("click",handleApplicationAction));
   refreshApprovedTeams();renderTournaments();
 }
@@ -345,7 +353,7 @@ function renderApplication(item){
     <div class="application-head"><div><small>${esc(item.tournaments?.name||"Турнір")}</small><h3>${esc(item.team_name)} <span class="muted">[${esc(item.team_tag)}]</span></h3><div class="meta">#${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</div></div><span class="pill">${esc(item.status)}</span></div>
     <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick)}</div><div><span>Email:</span> ${esc(item.captain_email)}</div><div><span>Контакт:</span> ${esc(item.contact)}</div><div><span>Профіль:</span> ${profile?'<a href="'+esc(profile)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
     <div class="players"><b>Склад:</b> ${players.map(esc).join(", ")}${item.substitute?" · Заміна: "+esc(item.substitute):""}${item.note?"<br><b>Коментар:</b> "+esc(item.note):""}</div>
-    <div class="card-actions"><button class="btn approve" data-app-action="approved" data-id="${item.id}">Підтвердити</button><button class="btn reject" data-app-action="rejected" data-id="${item.id}">Відхилити</button><button class="btn" data-app-action="pending" data-id="${item.id}">Pending</button><button class="btn" data-app-action="delete" data-id="${item.id}">Видалити</button></div>
+    <div class="card-actions"><button class="btn approve" data-app-action="approved" data-id="${item.id}"><i data-lucide="check"></i><span>Підтвердити</span></button><button class="btn reject" data-app-action="rejected" data-id="${item.id}"><i data-lucide="x-circle"></i><span>Відхилити</span></button><button class="btn" data-app-action="pending" data-id="${item.id}"><i data-lucide="clock-3"></i><span>Pending</span></button><button class="btn" data-app-action="delete" data-id="${item.id}"><i data-lucide="trash-2"></i><span>Видалити</span></button></div>
   </article>`;
 }
 async function handleApplicationAction(e){
@@ -365,7 +373,8 @@ async function loadUsers(){
   usersList.innerHTML='<div class="empty-state">Завантаження...</div>';
   try{
     const data=await usersRequest();usersCount.textContent=String(data.users.length);
-    usersList.innerHTML=data.users.length?data.users.map(u=>`<div class="user-row"><div class="user-email"><b>${esc(u.email||"Без email")}</b><small>${new Date(u.created_at).toLocaleString("uk-UA")}${u.is_self?" · це ви":""}</small></div><span class="role-badge ${u.is_admin?"admin":""}">${u.is_admin?"ADMIN":"USER"}</span><button class="btn ${u.is_admin?"reject":"approve"} user-action" data-user-id="${u.id}" data-make-admin="${u.is_admin?"false":"true"}">${u.is_admin?"Забрати адмінку":"Дати адмінку"}</button></div>`).join(""):'<div class="empty-state">Акаунтів немає.</div>';
+    usersList.innerHTML=data.users.length?data.users.map(u=>`<div class="user-row"><div class="user-email"><b>${esc(u.email||"Без email")}</b><small>${new Date(u.created_at).toLocaleString("uk-UA")}${u.is_self?" · це ви":""}</small></div><span class="role-badge ${u.is_admin?"admin":""}">${u.is_admin?"ADMIN":"USER"}</span><button class="btn ${u.is_admin?"reject":"approve"} user-action" data-user-id="${u.id}" data-make-admin="${u.is_admin?"false":"true"}"><i data-lucide="${u.is_admin?"user-x":"user-check"}"></i><span>${u.is_admin?"Забрати адмінку":"Дати адмінку"}</span></button></div>`).join(""):'<div class="empty-state">Акаунтів немає.</div>';
+    window.refreshIcons?.();
     usersList.querySelectorAll("[data-user-id]").forEach(btn=>btn.addEventListener("click",async()=>{btn.disabled=true;try{await usersRequest("POST",{user_id:btn.dataset.userId,make_admin:btn.dataset.makeAdmin==="true"});await loadUsers()}catch(e){alert(e.code==="last_admin"?"Не можна забрати права в останнього адміністратора.":"Не вдалося змінити права.");btn.disabled=false}}));
   }catch(e){console.error(e);usersList.innerHTML='<div class="empty-state error">Не вдалося завантажити користувачів.</div>'}
 }
@@ -618,12 +627,13 @@ async function loadMatches(){
             <option value="live" ${m.status==="live"?"selected":""}>LIVE</option>
             <option value="finished" ${m.status==="finished"?"selected":""}>Finished</option>
           </select>
-          <button class="btn approve" data-save-match type="button">Зберегти</button>
-          <button class="btn reject" data-delete-match="${m.id}" type="button">Видалити</button>
+          <button class="btn approve" data-save-match type="button"><i data-lucide="save"></i><span>Зберегти</span></button>
+          <button class="btn reject" data-delete-match="${m.id}" type="button"><i data-lucide="trash-2"></i><span>Видалити</span></button>
         </div>
       </div>`).join("")
     : '<div class="empty-state">Матчів ще немає.</div>';
 
+  window.refreshIcons?.();
   adminMatchesList.querySelectorAll("[data-save-match]").forEach(btn=>{
     btn.addEventListener("click",()=>saveBracketMatch(btn.closest("[data-match-id]")));
   });
@@ -695,7 +705,7 @@ function updateAuthMode(mode){
   const authBtn=$("#authBtn");
   const password=$("#password");
 
-  if(authBtn)authBtn.textContent=mode==="register"?"Створити акаунт":"Увійти";
+  if(authBtn)setButtonContent(authBtn,mode==="register"?"user-plus":"log-in",mode==="register"?"Створити акаунт":"Увійти");
   if(password)password.autocomplete=mode==="register"?"new-password":"current-password";
 
   loginMessage.textContent="";
