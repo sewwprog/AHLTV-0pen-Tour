@@ -1,46 +1,46 @@
 <!doctype html>
 <html lang="uk">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171513"><title>AHLTV — Подати заявку</title><link rel="stylesheet" href="styles.css?v=20260928-11"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171513"><title>AHLTV — Подати заявку</title><link rel="stylesheet" href="styles.css?v=20260928-12"></head>
 <body>
 <header class="site-header"><div class="shell header-inner">
   <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
-  <nav class="main-nav"><a href="./">Турніри</a><a class="active" href="apply.html">Подати заявку</a></nav>
-  <a class="account-btn desktop-only" href="admin.html">Увійти</a>
-  <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
+  <nav class="main-nav"><a href="./"><i data-lucide="trophy"></i><span>Турніри</span></a><a class="active" href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a></nav>
+  <a class="account-btn desktop-only" href="admin.html"><i data-lucide="log-in"></i><span>Увійти</span></a>
+  <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><i data-lucide="menu"></i></button>
 </div></header>
 <div class="drawer-backdrop" id="drawerBackdrop"></div>
 <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
-  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose">×</button></div>
-  <nav><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Увійти</a></nav>
+  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose" aria-label="Закрити меню"><i data-lucide="x"></i></button></div>
+  <nav><a href="./"><i data-lucide="trophy"></i><span>Турніри</span><i data-lucide="chevron-right"></i></a><a href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span><i data-lucide="chevron-right"></i></a><a href="admin.html"><i data-lucide="log-in"></i><span>Увійти</span><i data-lucide="chevron-right"></i></a></nav>
 </aside>
 <main class="shell apply-page">
   <section id="authGate" class="panel auth-gate hidden">
-    <div class="auth-gate-icon">A</div>
+    <div class="auth-gate-icon"><i data-lucide="lock-keyhole"></i></div>
     <div>
       <h2>Потрібен акаунт</h2>
       <p>Щоб зареєструвати команду на турнір, спочатку увійди або створи акаунт.</p>
     </div>
-    <a class="primary-btn" href="admin.html?next=apply.html">Увійти / Зареєструватися</a>
+    <a class="primary-btn" href="admin.html?next=apply.html"><i data-lucide="log-in"></i><span>Увійти / Зареєструватися</span></a>
   </section>
 
   <div id="applicationContent" class="hidden">
   <div class="apply-account-bar">
     <span>Ви увійшли як <b id="applyUserEmail"></b></span>
-    <a href="admin.html">Акаунт</a>
+    <a href="admin.html"><i data-lucide="circle-user-round"></i><span>Акаунт</span></a>
   </div>
 
   <div class="page-title compact"><div><small>TEAM APPLICATION</small><h1>Подати заявку</h1><p>Обери турнір з відкритою реєстрацією та заповни склад.</p></div></div>
-  <section class="panel apply-panel"><div class="panel-head"><span>ВИБІР ТУРНІРУ</span><strong id="selectedTournamentStatus"></strong></div><div class="tournament-select-wrap"><label>Турнір<select id="tournamentSelect" required><option value="">Завантаження...</option></select></label><div id="tournamentHint" class="tournament-hint"></div></div></section>
-  <section class="panel"><div class="panel-head"><span>ЗАЯВКА КОМАНДИ</span></div>
+  <section class="panel apply-panel"><div class="panel-head"><span><i data-lucide="trophy"></i> ВИБІР ТУРНІРУ</span><strong id="selectedTournamentStatus"></strong></div><div class="tournament-select-wrap"><label>Турнір<select id="tournamentSelect" required><option value="">Завантаження...</option></select></label><div id="tournamentHint" class="tournament-hint"></div></div></section>
+  <section class="panel"><div class="panel-head"><span><i data-lucide="clipboard-list"></i> ЗАЯВКА КОМАНДИ</span></div>
     <form id="teamForm" class="team-form">
       <fieldset><legend>Команда</legend><div class="form-grid"><label>Назва команди<input name="team_name" maxlength="40" required></label><label>Тег<input name="team_tag" maxlength="8" required></label><label>Капітан / нік<input name="captain_nick" maxlength="32" required></label><label>Email капітана<input name="captain_email" type="email" required></label><label>Telegram або Discord<input name="contact" maxlength="80" required></label><label>FACEIT / профіль<input name="captain_profile" type="url" placeholder="https://..."></label></div></fieldset>
       <fieldset><legend>Основний склад</legend><div class="form-grid"><label>Гравець 1<input name="player_1" required maxlength="32"></label><label>Гравець 2<input name="player_2" required maxlength="32"></label><label>Гравець 3<input name="player_3" required maxlength="32"></label><label>Гравець 4<input name="player_4" required maxlength="32"></label><label>Гравець 5<input name="player_5" required maxlength="32"></label><label>Заміна <span class="muted">(необов'язково)</span><input name="substitute" maxlength="32"></label></div></fieldset>
       <fieldset><legend>Додатково</legend><label>Коментар<textarea name="note" maxlength="500" rows="4"></textarea></label></fieldset>
       <label class="agreement"><input type="checkbox" required><span>Підтверджую правильність даних і згоду з правилами турніру.</span></label>
-      <div class="submit-line"><button class="primary-btn" type="submit" id="submitBtn">Відправити заявку</button><p id="formMessage"></p></div>
+      <div class="submit-line"><button class="primary-btn" type="submit" id="submitBtn"><i data-lucide="send-horizontal"></i><span>Відправити заявку</span></button><p id="formMessage"></p></div>
     </form>
   </section>
   </div>
 </main>
-<script type="module" src="ui.js?v=20260928-8"></script><script type="module" src="apply.js?v=20260928-8"></script>
+<script type="module" src="ui.js?v=20260928-12"></script><script type="module" src="apply.js?v=20260928-12"></script>
 </body></html>
