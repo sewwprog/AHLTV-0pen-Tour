@@ -757,3 +757,186 @@ button{touch-action:manipulation}
   .admin-match-actions{justify-content:flex-start}
   .admin-match-actions .btn{flex:1 1 auto}
 }
+
+/* DESKTOP REFINEMENT */
+@media (min-width: 701px){
+  .mobile-drawer,
+  .drawer-backdrop,
+  .menu-btn{
+    display:none!important;
+  }
+}
+
+@media (min-width: 1100px){
+  .shell{
+    width:min(1380px,calc(100% - 64px));
+  }
+
+  .header-inner{
+    height:68px;
+  }
+
+  .brand{
+    min-width:210px;
+    padding-right:28px;
+  }
+
+  .brand-mark{
+    width:40px;
+    height:40px;
+  }
+
+  .brand-copy strong{
+    font-size:22px;
+  }
+
+  .main-nav a{
+    min-width:124px;
+    justify-content:center;
+    padding:0 18px;
+  }
+
+  .account-btn{
+    padding:9px 17px;
+  }
+
+  .home-page{
+    padding-top:28px;
+  }
+
+  .page-title{
+    min-height:124px;
+    padding:26px 30px;
+    margin-bottom:20px;
+    border-radius:10px;
+  }
+
+  .page-title h1{
+    font-size:36px;
+    letter-spacing:-1.5px;
+  }
+
+  .page-title p{
+    font-size:13px;
+  }
+
+  .page-title>.primary-btn{
+    min-width:160px;
+    min-height:42px;
+  }
+
+  .tournaments-list{
+    gap:18px;
+  }
+
+  .tournament-card{
+    border-radius:9px;
+  }
+
+  .tournament-card-head{
+    grid-template-columns:78px minmax(0,1fr) auto;
+    gap:20px;
+    padding:22px 26px 20px;
+  }
+
+  .tournament-icon{
+    width:72px;
+    height:72px;
+    font-size:35px;
+  }
+
+  .tournament-title h2{
+    font-size:25px;
+    margin:4px 0 10px;
+  }
+
+  .tournament-title small{
+    font-size:10px;
+  }
+
+  .tournament-meta span{
+    padding:5px 8px;
+    font-size:10px;
+  }
+
+  .status-badge{
+    padding:7px 10px;
+    font-size:10px;
+  }
+
+  .tournament-description{
+    padding:0 26px 18px 124px;
+    font-size:12px;
+  }
+
+  .tournament-sections{
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  }
+
+  .tournament-sections>section{
+    min-height:110px;
+    padding:18px 26px;
+  }
+
+  .section-mini-head{
+    font-size:12px;
+  }
+
+  .team-chips>span{
+    padding:7px 9px;
+    font-size:11px;
+  }
+
+  .mini-matches>div{
+    grid-template-columns:100px minmax(0,1fr) auto;
+    padding:8px 0;
+    font-size:11px;
+  }
+
+  .tournament-card-footer{
+    min-height:56px;
+    padding:10px 26px;
+    font-size:11px;
+  }
+
+  .tournament-card-footer .primary-btn{
+    min-width:140px;
+  }
+
+  .apply-page{
+    max-width:1120px;
+  }
+
+  .admin-shell{
+    max-width:1260px;
+  }
+
+  .admin-top{
+    padding:20px 22px;
+  }
+
+  .admin-top h1{
+    font-size:25px;
+  }
+
+  .admin-tabs button{
+    min-width:145px;
+    padding:13px 18px;
+  }
+
+  .team-form{
+    padding:18px 22px 22px;
+  }
+
+  .form-grid{
+    gap:14px 18px;
+  }
+
+  .admin-tournament-main{
+    padding:16px 18px;
+  }
+
+  .admin-tournament-controls{
+    padding:12px 18px;
+  }
+}
