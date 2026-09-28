@@ -1,12 +1,12 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./supabase-config.js";
+const SUPABASE_URL = "https://hfxzdifqcjbslmxffvlf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi";
 
 const form = document.querySelector("#teamForm");
 const message = document.querySelector("#formMessage");
 const submitBtn = document.querySelector("#submitBtn");
 
-const configured = !SUPABASE_URL.includes("REPLACE_") && !SUPABASE_PUBLISHABLE_KEY.includes("REPLACE_");
-const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 function setMessage(text, type="") {
   message.textContent = text;
@@ -15,10 +15,6 @@ function setMessage(text, type="") {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!configured) {
-    setMessage("База ще не підключена. Адміністратор завершує налаштування Supabase.", "error");
-    return;
-  }
 
   const data = Object.fromEntries(new FormData(form).entries());
   const payload = {
