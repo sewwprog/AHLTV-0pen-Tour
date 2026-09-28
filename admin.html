@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#17212b">
-  <title>AHLTV Open Tour — Вхід</title>
+  <title>AHLTV Open Tour — Керування</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,24 +14,14 @@
         <span class="brand-mark">A</span>
         <span class="brand-copy"><strong>AHLTV</strong><small>OPEN TOUR</small></span>
       </a>
-      <nav class="main-nav">
-        <a href="./">Головна</a>
-        <a href="./#register">Реєстрація</a>
-        <a href="./#teams">Команди</a>
-      </nav>
-      <a class="account-btn" href="./">На сайт</a>
+      <nav class="main-nav"><a href="./">На сайт</a></nav>
+      <a class="account-btn" href="./">Головна</a>
     </div>
   </header>
 
-  <div class="subbar">
-    <div class="shell subbar-inner">
-      <div class="breadcrumb">AHLTV / Open Tour / <b>Account</b></div>
-    </div>
-  </div>
-
   <main class="shell admin-shell">
     <section id="loginView" class="panel login-panel">
-      <div class="panel-head light-head"><span>ВХІД</span><small>AHLTV ACCOUNT</small></div>
+      <div class="panel-head"><span>ВХІД</span><strong>AHLTV ACCOUNT</strong></div>
       <div class="login-body">
         <div class="login-logo">
           <span class="brand-mark large">A</span>
@@ -48,19 +38,81 @@
     </section>
 
     <section id="dashboardView" class="dashboard hidden">
-      <section class="panel">
-        <div class="panel-head light-head dashboard-head">
-          <span>ЗАЯВКИ КОМАНД</span>
-          <div class="admin-actions">
-            <span id="adminEmail"></span>
-            <button id="logoutBtn" class="secondary-btn">Вийти</button>
-          </div>
+      <div class="admin-top panel">
+        <div>
+          <small>ADMIN CONTROL</small>
+          <h1>Open Tour</h1>
         </div>
-        <div id="stats" class="admin-stats"></div>
+        <div class="admin-account">
+          <span id="adminEmail"></span>
+          <button id="logoutBtn" class="secondary-btn">Вийти</button>
+        </div>
+      </div>
+
+      <nav class="admin-tabs" aria-label="Admin navigation">
+        <button class="active" data-tab="applicationsTab">Заявки <span id="pendingBadge"></span></button>
+        <button data-tab="usersTab">Користувачі</button>
+        <button data-tab="matchesTab">Матчі</button>
+      </nav>
+
+      <section id="applicationsTab" class="admin-tab">
+        <section class="panel">
+          <div class="panel-head"><span>ЗАЯВКИ КОМАНД</span></div>
+          <div id="stats" class="admin-stats"></div>
+        </section>
+        <div id="applications" class="applications"></div>
+        <p id="emptyState" class="panel empty hidden">Заявок поки немає.</p>
       </section>
 
-      <div id="applications" class="applications"></div>
-      <p id="emptyState" class="panel empty hidden">Заявок поки немає.</p>
+      <section id="usersTab" class="admin-tab hidden">
+        <section class="panel">
+          <div class="panel-head">
+            <span>ЗАРЕЄСТРОВАНІ АКАУНТИ</span>
+            <strong id="usersCount"></strong>
+          </div>
+          <div id="usersList" class="users-list">
+            <div class="empty-state">Завантаження...</div>
+          </div>
+        </section>
+      </section>
+
+      <section id="matchesTab" class="admin-tab hidden">
+        <section class="panel">
+          <div class="panel-head"><span>ДОДАТИ МАТЧ</span></div>
+          <form id="matchForm" class="team-form compact-form">
+            <div class="form-grid">
+              <label>Команда 1<input name="team_one" list="approvedTeams" required placeholder="Team One"></label>
+              <label>Команда 2<input name="team_two" list="approvedTeams" required placeholder="Team Two"></label>
+              <label>Дата та час<input name="starts_at" type="datetime-local"></label>
+              <label>Стадія<input name="stage" maxlength="80" placeholder="Round 1 / Quarterfinal"></label>
+              <label>Формат
+                <select name="best_of">
+                  <option value="1">BO1</option>
+                  <option value="3" selected>BO3</option>
+                  <option value="5">BO5</option>
+                </select>
+              </label>
+              <label>Статус
+                <select name="status">
+                  <option value="scheduled" selected>Scheduled</option>
+                  <option value="live">Live</option>
+                  <option value="finished">Finished</option>
+                </select>
+              </label>
+            </div>
+            <button class="primary-btn" type="submit">Додати матч</button>
+            <p id="matchMessage"></p>
+          </form>
+          <datalist id="approvedTeams"></datalist>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><span>МАТЧІ НА САЙТІ</span><strong id="adminMatchesCount"></strong></div>
+          <div id="adminMatchesList" class="admin-matches-list">
+            <div class="empty-state">Матчів ще немає.</div>
+          </div>
+        </section>
+      </section>
     </section>
   </main>
 
