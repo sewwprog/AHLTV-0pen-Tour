@@ -308,8 +308,8 @@ function renderTournaments(){
     await supabase.from("tournaments").update({is_visible:!t.is_visible}).eq("id",t.id);await loadTournaments();
   }));
   tournamentList.querySelectorAll("[data-delete-tournament]").forEach(btn=>btn.addEventListener("click",async()=>{
-    const t=tournaments.find(x=>x.id===Number(btn.dataset.deleteTournament));if(!t||!confirm(`Видалити турнір "${t.name}" разом із його заявками та матчами?`))return;
-    await supabase.from("tournaments").delete().eq("id",t.id);await Promise.all([loadTournaments(),loadApplications(),loadMatches()]);
+    const t=tournaments.find(x=>x.id===Number(btn.dataset.deleteTournament));if(!t||!confirm(`Видалити турнір "${t.name}" разом із його заявками та сіткою?`))return;
+    await supabase.from("tournaments").delete().eq("id",t.id);await Promise.all([loadTournaments(),loadApplications()]);await loadBracketImage();
   }));
 }
 
