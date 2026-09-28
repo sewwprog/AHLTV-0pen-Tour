@@ -1,154 +1,38 @@
 <!doctype html>
 <html lang="uk">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#17212b">
-  <title>AHLTV Open Tour</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17212b"><title>AHLTV Open Tour</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="shell header-inner">
-      <a class="brand" href="./">
-        <span class="brand-mark">A</span>
-        <span class="brand-copy"><strong>AHLTV</strong><small>OPEN TOUR</small></span>
-      </a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
+    <nav class="main-nav"><a class="active" href="./">Турніри</a><a href="apply.html">Подати заявку</a></nav>
+    <a class="account-btn desktop-only" href="admin.html">Увійти</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
 
-      <nav class="main-nav">
-        <a class="active" href="#overview">Турнір</a>
-        <a href="#teams">Команди</a>
-        <a href="#matches">Матчі</a>
-        <a href="#register">Реєстрація</a>
-      </nav>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a><button id="drawerClose">×</button></div>
+  <nav><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Увійти</a></nav>
+</aside>
 
-      <a class="account-btn" href="admin.html">Увійти</a>
-    </div>
-  </header>
+<main class="shell home-page">
+  <section class="page-title">
+    <div><small>AHLTV TOURNAMENT PLATFORM</small><h1>Турніри</h1><p>Тут показуються тільки турніри, які створені адміністрацією.</p></div>
+    <a class="primary-btn" href="apply.html">Подати заявку</a>
+  </section>
 
-  <main class="shell tournament-page" id="overview">
-    <section class="tournament-head panel">
-      <div class="event-logo">A</div>
-      <div class="event-main">
-        <div class="event-kicker">AHLTV TOURNAMENT SERIES</div>
-        <h1>AHLTV Open Tour 2026</h1>
-        <div class="event-meta">
-          <span>Counter-Strike 2</span>
-          <span>Online</span>
-          <span>16 команд</span>
-          <span>BO3</span>
-        </div>
-      </div>
-      <div class="event-status">
-        <small>РЕЄСТРАЦІЯ</small>
-        <b>ВІДКРИТА</b>
-      </div>
-    </section>
+  <div id="tournamentsList" class="tournaments-list">
+    <section class="panel loading-panel">Завантаження турнірів...</section>
+  </div>
+</main>
 
-    <div class="content-grid">
-      <section class="main-column">
-        <section class="panel" id="teams">
-          <div class="panel-head">
-            <span>ПІДТВЕРДЖЕНІ КОМАНДИ</span>
-            <strong id="teamsCount">0 / 16</strong>
-          </div>
-          <div id="teamsList" class="teams-list">
-            <div class="empty-state">Підтверджених команд поки немає.</div>
-          </div>
-        </section>
-
-        <section class="panel hidden" id="matches">
-          <div class="panel-head">
-            <span>МАТЧІ</span>
-            <strong id="matchesCount"></strong>
-          </div>
-          <div id="matchesList" class="matches-list"></div>
-        </section>
-
-        <section class="panel" id="register">
-          <div class="panel-head">
-            <span>РЕЄСТРАЦІЯ КОМАНДИ</span>
-            <strong>TEAM APPLICATION</strong>
-          </div>
-
-          <div class="section-copy">
-            <h2>Подати заявку</h2>
-            <p>Заповни реальні дані команди. Після відправлення заявка потрапить адміністрації AHLTV.</p>
-          </div>
-
-          <form id="teamForm" class="team-form">
-            <fieldset>
-              <legend>Команда</legend>
-              <div class="form-grid">
-                <label>Назва команди<input name="team_name" maxlength="40" required placeholder="Core Team"></label>
-                <label>Тег<input name="team_tag" maxlength="8" required placeholder="CORE"></label>
-                <label>Капітан / нік<input name="captain_nick" maxlength="32" required placeholder="nickname"></label>
-                <label>Email капітана<input name="captain_email" type="email" required placeholder="team@email.com"></label>
-                <label>Telegram або Discord<input name="contact" maxlength="80" required placeholder="@username"></label>
-                <label>FACEIT / профіль<input name="captain_profile" type="url" placeholder="https://..."></label>
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>Основний склад</legend>
-              <div class="form-grid">
-                <label>Гравець 1<input name="player_1" required maxlength="32" placeholder="nickname"></label>
-                <label>Гравець 2<input name="player_2" required maxlength="32" placeholder="nickname"></label>
-                <label>Гравець 3<input name="player_3" required maxlength="32" placeholder="nickname"></label>
-                <label>Гравець 4<input name="player_4" required maxlength="32" placeholder="nickname"></label>
-                <label>Гравець 5<input name="player_5" required maxlength="32" placeholder="nickname"></label>
-                <label>Заміна <span class="muted">(необов'язково)</span><input name="substitute" maxlength="32" placeholder="nickname"></label>
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>Додатково</legend>
-              <label>Коментар<textarea name="note" maxlength="500" rows="4" placeholder="Додаткова інформація..."></textarea></label>
-            </fieldset>
-
-            <label class="agreement">
-              <input type="checkbox" required>
-              <span>Підтверджую правильність даних і згоду з правилами турніру.</span>
-            </label>
-
-            <div class="submit-line">
-              <button class="primary-btn" type="submit" id="submitBtn">Відправити заявку</button>
-              <p id="formMessage" aria-live="polite"></p>
-            </div>
-          </form>
-        </section>
-      </section>
-
-      <aside class="sidebar">
-        <section class="panel">
-          <div class="panel-head"><span>ІНФОРМАЦІЯ</span></div>
-          <div class="details-list">
-            <div><span>Гра</span><b>CS2</b></div>
-            <div><span>Команд</span><b>16</b></div>
-            <div><span>Формат</span><b>BO3</b></div>
-            <div><span>Проведення</span><b>Online</b></div>
-            <div><span>Реєстрація</span><b class="green">Відкрита</b></div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head"><span>СТАТУС</span></div>
-          <div class="status-card">
-            <span class="status-dot"></span>
-            <div><b>Registration open</b><small>Заявки приймаються</small></div>
-          </div>
-        </section>
-      </aside>
-    </div>
-  </main>
-
-  <footer class="site-footer">
-    <div class="shell footer-inner">
-      <span>© 2026 AHLTV Open Tour</span>
-      <span>AHLTV Tournament Platform</span>
-    </div>
-  </footer>
-
-  <script type="module" src="app.js"></script>
-</body>
-</html>
+<footer class="site-footer"><div class="shell footer-inner"><span>© 2026 AHLTV</span><span>Tournament Platform</span></div></footer>
+<script type="module" src="ui.js"></script>
+<script type="module" src="app.js"></script>
+</body></html>
