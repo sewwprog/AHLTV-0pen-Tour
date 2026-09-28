@@ -1,151 +1,29 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-
-const SUPABASE_URL = "https://hfxzdifqcjbslmxffvlf.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-const form = document.querySelector("#teamForm");
-const message = document.querySelector("#formMessage");
-const submitBtn = document.querySelector("#submitBtn");
-const teamsList = document.querySelector("#teamsList");
-const teamsCount = document.querySelector("#teamsCount");
-const matchesSection = document.querySelector("#matches");
-const matchesList = document.querySelector("#matchesList");
-const matchesCount = document.querySelector("#matchesCount");
-
-function esc(value = "") {
-  return String(value).replace(/[&<>"']/g, (c) => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
-
-function setMessage(text, type = "") {
-  message.textContent = text;
-  message.className = type;
-}
-
-function formatDate(value) {
-  if (!value) return "Дата уточнюється";
-  return new Date(value).toLocaleString("uk-UA", {
-    day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"
-  });
-}
-
-async function loadTeams() {
-  const { data, error } = await supabase.rpc("get_public_teams");
-
-  if (error) {
-    console.error(error);
-    teamsList.innerHTML = '<div class="empty-state">Не вдалося завантажити команди.</div>';
-    return;
-  }
-
-  teamsCount.textContent = `${data.length} / 16`;
-
-  if (!data.length) {
-    teamsList.innerHTML = '<div class="empty-state">Підтверджених команд поки немає.</div>';
-    return;
-  }
-
-  teamsList.innerHTML = data.map((team) => `
-    <div class="team-row">
-      <div class="team-logo-mini">${esc(team.team_tag.slice(0,1).toUpperCase())}</div>
-      <div>
-        <b>${esc(team.team_name)}</b>
-        <small>[${esc(team.team_tag)}]</small>
-      </div>
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.4";
+const supabase=createClient("https://hfxzdifqcjbslmxffvlf.supabase.co","sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi");
+const root=document.querySelector("#tournamentsList");
+const esc=(v="")=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const statusLabel=s=>({upcoming:"UPCOMING",registration:"REGISTRATION",live:"LIVE",finished:"FINISHED"}[s]||s.toUpperCase());
+const dateLabel=v=>v?new Date(v).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"Дата не вказана";
+const [{data:tournaments,error:tErr},{data:teams},{data:matches}]=await Promise.all([
+  supabase.from("tournaments").select("*").eq("is_visible",true).order("created_at",{ascending:false}),
+  supabase.from("team_registrations").select("id,tournament_id,team_name,team_tag,status").eq("status","approved").order("team_name"),
+  supabase.from("tournament_matches").select("*").eq("is_visible",true).order("starts_at",{ascending:true,nullsFirst:false})
+]);
+if(tErr){root.innerHTML='<section class="panel loading-panel error">Не вдалося завантажити турніри.</section>';throw tErr}
+if(!tournaments.length){root.innerHTML='<section class="panel loading-panel">Адміністратор ще не додав жодного турніру.</section>'}
+else root.innerHTML=tournaments.map(t=>{
+  const tt=(teams||[]).filter(x=>x.tournament_id===t.id),mm=(matches||[]).filter(x=>x.tournament_id===t.id);
+  return `<article class="panel tournament-card">
+    <div class="tournament-card-head">
+      <div class="tournament-icon">${esc((t.short_name||t.name).slice(0,1).toUpperCase())}</div>
+      <div class="tournament-title"><small>${esc(t.game)} · ${esc(t.format)}</small><h2>${esc(t.name)}</h2><div class="tournament-meta"><span>${esc(t.game)}</span><span>${esc(t.format)}</span><span>${tt.length} / ${t.max_teams} команд</span><span>${dateLabel(t.starts_at)}</span></div></div>
+      <span class="status-badge status-${esc(t.status)}">${statusLabel(t.status)}</span>
     </div>
-  `).join("");
-}
-
-async function loadMatches() {
-  const { data, error } = await supabase
-    .from("tournament_matches")
-    .select("*")
-    .eq("is_visible", true)
-    .order("starts_at", { ascending: true, nullsFirst: false })
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    console.error(error);
-    matchesSection.classList.add("hidden");
-    return;
-  }
-
-  if (!data.length) {
-    matchesSection.classList.add("hidden");
-    return;
-  }
-
-  matchesSection.classList.remove("hidden");
-  matchesCount.textContent = String(data.length);
-
-  matchesList.innerHTML = data.map((match) => {
-    const statusLabel =
-      match.status === "live" ? "LIVE" :
-      match.status === "finished" ? "FINISHED" : `BO${match.best_of}`;
-
-    const statusClass =
-      match.status === "live" ? "match-live" :
-      match.status === "finished" ? "match-finished" : "";
-
-    const scoreOne = match.team_one_score ?? "–";
-    const scoreTwo = match.team_two_score ?? "–";
-
-    return `
-      <article class="match-row-public">
-        <div class="match-when">
-          <span>${formatDate(match.starts_at)}</span>
-          <small>${esc(match.stage || "")}</small>
-        </div>
-        <div class="match-teams">
-          <div class="match-team"><b>${esc(match.team_one)}</b><strong>${scoreOne}</strong></div>
-          <div class="match-team"><b>${esc(match.team_two)}</b><strong>${scoreTwo}</strong></div>
-        </div>
-        <div class="match-info">
-          <b class="${statusClass}">${statusLabel}</b>
-          <small>BO${match.best_of}</small>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const data = Object.fromEntries(new FormData(form).entries());
-  const payload = {
-    team_name: data.team_name.trim(),
-    team_tag: data.team_tag.trim().toUpperCase(),
-    captain_nick: data.captain_nick.trim(),
-    captain_email: data.captain_email.trim().toLowerCase(),
-    contact: data.contact.trim(),
-    captain_profile: data.captain_profile.trim() || null,
-    players: [data.player_1,data.player_2,data.player_3,data.player_4,data.player_5].map(v => v.trim()),
-    substitute: data.substitute.trim() || null,
-    note: data.note.trim() || null
-  };
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Відправляємо...";
-  setMessage("");
-
-  const { error } = await supabase.from("team_registrations").insert(payload);
-
-  submitBtn.disabled = false;
-  submitBtn.textContent = "Відправити заявку";
-
-  if (error) {
-    console.error(error);
-    if (error.code === "23505") setMessage("Команда з такою назвою або тегом уже зареєстрована.", "error");
-    else setMessage("Не вдалося відправити заявку. Спробуй ще раз.", "error");
-    return;
-  }
-
-  form.reset();
-  setMessage("Заявку прийнято. Адміністрація AHLTV перевірить її.", "success");
-});
-
-await Promise.all([loadTeams(), loadMatches()]);
+    ${t.description?`<p class="tournament-description">${esc(t.description)}</p>`:""}
+    <div class="tournament-sections">
+      <section><div class="section-mini-head"><b>Команди</b><span>${tt.length} / ${t.max_teams}</span></div><div class="team-chips">${tt.length?tt.map(x=>`<span><b>${esc(x.team_tag)}</b> ${esc(x.team_name)}</span>`).join(""):'<em>Підтверджених команд ще немає.</em>'}</div></section>
+      ${mm.length?`<section><div class="section-mini-head"><b>Матчі</b><span>${mm.length}</span></div><div class="mini-matches">${mm.map(m=>`<div><span>${m.starts_at?new Date(m.starts_at).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"TBA"}</span><b>${esc(m.team_one)} <i>vs</i> ${esc(m.team_two)}</b><strong class="${m.status==="live"?"live-text":""}">${m.status==="live"?"LIVE":"BO"+m.best_of}</strong></div>`).join("")}</div></section>`:""}
+    </div>
+    <div class="tournament-card-footer"><span>${t.registration_open?"Реєстрація відкрита":"Реєстрація закрита"}</span>${t.registration_open&&["registration","live"].includes(t.status)?`<a class="primary-btn" href="apply.html?tournament=${t.id}">Подати заявку</a>`:""}</div>
+  </article>`;
+}).join("");
