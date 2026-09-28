@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090a0c">
+  <title>AHLTV Open Tour — Реєстрація</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="./">AHLTV <span>OPEN TOUR</span></a>
+    <nav>
+      <a href="#about">Про турнір</a>
+      <a href="#register">Реєстрація</a>
+      <a class="admin-link" href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="about">
+      <div class="eyebrow">AHLTV TOURNAMENT SERIES</div>
+      <h1>AHLTV<br><span>OPEN TOUR</span></h1>
+      <p class="hero-copy">Онлайн-турнір з Counter-Strike 2. Збирай склад, подавай заявку та чекай підтвердження від адміністрації AHLTV.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#register">Зареєструвати команду</a>
+        <span class="status-dot">Реєстрація відкрита</span>
+      </div>
+      <div class="facts">
+        <article><b>16</b><span>команд</span></article>
+        <article><b>BO3</b><span>основні матчі</span></article>
+        <article><b>CS2</b><span>дисципліна</span></article>
+      </div>
+    </section>
+
+    <section class="registration" id="register">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">TEAM APPLICATION</div>
+          <h2>Реєстрація команди</h2>
+        </div>
+        <p>Заповни форму один раз. Після відправлення заявка з'явиться в адмін-панелі.</p>
+      </div>
+
+      <form id="teamForm" class="card">
+        <div class="grid two">
+          <label>Назва команди<input name="team_name" maxlength="40" required placeholder="Напр. Core Team"></label>
+          <label>Тег<input name="team_tag" maxlength="8" required placeholder="CORE"></label>
+          <label>Капітан / нік<input name="captain_nick" maxlength="32" required placeholder="nickname"></label>
+          <label>Email капітана<input name="captain_email" type="email" required placeholder="team@email.com"></label>
+          <label>Telegram або Discord<input name="contact" maxlength="80" required placeholder="@username або username"></label>
+          <label>FACEIT / профіль капітана<input name="captain_profile" type="url" placeholder="https://..."></label>
+        </div>
+
+        <div class="players-block">
+          <div class="row-title"><h3>Основний склад</h3><span>5 гравців</span></div>
+          <div class="grid two">
+            <label>Гравець 1<input name="player_1" required maxlength="32" placeholder="nickname"></label>
+            <label>Гравець 2<input name="player_2" required maxlength="32" placeholder="nickname"></label>
+            <label>Гравець 3<input name="player_3" required maxlength="32" placeholder="nickname"></label>
+            <label>Гравець 4<input name="player_4" required maxlength="32" placeholder="nickname"></label>
+            <label>Гравець 5<input name="player_5" required maxlength="32" placeholder="nickname"></label>
+            <label>Заміна <span class="muted">(необов'язково)</span><input name="substitute" maxlength="32" placeholder="nickname"></label>
+          </div>
+        </div>
+
+        <label class="wide">Коментар до заявки<textarea name="note" maxlength="500" rows="4" placeholder="Додаткова інформація..."></textarea></label>
+        <label class="check"><input type="checkbox" required><span>Підтверджую, що дані правильні та команда погоджується з правилами турніру.</span></label>
+
+        <div class="submit-row">
+          <button class="btn primary" type="submit" id="submitBtn">Відправити заявку</button>
+          <p id="formMessage" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer>© 2026 AHLTV Open Tour</footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
