@@ -348,11 +348,40 @@ async function loadApplications(){
 }
 
 function renderApplication(item){
-  const profile=safeUrl(item.captain_profile),players=Array.isArray(item.players)?item.players:[];
+  const profile=safeUrl(item.captain_profile);
+  const players=Array.isArray(item.players)?item.players:[];
+  const playerSteam=Array.isArray(item.player_steam_links)?item.player_steam_links:[];
+  const substitutes=Array.isArray(item.substitutes)?item.substitutes:[];
+  const substituteSteam=Array.isArray(item.substitute_steam_links)?item.substitute_steam_links:[];
+
+  const rosterHtml=players.map((nick,index)=>{
+    const steam=safeUrl(playerSteam[index]);
+    return `<div class="admin-roster-row">
+      <span class="admin-roster-role">P${index+1}</span>
+      <b>${esc(nick)}</b>
+      ${steam?`<a href="${esc(steam)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> Steam</a>`:"<span>—</span>"}
+    </div>`;
+  }).join("");
+
+  const subsHtml=substitutes.map((nick,index)=>{
+    const steam=safeUrl(substituteSteam[index]);
+    return `<div class="admin-roster-row substitute">
+      <span class="admin-roster-role">S${index+1}</span>
+      <b>${esc(nick)}</b>
+      ${steam?`<a href="${esc(steam)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> Steam</a>`:"<span>—</span>"}
+    </div>`;
+  }).join("");
+
   return `<article class="application">
     <div class="application-head"><div><small>${esc(item.tournaments?.name||"Турнір")}</small><h3>${esc(item.team_name)} <span class="muted">[${esc(item.team_tag)}]</span></h3><div class="meta">#${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</div></div><span class="pill">${esc(item.status)}</span></div>
     <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick)}</div><div><span>Email:</span> ${esc(item.captain_email)}</div><div><span>Контакт:</span> ${esc(item.contact)}</div><div><span>Профіль:</span> ${profile?'<a href="'+esc(profile)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
-    <div class="players"><b>Склад:</b> ${players.map(esc).join(", ")}${item.substitute?" · Заміна: "+esc(item.substitute):""}${item.note?"<br><b>Коментар:</b> "+esc(item.note):""}</div>
+    <div class="admin-roster-block">
+      <div class="admin-roster-title"><b>Основний склад</b><span>5 гравців</span></div>
+      ${rosterHtml}
+      <div class="admin-roster-title subs"><b>Заміни</b><span>${substitutes.length}</span></div>
+      ${subsHtml}
+    </div>
+    ${item.note?`<div class="players"><b>Коментар:</b> ${esc(item.note)}</div>`:""}
     <div class="card-actions"><button class="btn approve" data-app-action="approved" data-id="${item.id}"><i data-lucide="check"></i><span>Підтвердити</span></button><button class="btn reject" data-app-action="rejected" data-id="${item.id}"><i data-lucide="x-circle"></i><span>Відхилити</span></button><button class="btn" data-app-action="pending" data-id="${item.id}"><i data-lucide="clock-3"></i><span>Pending</span></button><button class="btn" data-app-action="delete" data-id="${item.id}"><i data-lucide="trash-2"></i><span>Видалити</span></button></div>
   </article>`;
 }
