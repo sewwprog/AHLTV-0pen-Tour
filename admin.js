@@ -102,23 +102,70 @@ async function handleAction(event) {
   if (!error) await loadApplications();
 }
 
+
+async function getAdminState() {
+  const { data, error } = await supabase.rpc("has_ahltv_admin");
+  if (error) {
+    console.error(error);
+    return true;
+  }
+  return !!data;
+}
+
+async function refreshAuthButton() {
+  const hasAdmin = await getAdminState();
+  const btn = document.querySelector("#authBtn");
+  if (btn) btn.textContent = hasAdmin ? "Увійти" : "Увійти / Зареєструватися";
+}
+
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  loginMessage.textContent = "Вхід...";
+
   const email = document.querySelector("#email").value.trim().toLowerCase();
   const password = document.querySelector("#password").value;
+  loginMessage.textContent = "";
+
+  const hasAdmin = await getAdminState();
+
+  if (!hasAdmin) {
+    loginMessage.textContent = "Створюємо перший акаунт...";
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      loginMessage.textContent = "Не вдалося зареєструватися: " + error.message;
+      return;
+    }
+
+    if (data.session?.user) {
+      await openDashboard(data.session.user);
+      return;
+    }
+
+    loginMessage.textContent = "Акаунт створено. Якщо потрібно підтвердження пошти — підтвердь email, потім увійди.";
+    await refreshAuthButton();
+    return;
+  }
+
+  loginMessage.textContent = "Вхід...";
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
   if (error) {
     loginMessage.textContent = "Невірний email або пароль.";
     return;
   }
+
   await openDashboard(data.user);
 });
 
 document.querySelector("#logoutBtn").addEventListener("click", async () => {
   await supabase.auth.signOut();
   showLogin();
+  await refreshAuthButton();
 });
 
 const { data:{ session } } = await supabase.auth.getSession();
-if (session?.user) await openDashboard(session.user);
+if (session?.user) {
+  await openDashboard(session.user);
+} else {
+  await refreshAuthButton();
+}
