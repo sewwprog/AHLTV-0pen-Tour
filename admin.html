@@ -3,72 +3,66 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#2d3844">
+  <meta name="theme-color" content="#17212b">
   <title>AHLTV Open Tour — Вхід</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hltv-header">
-    <div class="hltv-header-inner">
-      <a class="hltv-brand" href="./">
-        <span class="ahltv-mark">A</span>
-        <span class="ahltv-word">AHLTV</span>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="./">
+        <span class="brand-mark">A</span>
+        <span class="brand-copy"><strong>AHLTV</strong><small>OPEN TOUR</small></span>
       </a>
-      <nav class="hltv-nav">
+      <nav class="main-nav">
         <a href="./">Головна</a>
         <a href="./#register">Реєстрація</a>
         <a href="./#teams">Команди</a>
       </nav>
-      <div class="hltv-header-actions">
-        <a class="login-link" href="./">На сайт</a>
-      </div>
+      <a class="account-btn" href="./">На сайт</a>
     </div>
   </header>
 
-  <div class="page-wrap admin-page">
-    <div class="event-tabs">
-      <strong>AHLTV Open Tour 2026</strong>
-      <div><a class="active" href="#">Account</a></div>
+  <div class="subbar">
+    <div class="shell subbar-inner">
+      <div class="breadcrumb">AHLTV / Open Tour / <b>Account</b></div>
     </div>
-
-    <main class="admin-layout">
-      <section id="loginView" class="hltv-box auth-hltv">
-        <div class="box-title blue">ВХІД</div>
-        <div class="auth-body">
-          <div class="auth-heading">
-            <div class="ahltv-mark big">A</div>
-            <div>
-              <h1>AHLTV Account</h1>
-              <p>Увійди до керування турніром.</p>
-            </div>
-          </div>
-
-          <form id="loginForm" class="hltv-form">
-            <label>Email<input id="email" type="email" autocomplete="username" required></label>
-            <label>Пароль<input id="password" type="password" autocomplete="current-password" required></label>
-            <button class="hltv-primary full" type="submit" id="authBtn">Увійти</button>
-            <p id="loginMessage" aria-live="polite"></p>
-          </form>
-        </div>
-      </section>
-
-      <section id="dashboardView" class="dashboard hidden">
-        <div class="hltv-box">
-          <div class="box-title blue dashboard-titlebar">
-            <span>ЗАЯВКИ КОМАНД</span>
-            <div class="admin-actions">
-              <span id="adminEmail"></span>
-              <button id="logoutBtn" class="hltv-secondary">Вийти</button>
-            </div>
-          </div>
-          <div id="stats" class="admin-stats"></div>
-        </div>
-
-        <div id="applications" class="applications"></div>
-        <p id="emptyState" class="hltv-box empty hidden">Заявок поки немає.</p>
-      </section>
-    </main>
   </div>
+
+  <main class="shell admin-shell">
+    <section id="loginView" class="panel login-panel">
+      <div class="panel-head light-head"><span>ВХІД</span><small>AHLTV ACCOUNT</small></div>
+      <div class="login-body">
+        <div class="login-logo">
+          <span class="brand-mark large">A</span>
+          <div><h1>AHLTV Account</h1><p>Увійди до керування турніром.</p></div>
+        </div>
+
+        <form id="loginForm" class="team-form login-form">
+          <label>Email<input id="email" type="email" autocomplete="username" required></label>
+          <label>Пароль<input id="password" type="password" autocomplete="current-password" required></label>
+          <button class="primary-btn full" type="submit" id="authBtn">Увійти</button>
+          <p id="loginMessage" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="dashboardView" class="dashboard hidden">
+      <section class="panel">
+        <div class="panel-head light-head dashboard-head">
+          <span>ЗАЯВКИ КОМАНД</span>
+          <div class="admin-actions">
+            <span id="adminEmail"></span>
+            <button id="logoutBtn" class="secondary-btn">Вийти</button>
+          </div>
+        </div>
+        <div id="stats" class="admin-stats"></div>
+      </section>
+
+      <div id="applications" class="applications"></div>
+      <p id="emptyState" class="panel empty hidden">Заявок поки немає.</p>
+    </section>
+  </main>
 
   <script type="module" src="admin.js"></script>
 </body>
