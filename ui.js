@@ -1,8 +1,86 @@
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import {
+  createIcons,
+  Trophy,
+  SendHorizontal,
+  LogIn,
+  Menu,
+  X,
+  UserRound,
+  UserPlus,
+  LogOut,
+  Settings,
+  Users,
+  GitBranch,
+  Globe2,
+  ClipboardList,
+  CalendarDays,
+  Gamepad2,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Pencil,
+  Trash2,
+  Check,
+  XCircle,
+  Upload,
+  Image,
+  Save,
+  Shield,
+  CircleDot,
+  Clock3,
+  Swords,
+  LayoutDashboard,
+  ScrollText,
+  ChevronRight,
+  Plus,
+  LockKeyhole,
+  UserCheck,
+  UserX,
+  ListChecks,
+  CircleUserRound
+} from "https://esm.sh/lucide@0.468.0";
 
 const SUPABASE_URL="https://hfxzdifqcjbslmxffvlf.supabase.co";
 const SUPABASE_KEY="sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi";
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const icons={
+  Trophy,SendHorizontal,LogIn,Menu,X,UserRound,UserPlus,LogOut,Settings,Users,
+  GitBranch,Globe2,ClipboardList,CalendarDays,Gamepad2,ExternalLink,Eye,EyeOff,
+  Pencil,Trash2,Check,XCircle,Upload,Image,Save,Shield,CircleDot,Clock3,Swords,
+  LayoutDashboard,ScrollText,ChevronRight,Plus,LockKeyhole,UserCheck,UserX,
+  ListChecks,CircleUserRound
+};
+
+function renderIcons(){
+  try{
+    createIcons({
+      icons,
+      attrs:{
+        width:"16",
+        height:"16",
+        "stroke-width":"2",
+        "aria-hidden":"true"
+      }
+    });
+  }catch(error){
+    console.debug("Icon render skipped",error);
+  }
+}
+window.refreshIcons=renderIcons;
+
+let iconFrame=0;
+const observer=new MutationObserver((mutations)=>{
+  const hasNewIcon=mutations.some(m=>[...m.addedNodes].some(node=>{
+    if(!(node instanceof Element))return false;
+    return node.matches?.("i[data-lucide]")||!!node.querySelector?.("i[data-lucide]");
+  }));
+  if(!hasNewIcon)return;
+  cancelAnimationFrame(iconFrame);
+  iconFrame=requestAnimationFrame(renderIcons);
+});
+observer.observe(document.documentElement,{childList:true,subtree:true});
 
 const body=document.body;
 const menuBtn=document.querySelector("#menuBtn");
@@ -58,7 +136,10 @@ async function loadSiteBranding(){
     .eq("id",1)
     .maybeSingle();
 
-  if(error||!data)return;
+  if(error||!data){
+    renderIcons();
+    return;
+  }
 
   document.querySelectorAll(".brand-mark").forEach(el=>setBrandMark(el,data.logo_url,data.site_name));
 
@@ -67,9 +148,8 @@ async function loadSiteBranding(){
   });
 
   document.querySelectorAll(".brand-copy small").forEach(el=>{
-    if(el.textContent.trim().toUpperCase()!=="ADMIN"){
-      el.textContent=data.site_subtitle||"";
-    }
+    const fixed=el.dataset.fixedSubtitle==="true";
+    if(!fixed)el.textContent=data.site_subtitle||"";
   });
 
   const homeTitle=document.querySelector("#homeTitle");
@@ -96,6 +176,9 @@ async function loadSiteBranding(){
     }
     icon.href=logo;
   }
+
+  renderIcons();
 }
 
+renderIcons();
 loadSiteBranding();
