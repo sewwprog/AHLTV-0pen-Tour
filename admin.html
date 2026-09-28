@@ -2,12 +2,12 @@
 <html lang="uk">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#17212b"><title>AHLTV — Admin</title>
+  <meta name="theme-color" content="#17212b"><title>AHLTV — Account</title>
   <link rel="stylesheet" href="styles.css?v=20260928-5">
 </head>
 <body>
 <header class="site-header"><div class="shell header-inner">
-  <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>ADMIN</small></span></a>
+  <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>ACCOUNT</small></span></a>
   <nav class="main-nav"><a href="./">На сайт</a><a href="apply.html">Подати заявку</a></nav>
   <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
 </div></header>
@@ -18,17 +18,37 @@
 </aside>
 <main class="shell admin-shell">
   <section id="loginView" class="panel login-panel">
-    <div class="panel-head"><span>ВХІД</span><strong>AHLTV ACCOUNT</strong></div>
-    <div class="login-body"><div class="login-logo"><span class="brand-mark large">A</span><div><h1>AHLTV Admin</h1><p>Керування турнірами.</p></div></div>
+    <div class="panel-head"><span>АКАУНТ</span><strong>AHLTV ACCOUNT</strong></div>
+    <div class="login-body">
+      <div class="login-logo"><span class="brand-mark large">A</span><div><h1>AHLTV Account</h1><p>Увійди або створи акаунт, щоб подавати заявки на турніри.</p></div></div>
+      <div class="auth-mode-switch">
+        <button class="active" type="button" data-auth-mode="login">Увійти</button>
+        <button type="button" data-auth-mode="register">Реєстрація</button>
+      </div>
       <form id="loginForm" class="team-form login-form">
         <label>Email<input id="email" type="email" autocomplete="username" required></label>
-        <label>Пароль<input id="password" type="password" autocomplete="current-password" required></label>
+        <label>Пароль<input id="password" type="password" minlength="6" autocomplete="current-password" required></label>
         <button class="primary-btn full" type="submit" id="authBtn">Увійти</button><p id="loginMessage"></p>
       </form>
     </div>
   </section>
+
+  <section id="userView" class="panel account-panel hidden">
+    <div class="panel-head"><span>АКАУНТ</span><strong>USER</strong></div>
+    <div class="account-body">
+      <div>
+        <small>Ви увійшли як</small>
+        <h2 id="userEmail"></h2>
+        <p>Тепер можна подати заявку на участь у турнірі.</p>
+      </div>
+      <div class="account-actions">
+        <a class="primary-btn" href="apply.html">Подати заявку</a>
+        <button class="secondary-btn" id="userLogoutBtn" type="button">Вийти</button>
+      </div>
+    </div>
+  </section>
   <section id="dashboardView" class="dashboard hidden">
-    <div class="admin-top panel"><div><small>ADMIN CONTROL</small><h1>Керування AHLTV</h1></div><div class="admin-account"><span id="adminEmail"></span><button id="logoutBtn" class="secondary-btn">Вийти</button></div></div>
+    <div class="admin-top panel"><div><small>CONTROL PANEL</small><h1>Керування AHLTV</h1></div><div class="admin-account"><span id="adminEmail"></span><button id="logoutBtn" class="secondary-btn">Вийти</button></div></div>
     <nav class="admin-tabs">
       <button class="active" data-tab="siteTab">Сайт</button>
       <button data-tab="tournamentsTab">Турніри</button>
