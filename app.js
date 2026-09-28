@@ -12,7 +12,7 @@ const statusLabel=s=>({upcoming:"UPCOMING",registration:"REGISTRATION",live:"LIV
 const dateLabel=v=>v?new Date(v).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"Дата не вказана";
 const [{data:tournaments,error:tErr},{data:teams},{data:matches}]=await Promise.all([
   supabase.from("tournaments").select("*").eq("is_visible",true).order("created_at",{ascending:false}),
-  supabase.from("team_registrations").select("id,tournament_id,team_name,team_tag,status").eq("status","approved").order("team_name"),
+  supabase.rpc("get_public_teams"),
   supabase.from("tournament_matches").select("*").eq("is_visible",true).order("starts_at",{ascending:true,nullsFirst:false})
 ]);
 if(tErr){root.innerHTML='<section class="panel loading-panel error">Не вдалося завантажити турніри.</section>';throw tErr}
