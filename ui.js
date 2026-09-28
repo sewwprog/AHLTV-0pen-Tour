@@ -70,6 +70,29 @@ function renderIcons(){
 }
 window.refreshIcons=renderIcons;
 
+
+function updateAccountLinks(session){
+  const isLoggedIn=!!session?.user;
+  const label=isLoggedIn?"Акаунт":"Увійти";
+  const icon=isLoggedIn?"circle-user-round":"log-in";
+
+  document.querySelectorAll('.account-btn, .mobile-drawer a[href="admin.html"]').forEach(link=>{
+    link.innerHTML=`<i data-lucide="${icon}"></i><span>${label}</span>${link.closest(".mobile-drawer")?'<i data-lucide="chevron-right"></i>':""}`;
+    link.setAttribute("aria-label",label);
+  });
+
+  renderIcons();
+}
+
+async function syncAuthHeader(){
+  const {data:{session}}=await supabase.auth.getSession();
+  updateAccountLinks(session);
+}
+
+supabase.auth.onAuthStateChange((_event,session)=>{
+  updateAccountLinks(session);
+});
+
 let iconFrame=0;
 const observer=new MutationObserver((mutations)=>{
   const hasNewIcon=mutations.some(m=>[...m.addedNodes].some(node=>{
@@ -181,4 +204,5 @@ async function loadSiteBranding(){
 }
 
 renderIcons();
+syncAuthHeader();
 loadSiteBranding();
