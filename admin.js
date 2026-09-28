@@ -46,7 +46,10 @@ async function uploadAsset(file,folder){
   return data.publicUrl;
 }
 
-const loginView=$("#loginView"),dashboardView=$("#dashboardView"),loginForm=$("#loginForm"),loginMessage=$("#loginMessage"),adminEmail=$("#adminEmail");
+const loginView=$("#loginView"),userView=$("#userView"),dashboardView=$("#dashboardView"),loginForm=$("#loginForm"),loginMessage=$("#loginMessage"),adminEmail=$("#adminEmail"),userEmail=$("#userEmail"),userLogoutBtn=$("#userLogoutBtn");
+const nextParam=new URLSearchParams(location.search).get("next");
+const safeNext=nextParam&&/^apply\.html(?:\?.*)?$/.test(nextParam)?nextParam:null;
+let authMode="login";
 const siteSettingsForm=$("#siteSettingsForm"),siteLogoFile=$("#siteLogoFile"),siteLogoPreview=$("#siteLogoPreview"),siteSettingsMessage=$("#siteSettingsMessage"),saveSiteSettingsBtn=$("#saveSiteSettingsBtn"),removeSiteLogo=$("#removeSiteLogo");
 const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview");
 const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge");
@@ -55,7 +58,12 @@ const matchForm=$("#matchForm"),matchTournament=$("#matchTournament"),approvedTe
 
 let tournaments=[],registrations=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
 
-function showLogin(message=""){loginView.classList.remove("hidden");dashboardView.classList.add("hidden");loginMessage.textContent=message}
+function showLogin(message=""){
+  loginView.classList.remove("hidden");
+  userView?.classList.add("hidden");
+  dashboardView.classList.add("hidden");
+  loginMessage.textContent=message;
+}
 
 async function isAdmin(userId){
   const {data,error}=await supabase.from("admin_users").select("user_id").eq("user_id",userId).maybeSingle();
@@ -71,10 +79,31 @@ function setupTabs(){
   }));
 }
 
-async function openDashboard(user){
-  if(!(await isAdmin(user.id))){await supabase.auth.signOut();showLogin("Цей акаунт не має прав адміністратора.");return}
-  loginView.classList.add("hidden");dashboardView.classList.remove("hidden");adminEmail.textContent=user.email||"";setupTabs();
-  await loadSiteSettings();await loadTournaments();await loadApplications();renderTournaments();await Promise.all([loadUsers(),loadMatches()]);
+async function openAccount(user){
+  if(safeNext){
+    location.href=safeNext;
+    return;
+  }
+
+  const admin=await isAdmin(user.id);
+  loginView.classList.add("hidden");
+
+  if(!admin){
+    dashboardView.classList.add("hidden");
+    userView?.classList.remove("hidden");
+    if(userEmail)userEmail.textContent=user.email||"";
+    return;
+  }
+
+  userView?.classList.add("hidden");
+  dashboardView.classList.remove("hidden");
+  adminEmail.textContent=user.email||"";
+  setupTabs();
+  await loadSiteSettings();
+  await loadTournaments();
+  await loadApplications();
+  renderTournaments();
+  await Promise.all([loadUsers(),loadMatches()]);
 }
 
 async function loadSiteSettings(){
@@ -346,20 +375,125 @@ async function loadMatches(){
   adminMatchesList.querySelectorAll("[data-delete-match]").forEach(btn=>btn.addEventListener("click",async()=>{if(!confirm("Видалити матч?"))return;await supabase.from("tournament_matches").delete().eq("id",Number(btn.dataset.deleteMatch));await loadMatches()}));
 }
 
-async function getAdminState(){const {data,error}=await supabase.rpc("has_ahltv_admin");return error?true:!!data}
-async function refreshAuthButton(){const btn=$("#authBtn");if(btn)btn.textContent=await getAdminState()?"Увійти":"Увійти / Зареєструватися"}
-loginForm.addEventListener("submit",async e=>{
-  e.preventDefault();const email=$("#email").value.trim().toLowerCase(),password=$("#password").value;loginMessage.textContent="";
-  const hasAdmin=await getAdminState();
-  if(!hasAdmin){
-    loginMessage.textContent="Створюємо перший акаунт...";
-    const r=await fetch(SUPABASE_URL+"/functions/v1/register-first-admin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})});
-    const result=await r.json().catch(()=>({}));
-    if(!r.ok){loginMessage.textContent=result.error==="admin_exists"?"Адмін уже створений. Увійди в акаунт.":"Не вдалося зареєструватися.";await refreshAuthButton();return}
-  }
-  const {data,error}=await supabase.auth.signInWithPassword({email,password});
-  if(error){loginMessage.textContent="Невірний email або пароль.";return}
-  await openDashboard(data.user);
+async function getAdminState(){
+  const {data,error}=await supabase.rpc("has_ahltv_admin");
+  return error?true:!!data;
+}
+
+function updateAuthMode(mode){
+  authMode=mode;
+  document.querySelectorAll("[data-auth-mode]").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.authMode===mode);
+  });
+  const authBtn=$("#authBtn");
+  const password=$("#password");
+  if(authBtn)authBtn.textContent=mode==="register"?"Створити акаунт":"Увійти";
+  if(password)password.autocomplete=mode==="register"?"new-password":"current-password";
+  loginMessage.textContent="";
+}
+
+document.querySelectorAll("[data-auth-mode]").forEach(btn=>{
+  btn.addEventListener("click",()=>updateAuthMode(btn.dataset.authMode));
 });
-$("#logoutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();showLogin();await refreshAuthButton()});
-const {data:{session}}=await supabase.auth.getSession();if(session?.user)await openDashboard(session.user);else await refreshAuthButton();
+
+loginForm.addEventListener("submit",async e=>{
+  e.preventDefault();
+
+  const email=$("#email").value.trim().toLowerCase();
+  const password=$("#password").value;
+  loginMessage.className="";
+  loginMessage.textContent=authMode==="register"?"Створюємо акаунт...":"Вхід...";
+
+  if(authMode==="register"){
+    if(password.length<6){
+      loginMessage.textContent="Пароль має містити щонайменше 6 символів.";
+      loginMessage.className="error";
+      return;
+    }
+
+    const hasAdmin=await getAdminState();
+
+    if(!hasAdmin){
+      const response=await fetch(SUPABASE_URL+"/functions/v1/register-first-admin",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({email,password})
+      });
+      const result=await response.json().catch(()=>({}));
+
+      if(!response.ok){
+        loginMessage.textContent=result.error==="admin_exists"
+          ?"Головний акаунт уже створений. Спробуй звичайну реєстрацію ще раз."
+          :"Не вдалося створити акаунт.";
+        loginMessage.className="error";
+        return;
+      }
+
+      const {data,error}=await supabase.auth.signInWithPassword({email,password});
+      if(error){
+        loginMessage.textContent="Акаунт створено. Спробуй увійти.";
+        updateAuthMode("login");
+        return;
+      }
+
+      await openAccount(data.user);
+      return;
+    }
+
+    const {data,error}=await supabase.auth.signUp({email,password});
+
+    if(error){
+      loginMessage.textContent=error.message?.toLowerCase().includes("already")
+        ?"Такий акаунт уже існує. Увійди."
+        :"Не вдалося створити акаунт.";
+      loginMessage.className="error";
+      return;
+    }
+
+    if(data.session?.user){
+      await openAccount(data.session.user);
+      return;
+    }
+
+    const signIn=await supabase.auth.signInWithPassword({email,password});
+    if(!signIn.error&&signIn.data.user){
+      await openAccount(signIn.data.user);
+      return;
+    }
+
+    loginMessage.textContent="Акаунт створено. Якщо Supabase попросить підтвердити email, підтвердь його і потім увійди.";
+    loginMessage.className="success";
+    updateAuthMode("login");
+    return;
+  }
+
+  const {data,error}=await supabase.auth.signInWithPassword({email,password});
+  if(error){
+    loginMessage.textContent="Невірний email або пароль.";
+    loginMessage.className="error";
+    return;
+  }
+
+  await openAccount(data.user);
+});
+
+$("#logoutBtn")?.addEventListener("click",async()=>{
+  await supabase.auth.signOut();
+  showLogin();
+  updateAuthMode("login");
+});
+
+userLogoutBtn?.addEventListener("click",async()=>{
+  await supabase.auth.signOut();
+  showLogin();
+  updateAuthMode("login");
+});
+
+const {data:{session}}=await supabase.auth.getSession();
+
+if(session?.user){
+  await openAccount(session.user);
+}else{
+  showLogin();
+  updateAuthMode("login");
+}
