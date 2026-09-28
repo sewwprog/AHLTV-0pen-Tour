@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="uk">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171513"><title>AHLTV — Подати заявку</title><link rel="stylesheet" href="styles.css?v=20260928-13"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171513"><title>AHLTV — Подати заявку</title><link rel="stylesheet" href="styles.css?v=20260928-15"></head>
 <body>
 <header class="site-header"><div class="shell header-inner">
   <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
@@ -34,7 +34,63 @@
   <section class="panel"><div class="panel-head"><span><i data-lucide="clipboard-list"></i> ЗАЯВКА КОМАНДИ</span></div>
     <form id="teamForm" class="team-form">
       <fieldset><legend>Команда</legend><div class="form-grid"><label>Назва команди<input name="team_name" maxlength="40" required></label><label>Тег<input name="team_tag" maxlength="8" required></label><label>Капітан / нік<input name="captain_nick" maxlength="32" required></label><label>Email капітана<input name="captain_email" type="email" required></label><label>Telegram або Discord<input name="contact" maxlength="80" required></label><label>FACEIT / профіль<input name="captain_profile" type="url" placeholder="https://..."></label></div></fieldset>
-      <fieldset><legend>Основний склад</legend><div class="form-grid"><label>Гравець 1<input name="player_1" required maxlength="32"></label><label>Гравець 2<input name="player_2" required maxlength="32"></label><label>Гравець 3<input name="player_3" required maxlength="32"></label><label>Гравець 4<input name="player_4" required maxlength="32"></label><label>Гравець 5<input name="player_5" required maxlength="32"></label><label>Заміна <span class="muted">(необов'язково)</span><input name="substitute" maxlength="32"></label></div></fieldset>
+      <fieldset>
+        <legend>Основний склад</legend>
+        <div class="roster-grid">
+        <div class="roster-card">
+          <div class="roster-card-title"><span>Гравець 1</span><b>STARTER</b></div>
+          <div class="roster-fields">
+            <label>Нік<input name="player_1" required maxlength="32" placeholder="nickname"></label>
+            <label>Steam-посилання<input name="player_1_steam" type="url" required placeholder="https://steamcommunity.com/id/..." title="Вкажи посилання Steam Community або s.team"></label>
+          </div>
+        </div>
+        <div class="roster-card">
+          <div class="roster-card-title"><span>Гравець 2</span><b>STARTER</b></div>
+          <div class="roster-fields">
+            <label>Нік<input name="player_2" required maxlength="32" placeholder="nickname"></label>
+            <label>Steam-посилання<input name="player_2_steam" type="url" required placeholder="https://steamcommunity.com/id/..." title="Вкажи посилання Steam Community або s.team"></label>
+          </div>
+        </div>
+        <div class="roster-card">
+          <div class="roster-card-title"><span>Гравець 3</span><b>STARTER</b></div>
+          <div class="roster-fields">
+            <label>Нік<input name="player_3" required maxlength="32" placeholder="nickname"></label>
+            <label>Steam-посилання<input name="player_3_steam" type="url" required placeholder="https://steamcommunity.com/id/..." title="Вкажи посилання Steam Community або s.team"></label>
+          </div>
+        </div>
+        <div class="roster-card">
+          <div class="roster-card-title"><span>Гравець 4</span><b>STARTER</b></div>
+          <div class="roster-fields">
+            <label>Нік<input name="player_4" required maxlength="32" placeholder="nickname"></label>
+            <label>Steam-посилання<input name="player_4_steam" type="url" required placeholder="https://steamcommunity.com/id/..." title="Вкажи посилання Steam Community або s.team"></label>
+          </div>
+        </div>
+        <div class="roster-card">
+          <div class="roster-card-title"><span>Гравець 5</span><b>STARTER</b></div>
+          <div class="roster-fields">
+            <label>Нік<input name="player_5" required maxlength="32" placeholder="nickname"></label>
+            <label>Steam-посилання<input name="player_5_steam" type="url" required placeholder="https://steamcommunity.com/id/..." title="Вкажи посилання Steam Community або s.team"></label>
+          </div>
+        </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="fieldset-heading">
+          <legend>Заміни</legend>
+          <span>Обов’язково 1 · максимум 3</span>
+        </div>
+        <div id="substitutesList" class="roster-grid substitutes-grid">
+          <div class="roster-card substitute-card" data-substitute-index="1">
+            <div class="roster-card-title"><span>Заміна 1</span><b>SUB</b></div>
+            <div class="roster-fields">
+              <label>Нік<input name="substitute_1" required maxlength="32" placeholder="nickname"></label>
+              <label>Steam-посилання<input name="substitute_1_steam" type="url" required placeholder="https://steamcommunity.com/id/..." title="Вкажи посилання Steam Community або s.team"></label>
+            </div>
+          </div>
+        </div>
+        <button class="secondary-btn add-substitute-btn" id="addSubstituteBtn" type="button"><i data-lucide="plus"></i><span>Додати заміну</span></button>
+      </fieldset>
       <fieldset><legend>Додатково</legend><label>Коментар<textarea name="note" maxlength="500" rows="4"></textarea></label></fieldset>
       <label class="agreement"><input type="checkbox" required><span>Підтверджую правильність даних і згоду з правилами турніру.</span></label>
       <div class="submit-line"><button class="primary-btn" type="submit" id="submitBtn"><i data-lucide="send-horizontal"></i><span>Відправити заявку</span></button><p id="formMessage"></p></div>
@@ -42,5 +98,5 @@
   </section>
   </div>
 </main>
-<script type="module" src="ui.js?v=20260928-14"></script><script type="module" src="apply.js?v=20260928-13"></script>
+<script type="module" src="ui.js?v=20260928-14"></script><script type="module" src="apply.js?v=20260928-15"></script>
 </body></html>
