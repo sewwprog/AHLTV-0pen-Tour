@@ -41,13 +41,13 @@ hero.innerHTML=`
     <h1>${esc(tournament.name)}</h1>
     <p>${esc(tournament.description||"")}</p>
     <div class="tournament-meta">
-      <span>${esc(tournament.game)}</span>
-      <span>${esc(tournament.format)}</span>
-      <span>до ${tournament.max_teams} команд</span>
-      <span>${tournament.status.toUpperCase()}</span>
+      <span><i data-lucide="gamepad-2"></i>${esc(tournament.game)}</span>
+      <span><i data-lucide="swords"></i>${esc(tournament.format)}</span>
+      <span><i data-lucide="users"></i>до ${tournament.max_teams} команд</span>
+      <span><i data-lucide="circle-dot"></i>${tournament.status.toUpperCase()}</span>
     </div>
   </div>
-  ${tournament.registration_open?'<a class="primary-btn detail-apply" href="apply.html?tournament='+tournament.id+'">Подати заявку</a>':""}
+  ${tournament.registration_open?'<a class="primary-btn detail-apply" href="apply.html?tournament='+tournament.id+'"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>':""}
 `;
 
 const tournamentTeams=(teams||[]).filter(t=>t.tournament_id===id);
@@ -83,3 +83,5 @@ const rules=(tournament.rules_text||"").trim();
 rulesRoot.innerHTML=rules
   ? rules.split(/\n{2,}/).map(block=>`<p>${esc(block).replace(/\n/g,"<br>")}</p>`).join("")
   : '<div class="empty-state">Правила для цього турніру ще не додані.</div>';
+
+window.refreshIcons?.();
