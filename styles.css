@@ -862,3 +862,201 @@ input[type="file"]::file-selector-button{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+
+/* SQUARED TEAM APPLICATION */
+.apply-page .panel{
+  border-radius:6px;
+}
+.apply-page .page-title{
+  border-radius:6px;
+}
+.apply-page .tournament-select-wrap select,
+.apply-page .team-form input,
+.apply-page .team-form textarea,
+.apply-page .team-form select{
+  border-radius:4px;
+}
+.apply-page .primary-btn,
+.apply-page .secondary-btn{
+  border-radius:4px;
+}
+
+.roster-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.roster-card{
+  overflow:hidden;
+  border:1px solid var(--line-2);
+  border-radius:4px;
+  background:#181614;
+}
+.roster-card-title{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:0 10px;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.022);
+}
+.roster-card-title>span{
+  color:#eee8e3;
+  font-size:10px;
+  font-weight:800;
+}
+.roster-card-title b{
+  color:#ff9368;
+  font:700 8px/1 "Space Mono",monospace;
+  letter-spacing:.06em;
+}
+.roster-card-title-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.roster-fields{
+  display:grid;
+  grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);
+  gap:9px;
+  padding:10px;
+}
+.roster-fields label{
+  min-width:0;
+}
+.roster-fields input{
+  min-width:0;
+}
+.fieldset-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+  border-bottom:1px solid var(--line);
+}
+.fieldset-heading legend{
+  width:auto;
+  margin:0;
+  border:0;
+}
+.fieldset-heading>span{
+  color:#807872;
+  font-size:9px;
+}
+.substitutes-grid{
+  margin-bottom:10px;
+}
+.add-substitute-btn{
+  min-height:34px;
+}
+.icon-btn{
+  width:26px;
+  height:26px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:1px solid var(--line);
+  border-radius:3px;
+  background:rgba(255,255,255,.03);
+  color:#9d938c;
+  cursor:pointer;
+}
+.icon-btn:hover{
+  color:#fff;
+  border-color:rgba(235,107,100,.22);
+  background:rgba(235,107,100,.08);
+}
+.icon-btn svg{
+  width:14px;
+  height:14px;
+}
+
+/* ADMIN ROSTER DETAILS */
+.admin-roster-block{
+  border-top:1px solid var(--line);
+}
+.admin-roster-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 13px;
+  background:rgba(255,255,255,.012);
+  color:#d9d1cb;
+  font-size:10px;
+}
+.admin-roster-title span{
+  color:#756d67;
+  font-size:9px;
+}
+.admin-roster-title.subs{
+  border-top:1px solid var(--line);
+}
+.admin-roster-row{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  gap:9px;
+  align-items:center;
+  padding:8px 13px;
+  border-top:1px solid rgba(255,255,255,.045);
+}
+.admin-roster-role{
+  width:28px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(240,106,59,.16);
+  border-radius:3px;
+  background:rgba(240,106,59,.06);
+  color:#ff9368;
+  font:700 8px/1 "Space Mono",monospace;
+}
+.admin-roster-row.substitute .admin-roster-role{
+  border-color:rgba(226,162,76,.18);
+  background:rgba(226,162,76,.06);
+  color:#e7b86b;
+}
+.admin-roster-row b{
+  overflow:hidden;
+  color:#e8e1dc;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.admin-roster-row a{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  color:#ff9368;
+  text-decoration:none;
+  font-size:10px;
+  font-weight:700;
+}
+.admin-roster-row a:hover{
+  text-decoration:underline;
+}
+
+@media(max-width:700px){
+  .roster-grid{
+    grid-template-columns:1fr;
+  }
+  .roster-fields{
+    grid-template-columns:1fr;
+  }
+  .fieldset-heading{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:3px;
+    padding-bottom:8px;
+  }
+  .admin-roster-row{
+    grid-template-columns:32px minmax(0,1fr);
+  }
+  .admin-roster-row a{
+    grid-column:2;
+    justify-self:start;
+  }
+}
