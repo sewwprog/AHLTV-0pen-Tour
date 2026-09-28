@@ -30,6 +30,12 @@ else root.innerHTML=tournaments.map(t=>{
       <section><div class="section-mini-head"><b>Команди</b><span>${tt.length} / ${t.max_teams}</span></div><div class="team-chips">${tt.length?tt.map(x=>`<span><b>${esc(x.team_tag)}</b> ${esc(x.team_name)}</span>`).join(""):'<em>Підтверджених команд ще немає.</em>'}</div></section>
       ${mm.length?`<section><div class="section-mini-head"><b>Матчі</b><span>${mm.length}</span></div><div class="mini-matches">${mm.map(m=>`<div><span>${m.starts_at?new Date(m.starts_at).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"TBA"}</span><b>${esc(m.team_one)} <i>vs</i> ${esc(m.team_two)}</b><strong class="${m.status==="live"?"live-text":""}">${m.status==="live"?"LIVE":"BO"+m.best_of}</strong></div>`).join("")}</div></section>`:""}
     </div>
-    <div class="tournament-card-footer"><span>${t.registration_open?"Реєстрація відкрита":"Реєстрація закрита"}</span>${t.registration_open&&["registration","live"].includes(t.status)?`<a class="primary-btn" href="apply.html?tournament=${t.id}">Подати заявку</a>`:""}</div>
+    <div class="tournament-card-footer">
+      <span>${t.registration_open?"Реєстрація відкрита":"Реєстрація закрита"}</span>
+      <div class="tournament-footer-actions">
+        <a class="secondary-btn" href="tournament.html?id=${t.id}">Відкрити турнір</a>
+        ${t.registration_open&&["registration","live"].includes(t.status)?`<a class="primary-btn" href="apply.html?tournament=${t.id}">Подати заявку</a>`:""}
+      </div>
+    </div>
   </article>`;
 }).join("");
