@@ -22,20 +22,21 @@ else root.innerHTML=tournaments.map(t=>{
   return `<article class="panel tournament-card">
     <div class="tournament-card-head">
       ${tournamentLogo(t)}
-      <div class="tournament-title"><small>${esc(t.game)} · ${esc(t.format)}</small><h2>${esc(t.name)}</h2><div class="tournament-meta"><span>${esc(t.game)}</span><span>${esc(t.format)}</span><span>${tt.length} / ${t.max_teams} команд</span><span>${dateLabel(t.starts_at)}</span></div></div>
+      <div class="tournament-title"><small>${esc(t.game)} · ${esc(t.format)}</small><h2>${esc(t.name)}</h2><div class="tournament-meta"><span><i data-lucide="gamepad-2"></i>${esc(t.game)}</span><span><i data-lucide="swords"></i>${esc(t.format)}</span><span><i data-lucide="users"></i>${tt.length} / ${t.max_teams} команд</span><span><i data-lucide="calendar-days"></i>${dateLabel(t.starts_at)}</span></div></div>
       <span class="status-badge status-${esc(t.status)}">${statusLabel(t.status)}</span>
     </div>
     ${t.description?`<p class="tournament-description">${esc(t.description)}</p>`:""}
     <div class="tournament-sections">
-      <section><div class="section-mini-head"><b>Команди</b><span>${tt.length} / ${t.max_teams}</span></div><div class="team-chips">${tt.length?tt.map(x=>`<span><b>${esc(x.team_tag)}</b> ${esc(x.team_name)}</span>`).join(""):'<em>Підтверджених команд ще немає.</em>'}</div></section>
-      ${mm.length?`<section><div class="section-mini-head"><b>Матчі</b><span>${mm.length}</span></div><div class="mini-matches">${mm.map(m=>`<div><span>${m.starts_at?new Date(m.starts_at).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"TBA"}</span><b>${esc(m.team_one)} <i>vs</i> ${esc(m.team_two)}</b><strong class="${m.status==="live"?"live-text":""}">${m.status==="live"?"LIVE":"BO"+m.best_of}</strong></div>`).join("")}</div></section>`:""}
+      <section><div class="section-mini-head"><b><i data-lucide="users"></i>Команди</b><span>${tt.length} / ${t.max_teams}</span></div><div class="team-chips">${tt.length?tt.map(x=>`<span><b>${esc(x.team_tag)}</b> ${esc(x.team_name)}</span>`).join(""):'<em>Підтверджених команд ще немає.</em>'}</div></section>
+      ${mm.length?`<section><div class="section-mini-head"><b><i data-lucide="swords"></i>Матчі</b><span>${mm.length}</span></div><div class="mini-matches">${mm.map(m=>`<div><span>${m.starts_at?new Date(m.starts_at).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"TBA"}</span><b>${esc(m.team_one)} <i>vs</i> ${esc(m.team_two)}</b><strong class="${m.status==="live"?"live-text":""}">${m.status==="live"?"LIVE":"BO"+m.best_of}</strong></div>`).join("")}</div></section>`:""}
     </div>
     <div class="tournament-card-footer">
-      <span>${t.registration_open?"Реєстрація відкрита":"Реєстрація закрита"}</span>
+      <span><i data-lucide="circle-dot"></i> ${t.registration_open?"Реєстрація відкрита":"Реєстрація закрита"}</span>
       <div class="tournament-footer-actions">
-        <a class="secondary-btn" href="tournament.html?id=${t.id}">Відкрити турнір</a>
-        ${t.registration_open&&["registration","live"].includes(t.status)?`<a class="primary-btn" href="apply.html?tournament=${t.id}">Подати заявку</a>`:""}
+        <a class="secondary-btn" href="tournament.html?id=${t.id}"><i data-lucide="external-link"></i><span>Відкрити турнір</span></a>
+        ${t.registration_open&&["registration","live"].includes(t.status)?`<a class="primary-btn" href="apply.html?tournament=${t.id}"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>`:""}
       </div>
     </div>
   </article>`;
 }).join("");
+window.refreshIcons?.();
