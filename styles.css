@@ -940,3 +940,109 @@ button{touch-action:manipulation}
     padding:12px 18px;
   }
 }
+
+
+/* BRANDING & ASSET EDITOR */
+.brand-mark.has-image{
+  padding:0;
+  overflow:hidden;
+  background:#fff;
+}
+.brand-mark.has-image img,
+.tournament-icon.has-logo img,
+.asset-preview.has-image img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+}
+.tournament-icon.has-logo{
+  padding:5px;
+  background:#fff;
+  border:1px solid #d8e0e6;
+  box-shadow:none;
+}
+.branding-editor{
+  display:grid;
+  grid-template-columns:104px minmax(0,1fr);
+  gap:16px;
+  align-items:center;
+  margin-bottom:16px;
+  padding:14px;
+  background:#f5f8fa;
+  border:1px solid var(--border);
+  border-radius:6px;
+}
+.asset-preview{
+  width:96px;
+  height:96px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  color:#fff;
+  background:linear-gradient(145deg,#3f8fc8,#2a6c9c);
+  border:1px solid #c7d4de;
+  border-radius:6px;
+  font-size:40px;
+  font-weight:900;
+}
+.asset-preview.has-image{
+  padding:8px;
+  background:#fff;
+}
+.asset-upload-copy{
+  display:grid;
+  gap:7px;
+  align-content:center;
+}
+.asset-upload-copy small{
+  color:#87919a;
+  font-size:10px;
+}
+.asset-upload-copy .secondary-btn{
+  width:max-content;
+}
+.tournament-logo-editor{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:-2px 0 16px;
+  padding:10px 12px;
+  background:#f8fafb;
+  border:1px solid #e0e5e9;
+  border-radius:5px;
+}
+.tournament-logo-preview{
+  width:62px;
+  height:62px;
+  flex:0 0 62px;
+  font-size:28px;
+}
+.tournament-logo-editor small{
+  color:#818c95;
+  line-height:1.45;
+}
+
+@media(max-width:700px){
+  .branding-editor{
+    grid-template-columns:76px minmax(0,1fr);
+    gap:12px;
+    padding:11px;
+  }
+  .asset-preview{
+    width:72px;
+    height:72px;
+    font-size:31px;
+  }
+  .asset-upload-copy .secondary-btn{
+    width:100%;
+  }
+  .tournament-logo-editor{
+    align-items:flex-start;
+  }
+  .tournament-logo-preview{
+    width:54px;
+    height:54px;
+    flex-basis:54px;
+  }
+}
