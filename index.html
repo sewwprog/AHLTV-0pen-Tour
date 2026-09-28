@@ -3,28 +3,28 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#171513"><title>AHLTV Open Tour</title>
-  <link rel="stylesheet" href="styles.css?v=20260928-11">
+  <link rel="stylesheet" href="styles.css?v=20260928-12">
 </head>
 <body>
 <header class="site-header">
   <div class="shell header-inner">
     <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
-    <nav class="main-nav"><a class="active" href="./">Турніри</a><a href="apply.html">Подати заявку</a></nav>
-    <a class="account-btn desktop-only" href="admin.html">Увійти</a>
-    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main-nav"><a class="active" href="./"><i data-lucide="trophy"></i><span>Турніри</span></a><a href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a></nav>
+    <a class="account-btn desktop-only" href="admin.html"><i data-lucide="log-in"></i><span>Увійти</span></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><i data-lucide="menu"></i></button>
   </div>
 </header>
 
 <div class="drawer-backdrop" id="drawerBackdrop"></div>
 <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
-  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a><button id="drawerClose">×</button></div>
-  <nav><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Увійти</a></nav>
+  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a><button id="drawerClose" aria-label="Закрити меню"><i data-lucide="x"></i></button></div>
+  <nav><a href="./"><i data-lucide="trophy"></i><span>Турніри</span><i data-lucide="chevron-right"></i></a><a href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span><i data-lucide="chevron-right"></i></a><a href="admin.html"><i data-lucide="log-in"></i><span>Увійти</span><i data-lucide="chevron-right"></i></a></nav>
 </aside>
 
 <main class="shell home-page">
   <section class="page-title">
     <div><small>AHLTV TOURNAMENT PLATFORM</small><h1 id="homeTitle">Турніри</h1><p id="homeDescription">Тут показуються тільки турніри, які створені адміністрацією.</p></div>
-    <a class="primary-btn" href="apply.html">Подати заявку</a>
+    <a class="primary-btn" href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>
   </section>
 
   <div id="tournamentsList" class="tournaments-list">
@@ -33,6 +33,6 @@
 </main>
 
 <footer class="site-footer"><div class="shell footer-inner"><span id="siteCopyright">© 2026 AHLTV</span><span id="siteFooterText">Tournament Platform</span></div></footer>
-<script type="module" src="ui.js?v=20260928-8"></script>
-<script type="module" src="app.js?v=20260928-8"></script>
+<script type="module" src="ui.js?v=20260928-12"></script>
+<script type="module" src="app.js?v=20260928-12"></script>
 </body></html>
