@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./supabase-config.js";
+const SUPABASE_URL = "https://hfxzdifqcjbslmxffvlf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi";
 
 const loginView = document.querySelector("#loginView");
 const dashboardView = document.querySelector("#dashboardView");
@@ -9,11 +10,8 @@ const applications = document.querySelector("#applications");
 const stats = document.querySelector("#stats");
 const emptyState = document.querySelector("#emptyState");
 const adminEmail = document.querySelector("#adminEmail");
-const createAdminBtn = document.querySelector("#createAdminBtn");
-const ALLOWED_ADMIN_EMAIL = "tisvitalij05@gmail.com";
 
-const configured = !SUPABASE_URL.includes("REPLACE_") && !SUPABASE_PUBLISHABLE_KEY.includes("REPLACE_");
-const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 function showLogin(message="") {
   loginView.classList.remove("hidden");
@@ -106,10 +104,6 @@ async function handleAction(event) {
 
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!configured) {
-    loginMessage.textContent = "Supabase ще не підключений.";
-    return;
-  }
   loginMessage.textContent = "Вхід...";
   const email = document.querySelector("#email").value.trim().toLowerCase();
   const password = document.querySelector("#password").value;
@@ -126,46 +120,5 @@ document.querySelector("#logoutBtn").addEventListener("click", async () => {
   showLogin();
 });
 
-if (!configured) {
-  showLogin("Supabase ще не підключений.");
-} else {
-  const { data:{ session } } = await supabase.auth.getSession();
-  if (session?.user) await openDashboard(session.user);
-}
-
-
-createAdminBtn?.addEventListener("click", async () => {
-  if (!configured) {
-    loginMessage.textContent = "Supabase ще не підключений.";
-    return;
-  }
-
-  const email = document.querySelector("#email").value.trim().toLowerCase();
-  const password = document.querySelector("#password").value;
-
-  if (email !== ALLOWED_ADMIN_EMAIL) {
-    loginMessage.textContent = "Ця пошта не дозволена для створення адмін-акаунта.";
-    return;
-  }
-
-  if (password.length < 6) {
-    loginMessage.textContent = "Пароль має містити щонайменше 6 символів.";
-    return;
-  }
-
-  loginMessage.textContent = "Створюємо акаунт...";
-  const { data, error } = await supabase.auth.signUp({ email, password });
-
-  if (error) {
-    loginMessage.textContent = error.message.includes("already")
-      ? "Акаунт уже існує. Натисни «Увійти»."
-      : "Не вдалося створити акаунт: " + error.message;
-    return;
-  }
-
-  if (data.session && data.user) {
-    await openDashboard(data.user);
-  } else {
-    loginMessage.textContent = "Акаунт створено. Якщо Supabase попросить підтвердити email — відкрий лист, а потім увійди.";
-  }
-});
+const { data:{ session } } = await supabase.auth.getSession();
+if (session?.user) await openDashboard(session.user);
