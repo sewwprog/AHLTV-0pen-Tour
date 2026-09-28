@@ -71,6 +71,84 @@ function renderIcons(){
 window.refreshIcons=renderIcons;
 
 
+/* Motion system */
+const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let revealObserver=null;
+
+function setupReveal(root=document){
+  if(reduceMotion)return;
+
+  const selector=[
+    ".page-title",
+    ".tournament-card",
+    ".panel",
+    ".roster-card",
+    ".application",
+    ".user-row",
+    ".admin-tournament-card",
+    ".detail-team-row",
+    ".admin-roster-row",
+    ".bracket-image-preview"
+  ].join(",");
+
+  const elements=[...root.querySelectorAll?.(selector)||[]]
+    .filter(el=>!el.classList.contains("motion-reveal"));
+
+  elements.forEach((el,index)=>{
+    el.classList.add("motion-reveal");
+    el.style.setProperty("--motion-delay",Math.min(index%7,6)*45+"ms");
+    revealObserver?.observe(el);
+  });
+}
+
+if(!reduceMotion){
+  document.documentElement.classList.add("motion-ready");
+
+  revealObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting)return;
+      entry.target.classList.add("is-visible");
+      revealObserver.unobserve(entry.target);
+    });
+  },{
+    threshold:.08,
+    rootMargin:"0px 0px -36px 0px"
+  });
+
+  requestAnimationFrame(()=>{
+    document.body.classList.add("page-entered");
+    setupReveal(document);
+  });
+
+  const motionObserver=new MutationObserver(mutations=>{
+    mutations.forEach(mutation=>{
+      mutation.addedNodes.forEach(node=>{
+        if(!(node instanceof Element))return;
+        setupReveal(node.matches?.(".motion-reveal")?node.parentElement:node);
+      });
+    });
+  });
+
+  motionObserver.observe(document.body,{childList:true,subtree:true});
+
+  document.addEventListener("pointerdown",event=>{
+    const target=event.target.closest(".primary-btn,.secondary-btn,.btn,.account-btn,.admin-tabs button,.detail-tabs a,.main-nav a");
+    if(!target)return;
+
+    const rect=target.getBoundingClientRect();
+    const size=Math.max(rect.width,rect.height)*1.8;
+    const wave=document.createElement("span");
+    wave.className="press-wave";
+    wave.style.width=wave.style.height=size+"px";
+    wave.style.left=(event.clientX-rect.left-size/2)+"px";
+    wave.style.top=(event.clientY-rect.top-size/2)+"px";
+    target.appendChild(wave);
+    wave.addEventListener("animationend",()=>wave.remove(),{once:true});
+  });
+}
+
+
+
 function updateAccountLinks(session){
   const isLoggedIn=!!session?.user;
   const label=isLoggedIn?"Акаунт":"Увійти";
