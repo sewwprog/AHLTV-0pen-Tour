@@ -2,6 +2,12 @@ import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.4";
 const supabase=createClient("https://hfxzdifqcjbslmxffvlf.supabase.co","sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi");
 const root=document.querySelector("#tournamentsList");
 const esc=(v="")=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const safeHttpUrl=v=>{try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)?u.href:null}catch{return null}};
+const tournamentLogo=t=>{
+  const logo=safeHttpUrl(t.logo_url);
+  if(logo)return `<div class="tournament-icon has-logo"><img src="${esc(logo)}" alt="${esc(t.name)} logo"></div>`;
+  return `<div class="tournament-icon">${esc((t.short_name||t.name).slice(0,1).toUpperCase())}</div>`;
+};
 const statusLabel=s=>({upcoming:"UPCOMING",registration:"REGISTRATION",live:"LIVE",finished:"FINISHED"}[s]||s.toUpperCase());
 const dateLabel=v=>v?new Date(v).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"Дата не вказана";
 const [{data:tournaments,error:tErr},{data:teams},{data:matches}]=await Promise.all([
@@ -15,7 +21,7 @@ else root.innerHTML=tournaments.map(t=>{
   const tt=(teams||[]).filter(x=>x.tournament_id===t.id),mm=(matches||[]).filter(x=>x.tournament_id===t.id);
   return `<article class="panel tournament-card">
     <div class="tournament-card-head">
-      <div class="tournament-icon">${esc((t.short_name||t.name).slice(0,1).toUpperCase())}</div>
+      ${tournamentLogo(t)}
       <div class="tournament-title"><small>${esc(t.game)} · ${esc(t.format)}</small><h2>${esc(t.name)}</h2><div class="tournament-meta"><span>${esc(t.game)}</span><span>${esc(t.format)}</span><span>${tt.length} / ${t.max_teams} команд</span><span>${dateLabel(t.starts_at)}</span></div></div>
       <span class="status-badge status-${esc(t.status)}">${statusLabel(t.status)}</span>
     </div>
