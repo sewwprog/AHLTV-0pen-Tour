@@ -642,16 +642,64 @@ async function getAdminState(){
   return error?true:!!data;
 }
 
+async function registerConfirmedUser(email,password){
+  const response=await fetch(SUPABASE_URL+"/functions/v1/register-user",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
+  });
+
+  const result=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    const error=new Error(result.error||"registration_failed");
+    error.code=result.error||"registration_failed";
+    throw error;
+  }
+
+  return result;
+}
+
+async function signInAccount(email,password){
+  let attempt=await supabase.auth.signInWithPassword({email,password});
+
+  if(!attempt.error){
+    return attempt;
+  }
+
+  const message=String(attempt.error.message||"").toLowerCase();
+  const emailNotConfirmed=
+    message.includes("email not confirmed") ||
+    message.includes("email_not_confirmed") ||
+    message.includes("not confirmed");
+
+  if(emailNotConfirmed){
+    try{
+      await registerConfirmedUser(email,password);
+    }catch(error){
+      if(error.code!=="user_exists")throw error;
+    }
+
+    attempt=await supabase.auth.signInWithPassword({email,password});
+  }
+
+  return attempt;
+}
+
 function updateAuthMode(mode){
   authMode=mode;
   document.querySelectorAll("[data-auth-mode]").forEach(btn=>{
     btn.classList.toggle("active",btn.dataset.authMode===mode);
   });
+
   const authBtn=$("#authBtn");
   const password=$("#password");
+
   if(authBtn)authBtn.textContent=mode==="register"?"Створити акаунт":"Увійти";
   if(password)password.autocomplete=mode==="register"?"new-password":"current-password";
+
   loginMessage.textContent="";
+  loginMessage.className="";
 }
 
 document.querySelectorAll("[data-auth-mode]").forEach(btn=>{
@@ -663,80 +711,88 @@ loginForm.addEventListener("submit",async e=>{
 
   const email=$("#email").value.trim().toLowerCase();
   const password=$("#password").value;
+
   loginMessage.className="";
   loginMessage.textContent=authMode==="register"?"Створюємо акаунт...":"Вхід...";
 
-  if(authMode==="register"){
-    if(password.length<6){
-      loginMessage.textContent="Пароль має містити щонайменше 6 символів.";
-      loginMessage.className="error";
-      return;
-    }
+  if(password.length<6){
+    loginMessage.textContent="Пароль має містити щонайменше 6 символів.";
+    loginMessage.className="error";
+    return;
+  }
 
+  if(authMode==="register"){
     const hasAdmin=await getAdminState();
 
-    if(!hasAdmin){
-      const response=await fetch(SUPABASE_URL+"/functions/v1/register-first-admin",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email,password})
-      });
-      const result=await response.json().catch(()=>({}));
+    try{
+      if(!hasAdmin){
+        const response=await fetch(SUPABASE_URL+"/functions/v1/register-first-admin",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({email,password})
+        });
 
-      if(!response.ok){
-        loginMessage.textContent=result.error==="admin_exists"
-          ?"Головний акаунт уже створений. Спробуй звичайну реєстрацію ще раз."
-          :"Не вдалося створити акаунт.";
-        loginMessage.className="error";
-        return;
+        const result=await response.json().catch(()=>({}));
+
+        if(!response.ok){
+          throw Object.assign(new Error(result.error||"registration_failed"),{
+            code:result.error||"registration_failed"
+          });
+        }
+      }else{
+        await registerConfirmedUser(email,password);
       }
-
-      const {data,error}=await supabase.auth.signInWithPassword({email,password});
-      if(error){
-        loginMessage.textContent="Акаунт створено. Спробуй увійти.";
+    }catch(error){
+      if(error.code==="user_exists"){
+        loginMessage.textContent="Такий акаунт уже існує. Спробуй увійти.";
+        loginMessage.className="error";
         updateAuthMode("login");
         return;
       }
 
-      await openAccount(data.user);
-      return;
-    }
+      if(error.code==="invalid_email"){
+        loginMessage.textContent="Перевір правильність email.";
+      }else if(error.code==="invalid_password"){
+        loginMessage.textContent="Пароль має містити щонайменше 6 символів.";
+      }else{
+        loginMessage.textContent="Не вдалося створити акаунт.";
+      }
 
-    const {data,error}=await supabase.auth.signUp({email,password});
-
-    if(error){
-      loginMessage.textContent=error.message?.toLowerCase().includes("already")
-        ?"Такий акаунт уже існує. Увійди."
-        :"Не вдалося створити акаунт.";
       loginMessage.className="error";
       return;
     }
 
-    if(data.session?.user){
-      await openAccount(data.session.user);
+    const signIn=await signInAccount(email,password);
+
+    if(signIn.error){
+      loginMessage.textContent="Акаунт створено, але вхід не вдався. Спробуй увійти ще раз.";
+      loginMessage.className="error";
+      updateAuthMode("login");
       return;
     }
 
-    const signIn=await supabase.auth.signInWithPassword({email,password});
-    if(!signIn.error&&signIn.data.user){
-      await openAccount(signIn.data.user);
-      return;
-    }
-
-    loginMessage.textContent="Акаунт створено. Якщо Supabase попросить підтвердити email, підтвердь його і потім увійди.";
-    loginMessage.className="success";
-    updateAuthMode("login");
+    await openAccount(signIn.data.user);
     return;
   }
 
-  const {data,error}=await supabase.auth.signInWithPassword({email,password});
-  if(error){
+  let signIn;
+
+  try{
+    signIn=await signInAccount(email,password);
+  }catch(error){
+    console.error(error);
+    loginMessage.textContent="Не вдалося виконати вхід. Спробуй ще раз.";
+    loginMessage.className="error";
+    return;
+  }
+
+  if(signIn.error){
     loginMessage.textContent="Невірний email або пароль.";
     loginMessage.className="error";
     return;
   }
 
-  await openAccount(data.user);
+  await openAccount(signIn.data.user);
 });
 
 $("#logoutBtn")?.addEventListener("click",async()=>{
