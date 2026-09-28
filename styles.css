@@ -1060,3 +1060,137 @@ input[type="file"]::file-selector-button{
     justify-self:start;
   }
 }
+
+
+/* BRACKET IMAGE MODE */
+.bracket-image-editor{
+  display:grid;
+  grid-template-columns:minmax(280px,.8fr) minmax(0,1.2fr);
+  gap:14px;
+  padding:14px;
+}
+.bracket-image-controls{
+  display:grid;
+  align-content:start;
+  gap:12px;
+}
+.bracket-image-controls label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  color:#bbb1aa;
+  font-size:11px;
+  font-weight:700;
+}
+.bracket-image-controls select,
+.bracket-image-controls input{
+  width:100%;
+  min-height:40px;
+  padding:9px 10px;
+  border:1px solid var(--line-2);
+  border-radius:8px;
+  background:#161412;
+  color:#f4efeb;
+}
+.bracket-image-preview{
+  min-height:330px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#141210;
+}
+.empty-bracket-preview{
+  display:grid;
+  justify-items:center;
+  gap:10px;
+  padding:24px;
+  color:#766e68;
+  text-align:center;
+}
+.empty-bracket-preview svg{
+  width:34px;
+  height:34px;
+  color:#ff9368;
+}
+.bracket-image-link{
+  position:relative;
+  width:100%;
+  height:100%;
+  min-height:330px;
+  display:grid;
+  place-items:center;
+  padding:12px;
+  text-decoration:none;
+}
+.bracket-image-link img{
+  width:100%;
+  max-height:650px;
+  object-fit:contain;
+}
+.bracket-image-link>span{
+  position:absolute;
+  right:12px;
+  bottom:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 9px;
+  border:1px solid var(--line-2);
+  border-radius:8px;
+  background:rgba(20,18,16,.88);
+  color:#e8e1dc;
+  font-size:10px;
+  font-weight:700;
+  backdrop-filter:blur(10px);
+}
+.public-bracket-image{
+  display:grid;
+  gap:12px;
+  justify-items:center;
+  padding:14px;
+}
+.public-bracket-image>a:first-child{
+  width:100%;
+  display:grid;
+  place-items:center;
+}
+.public-bracket-image img{
+  display:block;
+  width:auto;
+  max-width:100%;
+  max-height:1100px;
+  object-fit:contain;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#141210;
+}
+.bracket-open-btn{
+  justify-self:center;
+}
+#bracketSection .bracket-scroll{
+  padding:0;
+  background:transparent;
+}
+
+@media(max-width:700px){
+  .bracket-image-editor{
+    grid-template-columns:1fr;
+    padding:11px;
+  }
+  .bracket-image-preview,
+  .bracket-image-link{
+    min-height:220px;
+  }
+  .bracket-image-controls .form-actions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .public-bracket-image{
+    padding:10px;
+  }
+  .public-bracket-image img{
+    border-radius:6px;
+  }
+}
