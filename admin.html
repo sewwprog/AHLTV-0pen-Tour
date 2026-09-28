@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090a0c">
+  <title>AHLTV Open Tour — Admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="./">AHLTV <span>OPEN TOUR</span></a>
+    <nav><a href="./">На сайт</a></nav>
+  </header>
+
+  <main class="admin-main">
+    <section id="loginView" class="auth-wrap">
+      <div class="eyebrow">SECURE AREA</div>
+      <h1 class="admin-title">Admin panel</h1>
+      <form id="loginForm" class="card auth-card">
+        <label>Email<input id="email" type="email" autocomplete="username" required></label>
+        <label>Пароль<input id="password" type="password" autocomplete="current-password" required></label>
+        <button class="btn primary" type="submit">Увійти</button>
+        <p id="loginMessage" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="dashboardView" class="dashboard hidden">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">TOURNAMENT CONTROL</div>
+          <h2>Заявки команд</h2>
+        </div>
+        <div class="admin-actions">
+          <span id="adminEmail"></span>
+          <button id="logoutBtn" class="btn ghost">Вийти</button>
+        </div>
+      </div>
+      <div id="stats" class="facts compact"></div>
+      <div id="applications" class="applications"></div>
+      <p id="emptyState" class="empty hidden">Заявок поки немає.</p>
+    </section>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
