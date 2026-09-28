@@ -54,7 +54,7 @@ const siteSettingsForm=$("#siteSettingsForm"),siteLogoFile=$("#siteLogoFile"),si
 const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview");
 const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge");
 const usersList=$("#usersList"),usersCount=$("#usersCount");
-const matchForm=$("#matchForm"),matchTournament=$("#matchTournament"),bracketTournament=$("#bracketTournament"),generateBracketBtn=$("#generateBracketBtn"),bracketMessage=$("#bracketMessage"),approvedTeams=$("#approvedTeams"),matchMessage=$("#matchMessage"),adminMatchesList=$("#adminMatchesList"),adminMatchesCount=$("#adminMatchesCount");
+const bracketTournament=$("#bracketTournament"),bracketImageFile=$("#bracketImageFile"),saveBracketImageBtn=$("#saveBracketImageBtn"),removeBracketImageBtn=$("#removeBracketImageBtn"),bracketImagePreview=$("#bracketImagePreview"),bracketMessage=$("#bracketMessage");
 
 let tournaments=[],registrations=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
 
@@ -109,7 +109,7 @@ async function openAccount(user){
   await loadTournaments();
   await loadApplications();
   renderTournaments();
-  await Promise.all([loadUsers(),loadMatches()]);
+  await Promise.all([loadUsers(),loadBracketImage()]);
 }
 
 async function loadSiteSettings(){
@@ -318,21 +318,10 @@ function populateTournamentSelects(){
     ? '<option value="">Обери турнір</option>'+tournaments.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")
     : '<option value="">Спочатку створи турнір</option>';
 
-  matchTournament.innerHTML=options;
   if(bracketTournament)bracketTournament.innerHTML=options;
-  refreshApprovedTeams();
 }
-matchTournament.addEventListener("change",refreshApprovedTeams);
-bracketTournament?.addEventListener("change",()=>{
-  if(bracketTournament.value){
-    matchTournament.value=bracketTournament.value;
-    refreshApprovedTeams();
-  }
-});
-function refreshApprovedTeams(){
-  const id=Number(matchTournament.value);
-  approvedTeams.innerHTML=registrations.filter(r=>r.status==="approved"&&r.tournament_id===id).map(r=>`<option value="${esc(r.team_name)}"></option>`).join("");
-}
+
+bracketTournament?.addEventListener("change",loadBracketImage);
 
 async function loadApplications(){
   const {data,error}=await supabase.from("team_registrations").select("*, tournaments(name,short_name)").order("created_at",{ascending:false});
@@ -344,7 +333,7 @@ async function loadApplications(){
   applications.innerHTML=registrations.map(renderApplication).join("");
   window.refreshIcons?.();
   applications.querySelectorAll("[data-app-action]").forEach(btn=>btn.addEventListener("click",handleApplicationAction));
-  refreshApprovedTeams();renderTournaments();
+  renderTournaments();
 }
 
 function renderApplication(item){
@@ -408,273 +397,152 @@ async function loadUsers(){
   }catch(e){console.error(e);usersList.innerHTML='<div class="empty-state error">Не вдалося завантажити користувачів.</div>'}
 }
 
-function bracketRoundName(round,totalRounds){
-  if(round===totalRounds)return "Final";
-  if(round===totalRounds-1)return "Semifinal";
-  if(round===totalRounds-2&&totalRounds>=3)return "Quarterfinal";
-  return "Round "+round;
+function renderBracketPreview(url){
+  if(!bracketImagePreview)return;
+
+  const safe=safeUrl(url);
+
+  if(!safe){
+    bracketImagePreview.innerHTML=`
+      <div class="empty-bracket-preview">
+        <i data-lucide="image"></i>
+        <span>Для цього турніру фото сітки ще не додано</span>
+      </div>`;
+    window.refreshIcons?.();
+    return;
+  }
+
+  bracketImagePreview.innerHTML=`
+    <a href="${esc(safe)}" target="_blank" rel="noopener noreferrer" class="bracket-image-link">
+      <img src="${esc(safe)}" alt="Сітка турніру">
+      <span><i data-lucide="external-link"></i> Відкрити повністю</span>
+    </a>`;
+
+  window.refreshIcons?.();
 }
 
-async function advanceWinner(match,winner){
-  if(!match.bracket_round||!match.bracket_position||!winner||winner==="TBD"||winner==="BYE")return;
+async function loadBracketImage(){
+  if(!bracketTournament||!bracketImagePreview)return;
 
-  const nextRound=match.bracket_round+1;
-  const nextPosition=Math.ceil(match.bracket_position/2);
+  const tournamentId=Number(bracketTournament.value||0);
+  bracketMessage.textContent="";
+  bracketMessage.className="";
 
-  const {data:nextMatch}=await supabase
-    .from("tournament_matches")
-    .select("*")
-    .eq("tournament_id",match.tournament_id)
-    .eq("bracket_round",nextRound)
-    .eq("bracket_position",nextPosition)
-    .maybeSingle();
+  if(bracketImageFile)bracketImageFile.value="";
 
-  if(!nextMatch)return;
+  if(!tournamentId){
+    bracketImagePreview.innerHTML=`
+      <div class="empty-bracket-preview">
+        <i data-lucide="image"></i>
+        <span>Обери турнір і завантаж фото сітки</span>
+      </div>`;
+    window.refreshIcons?.();
+    return;
+  }
 
-  const field=match.bracket_position%2===1?"team_one":"team_two";
-  await supabase
-    .from("tournament_matches")
-    .update({[field]:winner})
-    .eq("id",nextMatch.id);
+  const tournament=tournaments.find(t=>t.id===tournamentId);
+
+  if(!tournament){
+    renderBracketPreview(null);
+    return;
+  }
+
+  renderBracketPreview(tournament.bracket_image_url);
 }
 
-generateBracketBtn?.addEventListener("click",async()=>{
+bracketImageFile?.addEventListener("change",()=>{
+  const file=bracketImageFile.files?.[0];
+  if(!file)return;
+  renderBracketPreview(URL.createObjectURL(file));
+});
+
+saveBracketImageBtn?.addEventListener("click",async()=>{
   const tournamentId=Number(bracketTournament?.value||0);
+  const file=bracketImageFile?.files?.[0];
+
+  bracketMessage.textContent="";
   bracketMessage.className="";
 
   if(!tournamentId){
-    bracketMessage.textContent="Обери турнір.";
+    bracketMessage.textContent="Спочатку обери турнір.";
     bracketMessage.className="error";
     return;
   }
 
-  const teams=registrations
-    .filter(r=>r.tournament_id===tournamentId&&r.status==="approved")
-    .map(r=>r.team_name);
-
-  if(teams.length<2){
-    bracketMessage.textContent="Потрібно щонайменше 2 підтверджені команди.";
+  if(!file){
+    bracketMessage.textContent="Обери фото сітки.";
     bracketMessage.className="error";
     return;
   }
 
-  if(!confirm("Створити нову сітку? Старі матчі сітки цього турніру будуть видалені."))return;
-
-  generateBracketBtn.disabled=true;
-  bracketMessage.textContent="Створюємо сітку...";
+  saveBracketImageBtn.disabled=true;
+  bracketMessage.textContent="Завантажуємо фото...";
 
   try{
-    await supabase
-      .from("tournament_matches")
-      .delete()
-      .eq("tournament_id",tournamentId)
-      .not("bracket_round","is",null);
+    const imageUrl=await uploadAsset(file,`brackets/${tournamentId}`);
 
-    let size=1;
-    while(size<teams.length)size*=2;
-    const totalRounds=Math.log2(size);
-    const seeded=[...teams];
-    while(seeded.length<size)seeded.push("BYE");
-
-    const rows=[];
-
-    for(let round=1;round<=totalRounds;round++){
-      const matchCount=size/Math.pow(2,round);
-
-      for(let position=1;position<=matchCount;position++){
-        let teamOne="TBD";
-        let teamTwo="TBD";
-
-        if(round===1){
-          teamOne=seeded[(position-1)*2]||"BYE";
-          teamTwo=seeded[(position-1)*2+1]||"BYE";
-        }
-
-        rows.push({
-          tournament_id:tournamentId,
-          team_one:teamOne,
-          team_two:teamTwo,
-          stage:bracketRoundName(round,totalRounds),
-          best_of:3,
-          status:"scheduled",
-          bracket_round:round,
-          bracket_position:position,
-          is_visible:true
-        });
-      }
-    }
-
-    const {data:created,error}=await supabase
-      .from("tournament_matches")
-      .insert(rows)
-      .select("*");
+    const {error}=await supabase
+      .from("tournaments")
+      .update({bracket_image_url:imageUrl})
+      .eq("id",tournamentId);
 
     if(error)throw error;
 
-    const firstRound=(created||[]).filter(m=>m.bracket_round===1);
+    const tournament=tournaments.find(t=>t.id===tournamentId);
+    if(tournament)tournament.bracket_image_url=imageUrl;
 
-    for(const match of firstRound){
-      const oneBye=match.team_one==="BYE";
-      const twoBye=match.team_two==="BYE";
-
-      if(oneBye!==twoBye){
-        const winner=oneBye?match.team_two:match.team_one;
-        await supabase
-          .from("tournament_matches")
-          .update({
-            status:"finished",
-            team_one_score:oneBye?0:1,
-            team_two_score:twoBye?0:1
-          })
-          .eq("id",match.id);
-
-        await advanceWinner(match,winner);
-      }
-    }
-
-    bracketMessage.textContent="Сітку створено.";
+    renderBracketPreview(imageUrl);
+    bracketImageFile.value="";
+    bracketMessage.textContent="Фото сітки збережено.";
     bracketMessage.className="success";
-    await loadMatches();
   }catch(error){
     console.error(error);
-    bracketMessage.textContent="Не вдалося створити сітку.";
+    bracketMessage.textContent=error?.message||"Не вдалося завантажити фото.";
     bracketMessage.className="error";
   }finally{
-    generateBracketBtn.disabled=false;
+    saveBracketImageBtn.disabled=false;
   }
 });
 
-matchForm.addEventListener("submit",async e=>{
-  e.preventDefault();
-  const d=Object.fromEntries(new FormData(matchForm).entries());
+removeBracketImageBtn?.addEventListener("click",async()=>{
+  const tournamentId=Number(bracketTournament?.value||0);
 
-  if(!d.tournament_id){
-    matchMessage.textContent="Обери турнір.";
-    matchMessage.className="error";
+  bracketMessage.textContent="";
+  bracketMessage.className="";
+
+  if(!tournamentId){
+    bracketMessage.textContent="Спочатку обери турнір.";
+    bracketMessage.className="error";
     return;
   }
 
-  const payload={
-    tournament_id:Number(d.tournament_id),
-    team_one:d.team_one.trim(),
-    team_two:d.team_two.trim(),
-    starts_at:d.starts_at?new Date(d.starts_at).toISOString():null,
-    stage:d.stage.trim()||null,
-    best_of:Number(d.best_of),
-    status:d.status,
-    bracket_round:d.bracket_round?Number(d.bracket_round):null,
-    bracket_position:d.bracket_position?Number(d.bracket_position):null,
-    team_one_score:d.team_one_score!==""?Number(d.team_one_score):null,
-    team_two_score:d.team_two_score!==""?Number(d.team_two_score):null
-  };
+  if(!confirm("Прибрати фото сітки з цього турніру?"))return;
 
-  matchMessage.textContent="Додаємо...";
-  matchMessage.className="";
+  removeBracketImageBtn.disabled=true;
 
-  const {error}=await supabase.from("tournament_matches").insert(payload);
+  try{
+    const {error}=await supabase
+      .from("tournaments")
+      .update({bracket_image_url:null})
+      .eq("id",tournamentId);
 
-  if(error){
+    if(error)throw error;
+
+    const tournament=tournaments.find(t=>t.id===tournamentId);
+    if(tournament)tournament.bracket_image_url=null;
+
+    if(bracketImageFile)bracketImageFile.value="";
+    renderBracketPreview(null);
+    bracketMessage.textContent="Фото сітки прибрано.";
+    bracketMessage.className="success";
+  }catch(error){
     console.error(error);
-    matchMessage.textContent="Не вдалося додати матч.";
-    matchMessage.className="error";
-    return;
+    bracketMessage.textContent="Не вдалося прибрати фото.";
+    bracketMessage.className="error";
+  }finally{
+    removeBracketImageBtn.disabled=false;
   }
-
-  matchForm.reset();
-  matchMessage.textContent="Матч додано.";
-  matchMessage.className="success";
-  populateTournamentSelects();
-  await loadMatches();
 });
-
-async function saveBracketMatch(row){
-  const id=Number(row.dataset.matchId);
-  const match=currentMatches.find(m=>m.id===id);
-  if(!match)return;
-
-  const scoreOneRaw=row.querySelector("[data-score-one]").value;
-  const scoreTwoRaw=row.querySelector("[data-score-two]").value;
-  const status=row.querySelector("[data-match-status-select]").value;
-
-  const scoreOne=scoreOneRaw===""?null:Number(scoreOneRaw);
-  const scoreTwo=scoreTwoRaw===""?null:Number(scoreTwoRaw);
-
-  const {error}=await supabase
-    .from("tournament_matches")
-    .update({
-      team_one_score:scoreOne,
-      team_two_score:scoreTwo,
-      status
-    })
-    .eq("id",id);
-
-  if(error){
-    alert("Не вдалося зберегти матч.");
-    return;
-  }
-
-  if(status==="finished"&&scoreOne!==null&&scoreTwo!==null&&scoreOne!==scoreTwo){
-    const winner=scoreOne>scoreTwo?match.team_one:match.team_two;
-    await advanceWinner(match,winner);
-  }
-
-  await loadMatches();
-}
-
-let currentMatches=[];
-
-async function loadMatches(){
-  const {data,error}=await supabase
-    .from("tournament_matches")
-    .select("*, tournaments(name)")
-    .order("tournament_id",{ascending:true})
-    .order("bracket_round",{ascending:true,nullsFirst:false})
-    .order("bracket_position",{ascending:true,nullsFirst:false})
-    .order("starts_at",{ascending:true,nullsFirst:false});
-
-  if(error){
-    adminMatchesList.innerHTML='<div class="empty-state error">Не вдалося завантажити матчі.</div>';
-    return;
-  }
-
-  currentMatches=data||[];
-  adminMatchesCount.textContent=String(currentMatches.length);
-
-  adminMatchesList.innerHTML=currentMatches.length
-    ? currentMatches.map(m=>`<div class="admin-match-row bracket-admin-row" data-match-id="${m.id}">
-        <div>
-          <small>${esc(m.tournaments?.name||"Турнір")} · ${esc(m.stage||"Матч")} ${m.bracket_round?"· R"+m.bracket_round+" #"+m.bracket_position:""}</small>
-          <b>${esc(m.team_one)} — ${esc(m.team_two)}</b>
-          <span>${m.starts_at?new Date(m.starts_at).toLocaleString("uk-UA"):"Дата не вказана"} · BO${m.best_of}</span>
-        </div>
-        <div class="bracket-admin-controls">
-          <input data-score-one type="number" min="0" value="${m.team_one_score??""}" placeholder="0" aria-label="Рахунок команди 1">
-          <span>:</span>
-          <input data-score-two type="number" min="0" value="${m.team_two_score??""}" placeholder="0" aria-label="Рахунок команди 2">
-          <select data-match-status-select>
-            <option value="scheduled" ${m.status==="scheduled"?"selected":""}>Scheduled</option>
-            <option value="live" ${m.status==="live"?"selected":""}>LIVE</option>
-            <option value="finished" ${m.status==="finished"?"selected":""}>Finished</option>
-          </select>
-          <button class="btn approve" data-save-match type="button"><i data-lucide="save"></i><span>Зберегти</span></button>
-          <button class="btn reject" data-delete-match="${m.id}" type="button"><i data-lucide="trash-2"></i><span>Видалити</span></button>
-        </div>
-      </div>`).join("")
-    : '<div class="empty-state">Матчів ще немає.</div>';
-
-  window.refreshIcons?.();
-  adminMatchesList.querySelectorAll("[data-save-match]").forEach(btn=>{
-    btn.addEventListener("click",()=>saveBracketMatch(btn.closest("[data-match-id]")));
-  });
-
-  adminMatchesList.querySelectorAll("[data-delete-match]").forEach(btn=>{
-    btn.addEventListener("click",async()=>{
-      if(!confirm("Видалити матч?"))return;
-      await supabase.from("tournament_matches").delete().eq("id",Number(btn.dataset.deleteMatch));
-      await loadMatches();
-    });
-  });
-}
 
 async function getAdminState(){
   const {data,error}=await supabase.rpc("has_ahltv_admin");
