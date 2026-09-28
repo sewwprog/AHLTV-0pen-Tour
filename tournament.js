@@ -20,10 +20,9 @@ if(!Number.isFinite(id)||id<=0){
   throw new Error("invalid tournament id");
 }
 
-const [{data:tournament,error:tErr},{data:teams,error:teamErr},{data:matches,error:mErr}]=await Promise.all([
+const [{data:tournament,error:tErr},{data:teams,error:teamErr}]=await Promise.all([
   supabase.from("tournaments").select("*").eq("id",id).eq("is_visible",true).maybeSingle(),
-  supabase.rpc("get_public_teams"),
-  supabase.from("tournament_matches").select("*").eq("tournament_id",id).eq("is_visible",true).order("bracket_round",{ascending:true,nullsFirst:false}).order("bracket_position",{ascending:true,nullsFirst:false})
+  supabase.rpc("get_public_teams")
 ]);
 
 if(tErr||!tournament){
@@ -57,27 +56,18 @@ teamsRoot.innerHTML=tournamentTeams.length
   ? tournamentTeams.map(t=>`<div class="detail-team-row"><span>${esc(t.team_tag)}</span><b>${esc(t.team_name)}</b></div>`).join("")
   : '<div class="empty-state">Підтверджених команд ще немає.</div>';
 
-const bracketMatches=(matches||[]).filter(m=>m.bracket_round&&m.bracket_position);
+const bracketImage=safeUrl(tournament.bracket_image_url);
 
-if(!bracketMatches.length){
-  bracketRoot.innerHTML='<div class="empty-state">Сітка ще не створена.</div>';
-}else{
-  const rounds=[...new Set(bracketMatches.map(m=>m.bracket_round))].sort((a,b)=>a-b);
-  bracketRoot.innerHTML=`<div class="bracket-board">${rounds.map(round=>{
-    const rm=bracketMatches.filter(m=>m.bracket_round===round).sort((a,b)=>a.bracket_position-b.bracket_position);
-    const title=rm[0]?.stage||("Round "+round);
-    return `<section class="bracket-round">
-      <div class="bracket-round-title">${esc(title)}</div>
-      <div class="bracket-round-matches">
-        ${rm.map(m=>`<article class="bracket-match ${m.status==="live"?"is-live":""}">
-          <div class="bracket-team"><span>${esc(m.team_one||"TBD")}</span><b>${m.team_one_score??"–"}</b></div>
-          <div class="bracket-team"><span>${esc(m.team_two||"TBD")}</span><b>${m.team_two_score??"–"}</b></div>
-          <small>${m.status==="live"?"LIVE":m.status.toUpperCase()} · BO${m.best_of}</small>
-        </article>`).join("")}
-      </div>
-    </section>`;
-  }).join("")}</div>`;
-}
+bracketRoot.innerHTML=bracketImage
+  ? `<div class="public-bracket-image">
+      <a href="${esc(bracketImage)}" target="_blank" rel="noopener noreferrer">
+        <img src="${esc(bracketImage)}" alt="Сітка турніру ${esc(tournament.name)}">
+      </a>
+      <a class="secondary-btn bracket-open-btn" href="${esc(bracketImage)}" target="_blank" rel="noopener noreferrer">
+        <i data-lucide="external-link"></i><span>Відкрити повністю</span>
+      </a>
+    </div>`
+  : '<div class="empty-state">Фото сітки ще не додано.</div>';
 
 const rules=(tournament.rules_text||"").trim();
 rulesRoot.innerHTML=rules
