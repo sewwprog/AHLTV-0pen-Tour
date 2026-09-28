@@ -1,0 +1,3 @@
+const body=document.body,menuBtn=document.querySelector("#menuBtn"),drawer=document.querySelector("#mobileDrawer"),backdrop=document.querySelector("#drawerBackdrop"),closeBtn=document.querySelector("#drawerClose");
+function setDrawer(open){body.classList.toggle("drawer-open",open);drawer?.setAttribute("aria-hidden",open?"false":"true");menuBtn?.setAttribute("aria-expanded",open?"true":"false")}
+menuBtn?.addEventListener("click",()=>setDrawer(true));closeBtn?.addEventListener("click",()=>setDrawer(false));backdrop?.addEventListener("click",()=>setDrawer(false));drawer?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>setDrawer(false)));document.addEventListener("keydown",e=>{if(e.key==="Escape")setDrawer(false)});
