@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#171513">
   <title>AHLTV — Турнір</title>
-  <link rel="stylesheet" href="styles.css?v=20260928-11">
+  <link rel="stylesheet" href="styles.css?v=20260928-12">
 </head>
 <body>
 <header class="site-header">
   <div class="shell header-inner">
     <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
-    <nav class="main-nav"><a href="./">Турніри</a><a href="apply.html">Подати заявку</a></nav>
-    <a class="account-btn desktop-only" href="admin.html">Акаунт</a>
-    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main-nav"><a href="./"><i data-lucide="trophy"></i><span>Турніри</span></a><a href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a></nav>
+    <a class="account-btn desktop-only" href="admin.html"><i data-lucide="circle-user-round"></i><span>Акаунт</span></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><i data-lucide="menu"></i></button>
   </div>
 </header>
 <div class="drawer-backdrop" id="drawerBackdrop"></div>
 <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
-  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose">×</button></div>
-  <nav><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Акаунт</a></nav>
+  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose" aria-label="Закрити меню"><i data-lucide="x"></i></button></div>
+  <nav><a href="./"><i data-lucide="trophy"></i><span>Турніри</span><i data-lucide="chevron-right"></i></a><a href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span><i data-lucide="chevron-right"></i></a><a href="admin.html"><i data-lucide="circle-user-round"></i><span>Акаунт</span><i data-lucide="chevron-right"></i></a></nav>
 </aside>
 
 <main class="shell tournament-detail-page">
@@ -28,28 +28,28 @@
   </section>
 
   <nav class="detail-tabs">
-    <a href="#teamsSection">Команди</a>
-    <a href="#bracketSection">Сітка</a>
-    <a href="#rulesSection">Правила</a>
+    <a href="#teamsSection"><i data-lucide="users"></i><span>Команди</span></a>
+    <a href="#bracketSection"><i data-lucide="git-branch"></i><span>Сітка</span></a>
+    <a href="#rulesSection"><i data-lucide="scroll-text"></i><span>Правила</span></a>
   </nav>
 
   <section id="teamsSection" class="panel">
-    <div class="panel-head"><span>КОМАНДИ</span><strong id="detailTeamsCount"></strong></div>
+    <div class="panel-head"><span><i data-lucide="users"></i> КОМАНДИ</span><strong id="detailTeamsCount"></strong></div>
     <div id="detailTeams" class="detail-teams"></div>
   </section>
 
   <section id="bracketSection" class="panel">
-    <div class="panel-head"><span>ТУРНІРНА СІТКА</span><strong>BRACKET</strong></div>
+    <div class="panel-head"><span><i data-lucide="git-branch"></i> ТУРНІРНА СІТКА</span><strong>BRACKET</strong></div>
     <div id="bracketRoot" class="bracket-scroll"></div>
   </section>
 
   <section id="rulesSection" class="panel">
-    <div class="panel-head"><span>ПРАВИЛА</span></div>
+    <div class="panel-head"><span><i data-lucide="scroll-text"></i> ПРАВИЛА</span></div>
     <div id="rulesContent" class="rules-content"></div>
   </section>
 </main>
 
-<script type="module" src="ui.js?v=20260928-8"></script>
-<script type="module" src="tournament.js?v=20260928-8"></script>
+<script type="module" src="ui.js?v=20260928-12"></script>
+<script type="module" src="tournament.js?v=20260928-12"></script>
 </body>
 </html>
