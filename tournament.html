@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17212b">
+  <title>AHLTV — Турнір</title>
+  <link rel="stylesheet" href="styles.css?v=20260928-8">
+</head>
+<body>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
+    <nav class="main-nav"><a href="./">Турніри</a><a href="apply.html">Подати заявку</a></nav>
+    <a class="account-btn desktop-only" href="admin.html">Акаунт</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose">×</button></div>
+  <nav><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Акаунт</a></nav>
+</aside>
+
+<main class="shell tournament-detail-page">
+  <section id="tournamentHero" class="panel tournament-detail-hero">
+    <div class="loading-panel">Завантаження турніру...</div>
+  </section>
+
+  <nav class="detail-tabs">
+    <a href="#teamsSection">Команди</a>
+    <a href="#bracketSection">Сітка</a>
+    <a href="#rulesSection">Правила</a>
+  </nav>
+
+  <section id="teamsSection" class="panel">
+    <div class="panel-head"><span>КОМАНДИ</span><strong id="detailTeamsCount"></strong></div>
+    <div id="detailTeams" class="detail-teams"></div>
+  </section>
+
+  <section id="bracketSection" class="panel">
+    <div class="panel-head"><span>ТУРНІРНА СІТКА</span><strong>BRACKET</strong></div>
+    <div id="bracketRoot" class="bracket-scroll"></div>
+  </section>
+
+  <section id="rulesSection" class="panel">
+    <div class="panel-head"><span>ПРАВИЛА</span></div>
+    <div id="rulesContent" class="rules-content"></div>
+  </section>
+</main>
+
+<script type="module" src="ui.js?v=20260928-8"></script>
+<script type="module" src="tournament.js?v=20260928-8"></script>
+</body>
+</html>
