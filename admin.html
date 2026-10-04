@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#171513"><title>AHLTV — Account</title>
-  <link rel="stylesheet" href="styles.css?v=20261004-01">
+  <link rel="stylesheet" href="styles.css?v=20261004-03">
 </head>
 <body>
 <header class="site-header"><div class="shell header-inner">
@@ -33,19 +33,26 @@
     </div>
   </section>
 
-  <section id="userView" class="panel account-panel hidden">
-    <div class="panel-head"><span>АКАУНТ</span><strong>USER</strong></div>
-    <div class="account-body">
-      <div>
-        <small>Ви увійшли як</small>
-        <h2 id="userEmail"></h2>
-        <p>Тепер можна подати заявку на участь у турнірі.</p>
+  <section id="userView" class="user-dashboard hidden">
+    <section class="panel account-panel">
+      <div class="panel-head"><span><i data-lucide="layout-dashboard"></i> КАБІНЕТ КАПІТАНА</span><strong>USER</strong></div>
+      <div class="account-body">
+        <div>
+          <small>Ви увійшли як</small>
+          <h2 id="userEmail"></h2>
+          <p>Тут показуються ваші заявки та їх актуальний статус.</p>
+        </div>
+        <div class="account-actions">
+          <a class="primary-btn" href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>
+          <button class="secondary-btn" id="userLogoutBtn" type="button"><i data-lucide="log-out"></i><span>Вийти</span></button>
+        </div>
       </div>
-      <div class="account-actions">
-        <a class="primary-btn" href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>
-        <button class="secondary-btn" id="userLogoutBtn" type="button"><i data-lucide="log-out"></i><span>Вийти</span></button>
-      </div>
-    </div>
+    </section>
+    <section class="panel user-applications-panel">
+      <div class="panel-head"><span><i data-lucide="clipboard-list"></i> МОЇ ЗАЯВКИ</span><strong id="userApplicationsCount">0</strong></div>
+      <div id="userApplicationStats" class="user-application-stats"></div>
+      <div id="userApplications" class="user-applications-list"><div class="empty-state">Завантаження заявок...</div></div>
+    </section>
   </section>
   <section id="dashboardView" class="dashboard hidden">
     <div class="admin-top panel"><div><small>CONTROL PANEL</small><h1>Керування AHLTV</h1></div><div class="admin-account"><span id="adminEmail"></span><button id="logoutBtn" class="secondary-btn"><i data-lucide="log-out"></i><span>Вийти</span></button></div></div>
@@ -154,5 +161,5 @@
     </section>  </section>
 </main>
 <script type="module" src="ui.js?v=20260928-20"></script>
-<script type="module" src="account.js?v=20261004-02"></script>
+<script type="module" src="account.js?v=20261004-03"></script>
 </body></html>
