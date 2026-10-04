@@ -2506,3 +2506,45 @@ body{
   }
   .public-bracket-gallery{padding:10px}
 }
+
+
+/* PUBLIC BRACKET FIXED TWO SLOTS 2026-10-04 */
+.public-bracket-gallery.has-two{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.public-bracket-image.is-empty{
+  min-height:360px;
+}
+.public-bracket-empty{
+  min-height:300px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:7px;
+  padding:24px;
+  color:#6f6761;
+  text-align:center;
+}
+.public-bracket-empty svg{
+  width:30px;
+  height:30px;
+  color:#c95833;
+}
+.public-bracket-empty b{
+  color:#d8d0ca;
+  font:700 11px/1 "Space Mono",monospace;
+}
+.public-bracket-empty span{
+  font-size:10px;
+}
+@media(max-width:700px){
+  .public-bracket-gallery.has-two{
+    grid-template-columns:1fr;
+  }
+  .public-bracket-image.is-empty{
+    min-height:240px;
+  }
+  .public-bracket-empty{
+    min-height:190px;
+  }
+}
