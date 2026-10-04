@@ -388,6 +388,10 @@ form.addEventListener("submit",async e=>{
 
     if(error.code==="23505"){
       message.textContent="Ця команда або тег уже зареєстровані на цей турнір.";
+    }else if(String(error.message||"").includes("duplicate_player_in_roster")){
+      message.textContent="Один Steam-профіль не можна вказувати двічі в одному складі.";
+    }else if(String(error.message||"").includes("duplicate_player_in_tournament")){
+      message.textContent="Один із цих Steam-профілів уже зареєстрований в іншій команді цього турніру.";
     }else if(error.code==="23514"){
       message.textContent="Перевір склад: 5 гравців, 1–3 заміни та правильні Steam-посилання.";
     }else if(error.code==="42501"){
