@@ -54,7 +54,7 @@ const siteSettingsForm=$("#siteSettingsForm"),siteLogoFile=$("#siteLogoFile"),si
 const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview");
 const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge");
 const usersList=$("#usersList"),usersCount=$("#usersCount");
-const bracketTournament=$("#bracketTournament"),bracketImageFile=$("#bracketImageFile"),saveBracketImageBtn=$("#saveBracketImageBtn"),removeBracketImageBtn=$("#removeBracketImageBtn"),bracketImagePreview=$("#bracketImagePreview"),bracketMessage=$("#bracketMessage");
+const bracketTournament=$("#bracketTournament"),bracketImageFile=$("#bracketImageFile"),saveBracketImageBtn=$("#saveBracketImageBtn"),removeBracketImageBtn=$("#removeBracketImageBtn"),bracketImagePreview=$("#bracketImagePreview"),bracketImageFile2=$("#bracketImageFile2"),saveBracketImageBtn2=$("#saveBracketImageBtn2"),removeBracketImageBtn2=$("#removeBracketImageBtn2"),bracketImagePreview2=$("#bracketImagePreview2"),bracketMessage=$("#bracketMessage");
 
 let tournaments=[],registrations=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
 
@@ -498,68 +498,91 @@ async function loadUsers(){
   }catch(e){console.error(e);usersList.innerHTML='<div class="empty-state error">Не вдалося завантажити користувачів.</div>'}
 }
 
-function renderBracketPreview(url){
-  if(!bracketImagePreview)return;
+function renderBracketPreview(container,url,slot=1){
+  if(!container)return;
 
   const safe=safeUrl(url);
 
   if(!safe){
-    bracketImagePreview.innerHTML=`
+    container.innerHTML=`
       <div class="empty-bracket-preview">
         <i data-lucide="image"></i>
-        <span>Для цього турніру фото сітки ще не додано</span>
+        <span>Сітка ${slot} ще не додана</span>
       </div>`;
     window.refreshIcons?.();
     return;
   }
 
-  bracketImagePreview.innerHTML=`
+  container.innerHTML=`
     <a href="${esc(safe)}" target="_blank" rel="noopener noreferrer" class="bracket-image-link">
-      <img src="${esc(safe)}" alt="Сітка турніру">
+      <img src="${esc(safe)}" alt="Сітка турніру ${slot}">
       <span><i data-lucide="external-link"></i> Відкрити повністю</span>
     </a>`;
 
   window.refreshIcons?.();
 }
 
+function getBracketSlot(slot){
+  if(slot===2){
+    return {
+      file:bracketImageFile2,
+      save:saveBracketImageBtn2,
+      remove:removeBracketImageBtn2,
+      preview:bracketImagePreview2,
+      column:"bracket_image_url_2"
+    };
+  }
+
+  return {
+    file:bracketImageFile,
+    save:saveBracketImageBtn,
+    remove:removeBracketImageBtn,
+    preview:bracketImagePreview,
+    column:"bracket_image_url"
+  };
+}
+
 async function loadBracketImage(){
-  if(!bracketTournament||!bracketImagePreview)return;
+  if(!bracketTournament||!bracketImagePreview||!bracketImagePreview2)return;
 
   const tournamentId=Number(bracketTournament.value||0);
   bracketMessage.textContent="";
   bracketMessage.className="";
 
   if(bracketImageFile)bracketImageFile.value="";
+  if(bracketImageFile2)bracketImageFile2.value="";
 
   if(!tournamentId){
-    bracketImagePreview.innerHTML=`
-      <div class="empty-bracket-preview">
-        <i data-lucide="image"></i>
-        <span>Обери турнір і завантаж фото сітки</span>
-      </div>`;
-    window.refreshIcons?.();
+    renderBracketPreview(bracketImagePreview,null,1);
+    renderBracketPreview(bracketImagePreview2,null,2);
     return;
   }
 
   const tournament=tournaments.find(t=>t.id===tournamentId);
 
   if(!tournament){
-    renderBracketPreview(null);
+    renderBracketPreview(bracketImagePreview,null,1);
+    renderBracketPreview(bracketImagePreview2,null,2);
     return;
   }
 
-  renderBracketPreview(tournament.bracket_image_url);
+  renderBracketPreview(bracketImagePreview,tournament.bracket_image_url,1);
+  renderBracketPreview(bracketImagePreview2,tournament.bracket_image_url_2,2);
 }
 
-bracketImageFile?.addEventListener("change",()=>{
-  const file=bracketImageFile.files?.[0];
-  if(!file)return;
-  renderBracketPreview(URL.createObjectURL(file));
-});
+function setupBracketFilePreview(slot){
+  const config=getBracketSlot(slot);
+  config.file?.addEventListener("change",()=>{
+    const file=config.file.files?.[0];
+    if(!file)return;
+    renderBracketPreview(config.preview,URL.createObjectURL(file),slot);
+  });
+}
 
-saveBracketImageBtn?.addEventListener("click",async()=>{
+async function saveBracketSlot(slot){
+  const config=getBracketSlot(slot);
   const tournamentId=Number(bracketTournament?.value||0);
-  const file=bracketImageFile?.files?.[0];
+  const file=config.file?.files?.[0];
 
   bracketMessage.textContent="";
   bracketMessage.className="";
@@ -571,41 +594,42 @@ saveBracketImageBtn?.addEventListener("click",async()=>{
   }
 
   if(!file){
-    bracketMessage.textContent="Обери фото сітки.";
+    bracketMessage.textContent=`Обери фото для сітки ${slot}.`;
     bracketMessage.className="error";
     return;
   }
 
-  saveBracketImageBtn.disabled=true;
-  bracketMessage.textContent="Завантажуємо фото...";
+  config.save.disabled=true;
+  bracketMessage.textContent=`Завантажуємо сітку ${slot}...`;
 
   try{
-    const imageUrl=await uploadAsset(file,`brackets/${tournamentId}`);
+    const imageUrl=await uploadAsset(file,`brackets/${tournamentId}/slot-${slot}`);
 
     const {error}=await supabase
       .from("tournaments")
-      .update({bracket_image_url:imageUrl})
+      .update({[config.column]:imageUrl})
       .eq("id",tournamentId);
 
     if(error)throw error;
 
     const tournament=tournaments.find(t=>t.id===tournamentId);
-    if(tournament)tournament.bracket_image_url=imageUrl;
+    if(tournament)tournament[config.column]=imageUrl;
 
-    renderBracketPreview(imageUrl);
-    bracketImageFile.value="";
-    bracketMessage.textContent="Фото сітки збережено.";
+    renderBracketPreview(config.preview,imageUrl,slot);
+    config.file.value="";
+    bracketMessage.textContent=`Сітку ${slot} збережено.`;
     bracketMessage.className="success";
   }catch(error){
     console.error(error);
-    bracketMessage.textContent=error?.message||"Не вдалося завантажити фото.";
+    bracketMessage.textContent=error?.message||`Не вдалося завантажити сітку ${slot}.`;
     bracketMessage.className="error";
   }finally{
-    saveBracketImageBtn.disabled=false;
+    config.save.disabled=false;
   }
-});
+}
 
-removeBracketImageBtn?.addEventListener("click",async()=>{
+async function removeBracketSlot(slot){
+  const config=getBracketSlot(slot);
   const tournamentId=Number(bracketTournament?.value||0);
 
   bracketMessage.textContent="";
@@ -617,33 +641,41 @@ removeBracketImageBtn?.addEventListener("click",async()=>{
     return;
   }
 
-  if(!confirm("Прибрати фото сітки з цього турніру?"))return;
+  if(!confirm(`Прибрати сітку ${slot} з цього турніру?`))return;
 
-  removeBracketImageBtn.disabled=true;
+  config.remove.disabled=true;
 
   try{
     const {error}=await supabase
       .from("tournaments")
-      .update({bracket_image_url:null})
+      .update({[config.column]:null})
       .eq("id",tournamentId);
 
     if(error)throw error;
 
     const tournament=tournaments.find(t=>t.id===tournamentId);
-    if(tournament)tournament.bracket_image_url=null;
+    if(tournament)tournament[config.column]=null;
 
-    if(bracketImageFile)bracketImageFile.value="";
-    renderBracketPreview(null);
-    bracketMessage.textContent="Фото сітки прибрано.";
+    if(config.file)config.file.value="";
+    renderBracketPreview(config.preview,null,slot);
+    bracketMessage.textContent=`Сітку ${slot} прибрано.`;
     bracketMessage.className="success";
   }catch(error){
     console.error(error);
-    bracketMessage.textContent="Не вдалося прибрати фото.";
+    bracketMessage.textContent=`Не вдалося прибрати сітку ${slot}.`;
     bracketMessage.className="error";
   }finally{
-    removeBracketImageBtn.disabled=false;
+    config.remove.disabled=false;
   }
-});
+}
+
+setupBracketFilePreview(1);
+setupBracketFilePreview(2);
+
+saveBracketImageBtn?.addEventListener("click",()=>saveBracketSlot(1));
+saveBracketImageBtn2?.addEventListener("click",()=>saveBracketSlot(2));
+removeBracketImageBtn?.addEventListener("click",()=>removeBracketSlot(1));
+removeBracketImageBtn2?.addEventListener("click",()=>removeBracketSlot(2));
 
 async function getAdminState(){
   const {data,error}=await supabase.rpc("has_ahltv_admin");
