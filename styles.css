@@ -2021,3 +2021,90 @@ body{
     justify-content:center;
   }
 }
+
+
+/* CAPTAIN CABINET + SEAT COUNTER 2026-10-04 */
+.home-registration-summary{
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin:12px 0 14px;
+  padding:10px 13px;
+  border:1px solid rgba(201,88,51,.17);
+  border-radius:7px;
+  background:#1d1a18;
+}
+.home-registration-copy{min-width:0;display:flex;align-items:center;gap:8px;color:#958b84;font-size:11px}
+.home-registration-copy b{color:#e6ddd7}
+.home-registration-copy strong{color:#dc724c}
+.registration-live-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#63c184;box-shadow:0 0 0 4px rgba(99,193,132,.08)}
+.summary-separator{color:#514b47}
+.home-registration-summary>a{display:inline-flex;align-items:center;gap:7px;color:#cfc6c0;text-decoration:none;font-size:10px;font-weight:700}
+.home-registration-summary>a:hover{color:#fff}
+.home-registration-summary>a svg{width:14px;height:14px}
+
+.tournament-quick-status{display:flex;align-items:center;gap:8px;margin:0 18px 10px 94px;color:#8f857f;font-size:10px}
+.tournament-quick-status>span:first-child{display:inline-flex;align-items:center;gap:5px;font-weight:700}
+.tournament-quick-status>span:first-child.open{color:#79c894}
+.tournament-quick-status>span:first-child.closed{color:#c47b75}
+.tournament-quick-status svg{width:13px;height:13px}
+.tournament-quick-status strong{color:#d9d1cb}
+.quick-dot{color:#514b47;font-style:normal}
+.seat-meter{margin:0 18px 14px 94px;padding:9px 10px;border:1px solid rgba(255,255,255,.055);border-radius:6px;background:#191715}
+.seat-meter-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;color:#766e68;font-size:9px}
+.seat-meter-head b{color:#cfc6c0}
+.seat-meter-track{height:5px;overflow:hidden;border-radius:2px;background:#2b2724}
+.seat-meter-track span{display:block;height:100%;min-width:0;border-radius:2px;background:#c95833;transition:width .35s cubic-bezier(.2,.75,.25,1)}
+.seat-meter small{display:block;margin-top:6px;color:#6f6762;font-size:9px}
+
+.user-dashboard{display:grid;gap:14px;max-width:980px;margin:24px auto 0}
+.user-applications-panel{overflow:hidden}
+.user-application-stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.user-application-stats>div{display:grid;gap:2px;padding:11px 14px;border-right:1px solid var(--line)}
+.user-application-stats>div:last-child{border-right:0}
+.user-application-stats b{color:#f0e9e4;font:700 18px/1 "Space Mono",monospace}
+.user-application-stats span{color:#766e68;font-size:9px;text-transform:uppercase}
+.user-applications-list{display:grid;gap:10px;padding:12px}
+.user-application-card{overflow:hidden;border:1px solid rgba(255,255,255,.07);border-radius:7px;background:#1a1816}
+.user-application-main{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px}
+.user-application-logo{width:52px;height:52px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:#141210;color:#dc724c;font:700 17px/1 "Space Mono",monospace}
+.user-application-logo.has-logo{padding:4px}
+.user-application-logo img{width:100%;height:100%;object-fit:contain}
+.user-application-copy{min-width:0}
+.user-application-copy>small{color:#756d67;font:700 8px/1 "Space Mono",monospace;letter-spacing:.06em}
+.user-application-copy h3{margin:4px 0 7px;overflow:hidden;color:#eee7e2;font-size:15px;text-overflow:ellipsis;white-space:nowrap}
+.user-application-copy h3 span{color:#7c746e;font-size:11px}
+.user-application-meta{display:flex;flex-wrap:wrap;gap:8px 12px;color:#817872;font-size:9px}
+.user-application-meta span{display:inline-flex;align-items:center;gap:5px}
+.user-application-meta svg{width:12px;height:12px}
+.cabinet-status{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;font:700 9px/1 "Space Mono",monospace}
+.cabinet-status svg{width:12px;height:12px}
+.cabinet-status-pending{border-color:rgba(226,162,76,.18);background:rgba(226,162,76,.06);color:#e2a24c}
+.cabinet-status-approved{border-color:rgba(99,193,132,.18);background:rgba(99,193,132,.06);color:#73c78f}
+.cabinet-status-rejected{border-color:rgba(235,107,100,.18);background:rgba(235,107,100,.06);color:#dc7871}
+.user-application-footer{min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-top:1px solid var(--line);background:#181614;color:#6e6761;font-size:9px}
+.user-application-footer .secondary-btn{min-height:30px;padding:0 9px;font-size:9px}
+.user-empty-applications{min-height:150px;display:grid;justify-items:center;gap:8px;padding:24px;color:#766e68;text-align:center}
+.user-empty-applications>i{width:30px;height:30px;color:#c95833}
+.user-empty-applications>div{display:grid;gap:3px}
+.user-empty-applications b{color:#d9d1cb}
+.user-empty-applications span{font-size:10px}
+
+@media(max-width:700px){
+  .home-registration-summary{align-items:flex-start;flex-direction:column}
+  .home-registration-copy{flex-wrap:wrap;row-gap:5px}
+  .home-registration-summary>a{width:100%;justify-content:space-between}
+  .tournament-quick-status{flex-wrap:wrap;margin:0 11px 9px}
+  .seat-meter{margin:0 11px 11px}
+  .user-dashboard{margin-top:14px}
+  .user-application-stats{grid-template-columns:repeat(2,1fr)}
+  .user-application-stats>div:nth-child(2){border-right:0}
+  .user-application-stats>div:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .user-application-main{grid-template-columns:46px minmax(0,1fr)}
+  .user-application-logo{width:46px;height:46px}
+  .cabinet-status{grid-column:1/-1;width:max-content}
+  .user-application-footer{align-items:flex-start;flex-direction:column}
+  .user-application-footer .secondary-btn{width:100%;justify-content:center}
+}
