@@ -2353,3 +2353,156 @@ body{
     grid-template-columns:1.25fr .7fr .95fr;
   }
 }
+
+
+/* DOUBLE BRACKET IMAGES 2026-10-04 */
+.bracket-double-editor{
+  display:grid;
+  gap:14px;
+  padding:14px;
+}
+.bracket-tournament-picker{
+  display:grid;
+  grid-template-columns:minmax(260px,420px) minmax(0,1fr);
+  align-items:end;
+  gap:10px 16px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:7px;
+  background:#1b1917;
+}
+.bracket-tournament-picker label,
+.bracket-slot>label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  color:#bbb1aa;
+  font-size:11px;
+  font-weight:700;
+}
+.bracket-tournament-picker select,
+.bracket-slot input{
+  width:100%;
+  min-height:40px;
+  padding:9px 10px;
+  border:1px solid var(--line-2);
+  border-radius:6px;
+  background:#161412;
+  color:#f4efeb;
+}
+.bracket-tournament-picker>span{
+  align-self:center;
+  color:#756d67;
+  font-size:10px;
+}
+.bracket-tournament-picker #bracketMessage{
+  grid-column:1/-1;
+  margin:0;
+}
+.bracket-slots{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.bracket-slot{
+  min-width:0;
+  display:grid;
+  align-content:start;
+  gap:10px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:7px;
+  background:#191715;
+}
+.bracket-slot-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-bottom:9px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.bracket-slot-head span{
+  color:#e8e1dc;
+  font:700 10px/1 "Space Mono",monospace;
+}
+.bracket-slot-head b{
+  color:#6f6761;
+  font:700 8px/1 "Space Mono",monospace;
+}
+.bracket-slot .form-actions{
+  margin:0;
+}
+.bracket-slot .bracket-image-preview,
+.bracket-slot .bracket-image-link{
+  min-height:260px;
+}
+.bracket-slot .bracket-image-link img{
+  max-height:520px;
+}
+
+.public-bracket-gallery{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  padding:12px;
+}
+.public-bracket-gallery.has-two{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.public-bracket-gallery .public-bracket-image{
+  min-width:0;
+  overflow:hidden;
+  padding:0 0 12px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:7px;
+  background:#191715;
+}
+.public-bracket-image-head{
+  width:100%;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:0 12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:#211e1c;
+}
+.public-bracket-image-head span{
+  color:#e8e1dc;
+  font:700 9px/1 "Space Mono",monospace;
+}
+.public-bracket-image-head b{
+  color:#6f6761;
+  font:700 8px/1 "Space Mono",monospace;
+}
+.public-bracket-gallery .public-bracket-image>a:first-of-type{
+  min-height:260px;
+  padding:10px;
+}
+.public-bracket-gallery .public-bracket-image img{
+  width:100%;
+  max-height:850px;
+}
+.public-bracket-gallery .bracket-open-btn{
+  margin-top:0;
+}
+
+@media(max-width:700px){
+  .bracket-double-editor{padding:11px}
+  .bracket-tournament-picker{
+    grid-template-columns:1fr;
+    align-items:start;
+  }
+  .bracket-tournament-picker #bracketMessage{grid-column:auto}
+  .bracket-slots,
+  .public-bracket-gallery.has-two{
+    grid-template-columns:1fr;
+  }
+  .bracket-slot .bracket-image-preview,
+  .bracket-slot .bracket-image-link{
+    min-height:220px;
+  }
+  .public-bracket-gallery{padding:10px}
+}
