@@ -321,6 +321,15 @@ form.addEventListener("submit",async e=>{
     return;
   }
 
+  const logoFile=teamLogoFile?.files?.[0]||null;
+
+  if(!logoFile){
+    message.textContent="Обов’язково додай логотип команди.";
+    message.className="error";
+    teamLogoFile?.focus();
+    return;
+  }
+
   const roster=validateRoster(d);
 
   if(roster.error){
@@ -331,7 +340,6 @@ form.addEventListener("submit",async e=>{
   }
 
   let teamLogoUrl=null;
-  const logoFile=teamLogoFile?.files?.[0]||null;
 
   if(logoFile){
     submit.disabled=true;
