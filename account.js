@@ -382,9 +382,36 @@ function renderApplication(item){
 }
 async function handleApplicationAction(e){
   const id=Number(e.currentTarget.dataset.id),action=e.currentTarget.dataset.appAction;
-  if(action==="delete"){if(!confirm("Видалити заявку?"))return;await supabase.from("team_registrations").delete().eq("id",id)}
-  else await supabase.from("team_registrations").update({status:action}).eq("id",id);
-  await loadApplications();
+  e.currentTarget.disabled=true;
+
+  try{
+    let error=null;
+
+    if(action==="delete"){
+      if(!confirm("Видалити заявку?")){
+        e.currentTarget.disabled=false;
+        return;
+      }
+      ({error}=await supabase.from("team_registrations").delete().eq("id",id));
+    }else{
+      ({error}=await supabase.from("team_registrations").update({status:action}).eq("id",id));
+    }
+
+    if(error){
+      console.error(error);
+      if(String(error.message||"").includes("tournament_team_limit_reached")){
+        alert("Ліміт команд на цьому турнірі вже заповнений. Реєстрація закрита.");
+      }else{
+        alert("Не вдалося змінити статус заявки.");
+      }
+      return;
+    }
+
+    await loadTournaments();
+    await loadApplications();
+  }finally{
+    e.currentTarget.disabled=false;
+  }
 }
 
 async function getAccessToken(){const {data:{session}}=await supabase.auth.getSession();return session?.access_token||null}
