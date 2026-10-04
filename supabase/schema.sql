@@ -7,7 +7,8 @@ create table if not exists public.team_registrations (
   captain_nick text not null check (char_length(captain_nick) between 2 and 32),
   captain_email text not null check (char_length(captain_email) <= 254),
   contact text not null check (char_length(contact) between 2 and 80),
-  captain_profile text,
+  captain_profile text, -- legacy field kept for compatibility
+  team_logo_url text,
   players text[] not null check (cardinality(players) = 5),
   substitute text,
   note text check (char_length(note) <= 500),
