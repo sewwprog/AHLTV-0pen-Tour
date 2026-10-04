@@ -90,3 +90,64 @@ on public.admin_users
 for select
 to authenticated
 using (user_id = (select auth.uid()));
+
+
+-- Auto-close registration when approved team limit is reached
+create or replace function public.enforce_tournament_team_limit()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_max_teams integer;
+  v_approved_count integer;
+begin
+  if new.status <> 'approved' then
+    return new;
+  end if;
+
+  if tg_op = 'UPDATE'
+     and old.status = 'approved'
+     and old.tournament_id = new.tournament_id then
+    return new;
+  end if;
+
+  select t.max_teams
+    into v_max_teams
+  from public.tournaments t
+  where t.id = new.tournament_id
+  for update;
+
+  if v_max_teams is null then
+    raise exception using errcode = 'P0001', message = 'tournament_not_found';
+  end if;
+
+  select count(*)::integer
+    into v_approved_count
+  from public.team_registrations r
+  where r.tournament_id = new.tournament_id
+    and r.status = 'approved';
+
+  if v_approved_count >= v_max_teams then
+    raise exception using errcode = 'P0001', message = 'tournament_team_limit_reached';
+  end if;
+
+  if v_approved_count + 1 >= v_max_teams then
+    update public.tournaments
+    set registration_open = false
+    where id = new.tournament_id;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_enforce_tournament_team_limit
+on public.team_registrations;
+
+create trigger trg_enforce_tournament_team_limit
+before insert or update of status, tournament_id
+on public.team_registrations
+for each row
+execute function public.enforce_tournament_team_limit();
