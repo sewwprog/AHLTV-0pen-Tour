@@ -4,6 +4,7 @@ const supabase=createClient(
   "https://hfxzdifqcjbslmxffvlf.supabase.co",
   "sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi"
 );
+const ASSET_BUCKET="ahltv-assets";
 
 const authGate=document.querySelector("#authGate");
 const applicationContent=document.querySelector("#applicationContent");
@@ -16,9 +17,81 @@ const message=document.querySelector("#formMessage");
 const submit=document.querySelector("#submitBtn");
 const substitutesList=document.querySelector("#substitutesList");
 const addSubstituteBtn=document.querySelector("#addSubstituteBtn");
+const teamLogoFile=document.querySelector("#teamLogoFile");
+const teamLogoPreview=document.querySelector("#teamLogoPreview");
 
 let tournaments=[];
 let currentUser=null;
+let teamLogoObjectUrl=null;
+
+const allowedTeamLogoTypes=new Set(["image/png","image/jpeg","image/webp"]);
+
+function resetTeamLogoPreview(){
+  if(teamLogoObjectUrl){
+    URL.revokeObjectURL(teamLogoObjectUrl);
+    teamLogoObjectUrl=null;
+  }
+
+  if(teamLogoPreview){
+    teamLogoPreview.classList.remove("has-image");
+    teamLogoPreview.innerHTML='<i data-lucide="image"></i>';
+    window.refreshIcons?.();
+  }
+}
+
+function previewTeamLogo(file){
+  if(!teamLogoPreview||!file)return;
+  if(teamLogoObjectUrl)URL.revokeObjectURL(teamLogoObjectUrl);
+  teamLogoObjectUrl=URL.createObjectURL(file);
+  teamLogoPreview.classList.add("has-image");
+  teamLogoPreview.innerHTML="";
+  const img=document.createElement("img");
+  img.src=teamLogoObjectUrl;
+  img.alt="Логотип команди";
+  teamLogoPreview.appendChild(img);
+}
+
+async function uploadTeamLogo(file){
+  if(!file)return null;
+  if(!currentUser)throw new Error("Потрібно увійти в акаунт.");
+  if(file.size>5*1024*1024)throw new Error("Логотип завеликий. Максимум 5 МБ.");
+  if(!allowedTeamLogoTypes.has(file.type))throw new Error("Логотип має бути PNG, JPG або WEBP.");
+
+  const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg";
+  const path=`team-logos/${currentUser.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+
+  const {error}=await supabase.storage
+    .from(ASSET_BUCKET)
+    .upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+
+  if(error)throw error;
+
+  const {data}=supabase.storage.from(ASSET_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+teamLogoFile?.addEventListener("change",()=>{
+  const file=teamLogoFile.files?.[0]||null;
+
+  if(!file){
+    resetTeamLogoPreview();
+    return;
+  }
+
+  if(file.size>5*1024*1024||!allowedTeamLogoTypes.has(file.type)){
+    teamLogoFile.value="";
+    resetTeamLogoPreview();
+    message.textContent=file.size>5*1024*1024
+      ?"Логотип завеликий. Максимум 5 МБ."
+      :"Логотип має бути PNG, JPG або WEBP.";
+    message.className="error";
+    return;
+  }
+
+  message.textContent="";
+  message.className="";
+  previewTeamLogo(file);
+});
 
 const statusLabel=s=>({
   registration:"REGISTRATION",
@@ -257,6 +330,26 @@ form.addEventListener("submit",async e=>{
     return;
   }
 
+  let teamLogoUrl=null;
+  const logoFile=teamLogoFile?.files?.[0]||null;
+
+  if(logoFile){
+    submit.disabled=true;
+    const uploadText=submit.querySelector("span");
+    if(uploadText)uploadText.textContent="Завантажуємо лого...";
+
+    try{
+      teamLogoUrl=await uploadTeamLogo(logoFile);
+    }catch(error){
+      console.error(error);
+      submit.disabled=false;
+      if(uploadText)uploadText.textContent="Відправити заявку";
+      message.textContent=error?.message||"Не вдалося завантажити логотип.";
+      message.className="error";
+      return;
+    }
+  }
+
   const payload={
     tournament_id:Number(select.value),
     user_id:currentUser.id,
@@ -265,7 +358,7 @@ form.addEventListener("submit",async e=>{
     captain_nick:d.captain_nick.trim(),
     captain_email:d.captain_email.trim().toLowerCase(),
     contact,
-    captain_profile:d.captain_profile.trim()||null,
+    team_logo_url:teamLogoUrl,
     players:roster.players,
     player_steam_links:roster.playerSteamLinks,
     substitutes:roster.substitutes,
@@ -301,6 +394,7 @@ form.addEventListener("submit",async e=>{
 
   form.reset();
   resetSubstitutes();
+  resetTeamLogoPreview();
 
   if(currentUser?.email)form.elements.captain_email.value=currentUser.email;
 
