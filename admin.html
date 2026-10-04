@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#171513"><title>AHLTV — Account</title>
-  <link rel="stylesheet" href="styles.css?v=20261004-03">
+  <link rel="stylesheet" href="styles.css?v=20261004-05">
 </head>
 <body>
 <header class="site-header"><div class="shell header-inner">
@@ -131,35 +131,50 @@
     </section>
     <section id="matchesTab" class="admin-tab hidden">
       <section class="panel">
-        <div class="panel-head"><span><i data-lucide="image"></i> СІТКА ТУРНІРУ</span><strong>IMAGE</strong></div>
-        <div class="bracket-image-editor">
-          <div class="bracket-image-controls">
+        <div class="panel-head"><span><i data-lucide="images"></i> СІТКА ТУРНІРУ</span><strong>2 IMAGES</strong></div>
+
+        <div class="bracket-double-editor">
+          <div class="bracket-tournament-picker">
             <label>Турнір
               <select id="bracketTournament"></select>
             </label>
-
-            <label>Фото сітки
-              <input id="bracketImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-            </label>
-
-            <div class="form-actions">
-              <button class="primary-btn" id="saveBracketImageBtn" type="button"><i data-lucide="upload"></i><span>Завантажити сітку</span></button>
-              <button class="secondary-btn" id="removeBracketImageBtn" type="button"><i data-lucide="trash-2"></i><span>Прибрати фото</span></button>
-            </div>
-
+            <span>Можна одночасно показувати дві сітки для одного турніру.</span>
             <p id="bracketMessage"></p>
           </div>
 
-          <div class="bracket-image-preview" id="bracketImagePreview">
-            <div class="empty-bracket-preview">
-              <i data-lucide="image"></i>
-              <span>Обери турнір і завантаж фото сітки</span>
-            </div>
+          <div class="bracket-slots">
+            <section class="bracket-slot">
+              <div class="bracket-slot-head"><span>СІТКА 1</span><b>IMAGE 01</b></div>
+              <label>Фото сітки 1
+                <input id="bracketImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+              </label>
+              <div class="form-actions">
+                <button class="primary-btn" id="saveBracketImageBtn" type="button"><i data-lucide="upload"></i><span>Завантажити</span></button>
+                <button class="secondary-btn" id="removeBracketImageBtn" type="button"><i data-lucide="trash-2"></i><span>Прибрати</span></button>
+              </div>
+              <div class="bracket-image-preview" id="bracketImagePreview">
+                <div class="empty-bracket-preview"><i data-lucide="image"></i><span>Сітка 1 ще не додана</span></div>
+              </div>
+            </section>
+
+            <section class="bracket-slot">
+              <div class="bracket-slot-head"><span>СІТКА 2</span><b>IMAGE 02</b></div>
+              <label>Фото сітки 2
+                <input id="bracketImageFile2" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+              </label>
+              <div class="form-actions">
+                <button class="primary-btn" id="saveBracketImageBtn2" type="button"><i data-lucide="upload"></i><span>Завантажити</span></button>
+                <button class="secondary-btn" id="removeBracketImageBtn2" type="button"><i data-lucide="trash-2"></i><span>Прибрати</span></button>
+              </div>
+              <div class="bracket-image-preview" id="bracketImagePreview2">
+                <div class="empty-bracket-preview"><i data-lucide="image"></i><span>Сітка 2 ще не додана</span></div>
+              </div>
+            </section>
           </div>
         </div>
       </section>
     </section>  </section>
 </main>
 <script type="module" src="ui.js?v=20260928-20"></script>
-<script type="module" src="account.js?v=20261004-03"></script>
+<script type="module" src="account.js?v=20261004-05"></script>
 </body></html>
