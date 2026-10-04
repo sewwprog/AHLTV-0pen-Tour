@@ -340,10 +340,17 @@ async function loadApplications(){
 }
 
 function renderApplication(item){
-  const profile=safeUrl(item.captain_profile),players=Array.isArray(item.players)?item.players:[];
+  const logo=safeUrl(item.team_logo_url),players=Array.isArray(item.players)?item.players:[];
+  const fallback=esc((item.team_tag||item.team_name||"A").slice(0,1).toUpperCase());
   return `<article class="application">
-    <div class="application-head"><div><small>${esc(item.tournaments?.name||"Турнір")}</small><h3>${esc(item.team_name)} <span class="muted">[${esc(item.team_tag)}]</span></h3><div class="meta">#${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</div></div><span class="pill">${esc(item.status)}</span></div>
-    <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick)}</div><div><span>Email:</span> ${esc(item.captain_email)}</div><div><span>Контакт:</span> ${esc(item.contact)}</div><div><span>Профіль:</span> ${profile?'<a href="'+esc(profile)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
+    <div class="application-head">
+      <div class="application-team">
+        <div class="application-team-logo ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="${esc(item.team_name)} logo">`:fallback}</div>
+        <div><small>${esc(item.tournaments?.name||"Турнір")}</small><h3>${esc(item.team_name)} <span class="muted">[${esc(item.team_tag)}]</span></h3><div class="meta">#${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</div></div>
+      </div>
+      <span class="pill">${esc(item.status)}</span>
+    </div>
+    <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick)}</div><div><span>Email:</span> ${esc(item.captain_email)}</div><div><span>Контакт:</span> ${esc(item.contact)}</div><div><span>Логотип:</span> ${logo?'<a href="'+esc(logo)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
     <div class="players"><b>Склад:</b> ${players.map(esc).join(", ")}${item.substitute?" · Заміна: "+esc(item.substitute):""}${item.note?"<br><b>Коментар:</b> "+esc(item.note):""}</div>
     <div class="card-actions"><button class="btn approve" data-app-action="approved" data-id="${item.id}">Підтвердити</button><button class="btn reject" data-app-action="rejected" data-id="${item.id}">Відхилити</button><button class="btn" data-app-action="pending" data-id="${item.id}">Pending</button><button class="btn" data-app-action="delete" data-id="${item.id}">Видалити</button></div>
   </article>`;
