@@ -337,7 +337,7 @@ async function loadApplications(){
 }
 
 function renderApplication(item){
-  const profile=safeUrl(item.captain_profile);
+  const logo=safeUrl(item.team_logo_url);
   const players=Array.isArray(item.players)?item.players:[];
   const playerSteam=Array.isArray(item.player_steam_links)?item.player_steam_links:[];
   const substitutes=Array.isArray(item.substitutes)?item.substitutes:[];
@@ -362,8 +362,14 @@ function renderApplication(item){
   }).join("");
 
   return `<article class="application">
-    <div class="application-head"><div><small>${esc(item.tournaments?.name||"Турнір")}</small><h3>${esc(item.team_name)} <span class="muted">[${esc(item.team_tag)}]</span></h3><div class="meta">#${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</div></div><span class="pill">${esc(item.status)}</span></div>
-    <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick)}</div><div><span>Email:</span> ${esc(item.captain_email)}</div><div><span>Контакт:</span> ${esc(item.contact)}</div><div><span>Профіль:</span> ${profile?'<a href="'+esc(profile)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
+    <div class="application-head">
+      <div class="application-team">
+        <div class="application-team-logo ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="${esc(item.team_name)} logo">`:esc((item.team_tag||item.team_name||"A").slice(0,1).toUpperCase())}</div>
+        <div><small>${esc(item.tournaments?.name||"Турнір")}</small><h3>${esc(item.team_name)} <span class="muted">[${esc(item.team_tag)}]</span></h3><div class="meta">#${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</div></div>
+      </div>
+      <span class="pill">${esc(item.status)}</span>
+    </div>
+    <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick)}</div><div><span>Email:</span> ${esc(item.captain_email)}</div><div><span>Контакт:</span> ${esc(item.contact)}</div><div><span>Логотип:</span> ${logo?'<a href="'+esc(logo)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
     <div class="admin-roster-block">
       <div class="admin-roster-title"><b>Основний склад</b><span>5 гравців</span></div>
       ${rosterHtml}
