@@ -2108,3 +2108,248 @@ body{
   .user-application-footer{align-items:flex-start;flex-direction:column}
   .user-application-footer .secondary-btn{width:100%;justify-content:center}
 }
+
+
+/* DESKTOP HOME TOURNAMENT POLISH 2026-10-04 */
+@media(min-width:701px){
+  .home-page{
+    padding-top:24px;
+  }
+
+  .home-registration-summary{
+    min-height:64px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:18px;
+    margin:14px 0 16px;
+    padding:0 16px;
+    border:1px solid rgba(255,255,255,.075);
+    border-left:3px solid #c95833;
+    border-radius:7px;
+    background:
+      linear-gradient(90deg,rgba(201,88,51,.055),transparent 28%),
+      #1d1a18;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+  }
+
+  .home-registration-copy{
+    display:grid;
+    grid-template-columns:auto auto 1px auto 1px auto;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+    color:#8f857f;
+    font-size:11px;
+  }
+
+  .home-registration-copy b{
+    color:#e8e0da;
+    font-size:11px;
+    white-space:nowrap;
+  }
+
+  .home-registration-copy strong{
+    min-width:88px;
+    color:#fff;
+    font:700 13px/1 "Space Mono",monospace;
+    white-space:nowrap;
+  }
+
+  .home-registration-copy>span:last-child{
+    white-space:nowrap;
+  }
+
+  .home-registration-copy .summary-separator{
+    width:1px;
+    height:22px;
+    overflow:hidden;
+    font-size:0;
+    background:rgba(255,255,255,.08);
+  }
+
+  .registration-live-dot{
+    width:8px;
+    height:8px;
+    box-shadow:0 0 0 4px rgba(99,193,132,.07);
+  }
+
+  .home-registration-summary>a{
+    min-width:270px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:0 12px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:5px;
+    background:#221f1c;
+    color:#d8d0ca;
+    transition:border-color .18s ease,background-color .18s ease;
+  }
+
+  .home-registration-summary>a:hover{
+    border-color:rgba(201,88,51,.28);
+    background:#26211e;
+  }
+
+  .home-registration-summary>a span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .tournament-card{
+    overflow:hidden;
+  }
+
+  .tournament-card-head{
+    padding-bottom:16px;
+  }
+
+  .tournament-description{
+    padding-bottom:16px;
+  }
+
+  .tournament-quick-status{
+    display:grid;
+    grid-template-columns:1.2fr .8fr 1fr;
+    gap:0;
+    margin:0;
+    padding:0 18px;
+    border-top:1px solid rgba(255,255,255,.055);
+    border-bottom:1px solid rgba(255,255,255,.055);
+    background:#1b1917;
+  }
+
+  .tournament-quick-status>span,
+  .tournament-quick-status>strong{
+    min-height:52px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:0 14px;
+    border-right:1px solid rgba(255,255,255,.055);
+    color:#a69c95;
+    font-size:10px;
+    font-weight:700;
+  }
+
+  .tournament-quick-status>span:first-child{
+    padding-left:0;
+  }
+
+  .tournament-quick-status>span:last-child{
+    border-right:0;
+    padding-right:0;
+  }
+
+  .tournament-quick-status>strong{
+    justify-content:center;
+    color:#f0e8e3;
+    font:700 12px/1 "Space Mono",monospace;
+  }
+
+  .tournament-quick-status>span:first-child.open{
+    color:#79c894;
+  }
+
+  .tournament-quick-status>span:first-child.closed{
+    color:#d27a73;
+  }
+
+  .tournament-quick-status .quick-dot{
+    display:none;
+  }
+
+  .seat-meter{
+    display:grid;
+    grid-template-columns:150px minmax(220px,1fr) 130px;
+    align-items:center;
+    gap:14px;
+    margin:0;
+    padding:11px 18px 13px;
+    border:0;
+    border-radius:0;
+    background:#1d1a18;
+  }
+
+  .seat-meter-head{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    margin:0;
+    white-space:nowrap;
+  }
+
+  .seat-meter-head span{
+    color:#756d67;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+
+  .seat-meter-head b{
+    color:#cfc6c0;
+    font:700 10px/1 "Space Mono",monospace;
+  }
+
+  .seat-meter-track{
+    height:6px;
+    border:1px solid rgba(255,255,255,.035);
+    border-radius:3px;
+    background:#292522;
+  }
+
+  .seat-meter-track span{
+    border-radius:3px;
+    background:linear-gradient(90deg,#b94f2f,#dc724c);
+  }
+
+  .seat-meter small{
+    margin:0;
+    color:#837972;
+    font-size:9px;
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  .tournament-sections{
+    border-top:1px solid rgba(255,255,255,.045);
+  }
+
+  .tournament-sections>section{
+    padding:16px 18px;
+  }
+
+  .tournament-card-footer{
+    min-height:58px;
+    padding:10px 16px 10px 18px;
+  }
+
+  .tournament-card-footer>span{
+    color:#6f6761;
+    font-size:9px;
+  }
+
+  .tournament-footer-actions{
+    gap:8px;
+  }
+
+  .tournament-footer-actions .secondary-btn,
+  .tournament-footer-actions .primary-btn{
+    min-height:38px;
+  }
+}
+
+@media(min-width:1100px){
+  .home-registration-summary{
+    grid-template-columns:minmax(0,1fr) 340px;
+  }
+
+  .tournament-quick-status{
+    grid-template-columns:1.25fr .7fr .95fr;
+  }
+}
