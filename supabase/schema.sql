@@ -15,11 +15,17 @@ create table if not exists public.team_registrations (
   status text not null default 'pending' check (status in ('pending','approved','rejected'))
 );
 
-create unique index if not exists team_registrations_name_ci
-on public.team_registrations (lower(team_name));
+drop index if exists public.team_registrations_name_ci;
+drop index if exists public.team_registrations_tag_ci;
+drop index if exists public.team_registrations_tournament_name_ci;
+create unique index team_registrations_tournament_name_ci
+on public.team_registrations (tournament_id, lower(team_name))
+where status <> 'rejected';
 
-create unique index if not exists team_registrations_tag_ci
-on public.team_registrations (lower(team_tag));
+drop index if exists public.team_registrations_tournament_tag_ci;
+create unique index team_registrations_tournament_tag_ci
+on public.team_registrations (tournament_id, lower(team_tag))
+where status <> 'rejected';
 
 create table if not exists public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -36,11 +42,13 @@ grant select on public.admin_users to authenticated;
 grant usage, select on sequence public.team_registrations_id_seq to anon, authenticated;
 
 drop policy if exists "public can submit tournament registration" on public.team_registrations;
-create policy "public can submit tournament registration"
+
+drop policy if exists "Users can read own tournament registrations" on public.team_registrations;
+create policy "Users can read own tournament registrations"
 on public.team_registrations
-for insert
-to anon, authenticated
-with check (status = 'pending');
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
 
 drop policy if exists "admin can read registrations" on public.team_registrations;
 create policy "admin can read registrations"
@@ -151,3 +159,55 @@ before insert or update of status, tournament_id
 on public.team_registrations
 for each row
 execute function public.enforce_tournament_team_limit();
+
+
+-- Prevent duplicate Steam players inside one tournament
+create or replace function public.enforce_registration_duplicates()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_new_links text[];
+  v_total integer;
+  v_distinct integer;
+begin
+  if new.status = 'rejected' then return new; end if;
+
+  select coalesce(array_agg(normalized), '{}'::text[])
+  into v_new_links
+  from (
+    select regexp_replace(lower(rtrim(btrim(link), '/')), '^https://www\.', 'https://') as normalized
+    from unnest(coalesce(new.player_steam_links, '{}'::text[]) || coalesce(new.substitute_steam_links, '{}'::text[])) as u(link)
+    where btrim(link) <> ''
+  ) normalized_links;
+
+  v_total := cardinality(v_new_links);
+  select count(distinct link)::integer into v_distinct from unnest(v_new_links) as u(link);
+
+  if v_total <> v_distinct then
+    raise exception using errcode = 'P0001', message = 'duplicate_player_in_roster';
+  end if;
+
+  if exists (
+    select 1
+    from public.team_registrations r
+    cross join lateral unnest(coalesce(r.player_steam_links, '{}'::text[]) || coalesce(r.substitute_steam_links, '{}'::text[])) as existing(link)
+    where r.tournament_id = new.tournament_id
+      and r.id <> coalesce(new.id, -1)
+      and r.status <> 'rejected'
+      and regexp_replace(lower(rtrim(btrim(existing.link), '/')), '^https://www\.', 'https://') = any(v_new_links)
+  ) then
+    raise exception using errcode = 'P0001', message = 'duplicate_player_in_tournament';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_enforce_registration_duplicates on public.team_registrations;
+create trigger trg_enforce_registration_duplicates
+before insert or update of tournament_id, status, player_steam_links, substitute_steam_links
+on public.team_registrations
+for each row execute function public.enforce_registration_duplicates();
