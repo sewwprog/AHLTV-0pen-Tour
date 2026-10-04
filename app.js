@@ -30,7 +30,7 @@ if(summary&&featured){
       <span class="summary-separator">·</span>
       <strong>${registered}/${featured.max_teams} місць</strong>
       <span class="summary-separator">·</span>
-      <span>старт ${shortDateLabel(featured.starts_at)}</span>
+      <span>Старт: ${shortDateLabel(featured.starts_at)}</span>
     </div>
     <a href="apply.html?tournament=${featured.id}"><span>${esc(featured.name)}</span><i data-lucide="arrow-right"></i></a>
   `;
@@ -48,7 +48,7 @@ else root.innerHTML=tournaments.map(t=>{
     ${t.description?`<p class="tournament-description">${esc(t.description)}</p>`:""}
     <div class="tournament-quick-status">
       <span class="${t.registration_open?"open":"closed"}"><i data-lucide="${t.registration_open?"circle-check":"circle-x"}"></i>${t.registration_open?"Реєстрація відкрита":"Реєстрація закрита"}</span>
-      <i class="quick-dot">·</i><strong>${filled}/${t.max_teams} місць</strong><i class="quick-dot">·</i><span>старт ${shortDateLabel(t.starts_at)}</span>
+      <i class="quick-dot">·</i><strong>${filled}/${t.max_teams} місць</strong><i class="quick-dot">·</i><span>Старт: ${shortDateLabel(t.starts_at)}</span>
     </div>
     <div class="seat-meter">
       <div class="seat-meter-head"><span>Заповнення турніру</span><b>${seatPercent}%</b></div>
