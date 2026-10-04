@@ -56,28 +56,32 @@ teamsRoot.innerHTML=tournamentTeams.length
   ? tournamentTeams.map(t=>`<div class="detail-team-row"><span>${esc(t.team_tag)}</span><b>${esc(t.team_name)}</b></div>`).join("")
   : '<div class="empty-state">Підтверджених команд ще немає.</div>';
 
-const bracketImages=[
+const bracketSlots=[
   safeUrl(tournament.bracket_image_url),
   safeUrl(tournament.bracket_image_url_2)
-].filter(Boolean);
+];
 
-bracketRoot.innerHTML=bracketImages.length
-  ? `<div class="public-bracket-gallery ${bracketImages.length>1?"has-two":""}">
-      ${bracketImages.map((image,index)=>`
-        <section class="public-bracket-image">
-          <div class="public-bracket-image-head">
-            <span>СІТКА ${index+1}</span>
-            <b>IMAGE 0${index+1}</b>
-          </div>
-          <a href="${esc(image)}" target="_blank" rel="noopener noreferrer">
+bracketRoot.innerHTML=`<div class="public-bracket-gallery has-two">
+  ${bracketSlots.map((image,index)=>`
+    <section class="public-bracket-image ${image?"has-image":"is-empty"}">
+      <div class="public-bracket-image-head">
+        <span>СІТКА ${index+1}</span>
+        <b>IMAGE 0${index+1}</b>
+      </div>
+      ${image
+        ? `<a href="${esc(image)}" target="_blank" rel="noopener noreferrer">
             <img src="${esc(image)}" alt="Сітка ${index+1} турніру ${esc(tournament.name)}">
           </a>
           <a class="secondary-btn bracket-open-btn" href="${esc(image)}" target="_blank" rel="noopener noreferrer">
             <i data-lucide="external-link"></i><span>Відкрити повністю</span>
-          </a>
-        </section>`).join("")}
-    </div>`
-  : '<div class="empty-state">Фото сітки ще не додано.</div>';
+          </a>`
+        : `<div class="public-bracket-empty">
+            <i data-lucide="image-plus"></i>
+            <b>Сітка ${index+1}</b>
+            <span>Фото ще не додано</span>
+          </div>`}
+    </section>`).join("")}
+</div>`;
 
 const rules=(tournament.rules_text||"").trim();
 rulesRoot.innerHTML=rules
