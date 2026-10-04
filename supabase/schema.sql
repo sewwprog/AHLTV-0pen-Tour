@@ -211,3 +211,8 @@ create trigger trg_enforce_registration_duplicates
 before insert or update of tournament_id, status, player_steam_links, substitute_steam_links
 on public.team_registrations
 for each row execute function public.enforce_registration_duplicates();
+
+
+-- Second bracket image for a tournament
+alter table public.tournaments
+  add column if not exists bracket_image_url_2 text;
