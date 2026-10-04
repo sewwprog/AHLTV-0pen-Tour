@@ -46,7 +46,7 @@ async function uploadAsset(file,folder){
   return data.publicUrl;
 }
 
-const loginView=$("#loginView"),userView=$("#userView"),dashboardView=$("#dashboardView"),loginForm=$("#loginForm"),loginMessage=$("#loginMessage"),adminEmail=$("#adminEmail"),userEmail=$("#userEmail"),userLogoutBtn=$("#userLogoutBtn");
+const loginView=$("#loginView"),userView=$("#userView"),dashboardView=$("#dashboardView"),loginForm=$("#loginForm"),loginMessage=$("#loginMessage"),adminEmail=$("#adminEmail"),userEmail=$("#userEmail"),userLogoutBtn=$("#userLogoutBtn"),userApplications=$("#userApplications"),userApplicationsCount=$("#userApplicationsCount"),userApplicationStats=$("#userApplicationStats");
 const nextParam=new URLSearchParams(location.search).get("next");
 const safeNext=nextParam&&/^apply\.html(?:\?.*)?$/.test(nextParam)?nextParam:null;
 let authMode="login";
@@ -85,6 +85,73 @@ function setupTabs(){
   }));
 }
 
+const applicationStatusLabel=s=>({pending:"Очікує",approved:"Прийнята",rejected:"Відхилена"}[s]||String(s).toUpperCase());
+const applicationStatusIcon=s=>s==="approved"?"badge-check":s==="rejected"?"circle-x":"clock-3";
+
+async function loadUserApplications(user){
+  if(!userApplications)return;
+  userApplications.innerHTML='<div class="empty-state">Завантаження заявок...</div>';
+  const {data,error}=await supabase
+    .from("team_registrations")
+    .select("id,created_at,tournament_id,team_name,team_tag,team_logo_url,status,players,substitutes,tournaments(name,starts_at,status)")
+    .eq("user_id",user.id)
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    userApplications.innerHTML='<div class="empty-state error">Не вдалося завантажити ваші заявки.</div>';
+    return;
+  }
+
+  const items=data||[];
+  const pending=items.filter(x=>x.status==="pending").length;
+  const approved=items.filter(x=>x.status==="approved").length;
+  const rejected=items.filter(x=>x.status==="rejected").length;
+  if(userApplicationsCount)userApplicationsCount.textContent=String(items.length);
+  if(userApplicationStats)userApplicationStats.innerHTML=`
+    <div><b>${items.length}</b><span>всього</span></div>
+    <div><b>${pending}</b><span>очікують</span></div>
+    <div><b>${approved}</b><span>прийняті</span></div>
+    <div><b>${rejected}</b><span>відхилені</span></div>`;
+
+  if(!items.length){
+    userApplications.innerHTML=`<div class="user-empty-applications">
+      <i data-lucide="clipboard-plus"></i>
+      <div><b>Заявок ще немає</b><span>Подайте команду на відкритий турнір — вона з’явиться тут.</span></div>
+      <a class="primary-btn" href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>
+    </div>`;
+    window.refreshIcons?.();
+    return;
+  }
+
+  userApplications.innerHTML=items.map(item=>{
+    const logo=safeUrl(item.team_logo_url);
+    const players=Array.isArray(item.players)?item.players:[];
+    const substitutes=Array.isArray(item.substitutes)?item.substitutes:[];
+    const tournament=item.tournaments||{};
+    const start=tournament.starts_at?new Date(tournament.starts_at).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"Дата не вказана";
+    return `<article class="user-application-card">
+      <div class="user-application-main">
+        <div class="user-application-logo ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="${esc(item.team_name)} logo">`:esc((item.team_tag||item.team_name||"A").slice(0,1).toUpperCase())}</div>
+        <div class="user-application-copy">
+          <small>${esc(tournament.name||"Турнір")}</small>
+          <h3>${esc(item.team_name)} <span>[${esc(item.team_tag)}]</span></h3>
+          <div class="user-application-meta">
+            <span><i data-lucide="users"></i>${players.length} основних · ${substitutes.length} замін</span>
+            <span><i data-lucide="calendar-days"></i>${esc(start)}</span>
+          </div>
+        </div>
+        <span class="cabinet-status cabinet-status-${esc(item.status)}"><i data-lucide="${applicationStatusIcon(item.status)}"></i>${applicationStatusLabel(item.status)}</span>
+      </div>
+      <div class="user-application-footer">
+        <span>Заявка #${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</span>
+        <a class="secondary-btn" href="tournament.html?id=${item.tournament_id}"><i data-lucide="external-link"></i><span>Відкрити турнір</span></a>
+      </div>
+    </article>`;
+  }).join("");
+  window.refreshIcons?.();
+}
+
 async function openAccount(user){
   if(safeNext){
     location.href=safeNext;
@@ -98,6 +165,7 @@ async function openAccount(user){
     dashboardView.classList.add("hidden");
     userView?.classList.remove("hidden");
     if(userEmail)userEmail.textContent=user.email||"";
+    await loadUserApplications(user);
     return;
   }
 
