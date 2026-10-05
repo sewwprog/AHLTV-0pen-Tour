@@ -26,6 +26,30 @@ let teamLogoObjectUrl=null;
 
 const allowedTeamLogoTypes=new Set(["image/png","image/jpeg","image/webp"]);
 
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+function isNetworkError(error){
+  const text=String(error?.message||error||"").toLowerCase();
+  return text.includes("failed to fetch")
+    ||text.includes("networkerror")
+    ||text.includes("network request failed")
+    ||text.includes("load failed");
+}
+
+async function retryNetwork(task,retries=2){
+  let lastError;
+  for(let attempt=0;attempt<=retries;attempt++){
+    try{
+      return await task();
+    }catch(error){
+      lastError=error;
+      if(!isNetworkError(error)||attempt===retries)throw error;
+      await sleep(700*(attempt+1));
+    }
+  }
+  throw lastError;
+}
+
 function resetTeamLogoPreview(){
   if(teamLogoObjectUrl){
     URL.revokeObjectURL(teamLogoObjectUrl);
@@ -60,9 +84,9 @@ async function uploadTeamLogo(file){
   const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg";
   const path=`team-logos/${currentUser.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
-  const {error}=await supabase.storage
+  const {error}=await retryNetwork(()=>supabase.storage
     .from(ASSET_BUCKET)
-    .upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+    .upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type}));
 
   if(error)throw error;
 
@@ -352,7 +376,9 @@ form.addEventListener("submit",async e=>{
       console.error(error);
       submit.disabled=false;
       if(uploadText)uploadText.textContent="Відправити заявку";
-      message.textContent=error?.message||"Не вдалося завантажити логотип.";
+      message.textContent=isNetworkError(error)
+        ?"Немає зв’язку з сервером. Перевір інтернет і натисни «Відправити заявку» ще раз."
+        :(error?.message||"Не вдалося завантажити логотип.");
       message.className="error";
       return;
     }
@@ -378,7 +404,15 @@ form.addEventListener("submit",async e=>{
   const submitText=submit.querySelector("span");
   if(submitText)submitText.textContent="Відправляємо...";
 
-  const {error}=await supabase.from("team_registrations").insert(payload);
+  let error=null;
+
+  try{
+    const result=await retryNetwork(()=>supabase.from("team_registrations").insert(payload));
+    error=result.error;
+  }catch(networkError){
+    console.error(networkError);
+    error=networkError;
+  }
 
   submit.disabled=false;
   if(submitText)submitText.textContent="Відправити заявку";
@@ -386,7 +420,9 @@ form.addEventListener("submit",async e=>{
   if(error){
     console.error(error);
 
-    if(error.code==="23505"){
+    if(isNetworkError(error)){
+      message.textContent="Немає зв’язку з сервером. Перевір інтернет і спробуй відправити заявку ще раз.";
+    }else if(error.code==="23505"){
       message.textContent="Ця команда або тег уже зареєстровані на цей турнір.";
     }else if(String(error.message||"").includes("duplicate_player_in_roster")){
       message.textContent="Один Steam-профіль не можна вказувати двічі в одному складі.";
