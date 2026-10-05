@@ -56,7 +56,7 @@ else root.innerHTML=tournaments.map(t=>{
       <small>${seatsLeft>0?`Залишилось ${seatsLeft} місць`:"Вільних місць немає"}</small>
     </div>
     <div class="tournament-sections">
-      <section><div class="section-mini-head"><b><i data-lucide="users"></i>Команди</b><span>${tt.length} / ${t.max_teams}</span></div><div class="team-chips">${tt.length?tt.map(x=>`<span><b>${esc(x.team_tag)}</b> ${esc(x.team_name)}</span>`).join(""):'<em>Підтверджених команд ще немає.</em>'}</div></section>
+      <section><div class="section-mini-head"><b><i data-lucide="users"></i>Команди</b><span>${tt.length} / ${t.max_teams}</span></div><div class="team-chips">${tt.length?tt.map(x=>{const teamLogo=safeHttpUrl(x.team_logo_url);return `<span class="team-chip">${teamLogo?`<img class="team-chip-logo" src="${esc(teamLogo)}" alt="${esc(x.team_name)} logo">`:""}${x.team_tag?`<b>${esc(x.team_tag)}</b>`:""}<i>${esc(x.team_name)}</i></span>`}).join(""):'<em>Підтверджених команд ще немає.</em>'}</div></section>
       ${mm.length?`<section><div class="section-mini-head"><b><i data-lucide="swords"></i>Матчі</b><span>${mm.length}</span></div><div class="mini-matches">${mm.map(m=>`<div><span>${m.starts_at?new Date(m.starts_at).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"TBA"}</span><b>${esc(m.team_one)} <i>vs</i> ${esc(m.team_two)}</b><strong class="${m.status==="live"?"live-text":""}">${m.status==="live"?"LIVE":"BO"+m.best_of}</strong></div>`).join("")}</div></section>`:""}
     </div>
     <div class="tournament-card-footer">
