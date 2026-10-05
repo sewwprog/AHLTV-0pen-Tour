@@ -52,11 +52,12 @@ const safeNext=nextParam&&/^apply\.html(?:\?.*)?$/.test(nextParam)?nextParam:nul
 let authMode="login";
 const siteSettingsForm=$("#siteSettingsForm"),siteLogoFile=$("#siteLogoFile"),siteLogoPreview=$("#siteLogoPreview"),siteSettingsMessage=$("#siteSettingsMessage"),saveSiteSettingsBtn=$("#saveSiteSettingsBtn"),removeSiteLogo=$("#removeSiteLogo");
 const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview");
+const manualTeamForm=$("#manualTeamForm"),manualTeamTournament=$("#manualTeamTournament"),manualTeamName=$("#manualTeamName"),manualTeamLogoFile=$("#manualTeamLogoFile"),manualTeamLogoPreview=$("#manualTeamLogoPreview"),manualTeamSubmitBtn=$("#manualTeamSubmitBtn"),manualTeamMessage=$("#manualTeamMessage"),manualTeamsList=$("#manualTeamsList");
 const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge");
 const usersList=$("#usersList"),usersCount=$("#usersCount");
 const bracketTournament=$("#bracketTournament"),bracketImageFile=$("#bracketImageFile"),saveBracketImageBtn=$("#saveBracketImageBtn"),removeBracketImageBtn=$("#removeBracketImageBtn"),bracketImagePreview=$("#bracketImagePreview"),bracketImageFile2=$("#bracketImageFile2"),saveBracketImageBtn2=$("#saveBracketImageBtn2"),removeBracketImageBtn2=$("#removeBracketImageBtn2"),bracketImagePreview2=$("#bracketImagePreview2"),bracketMessage=$("#bracketMessage");
 
-let tournaments=[],registrations=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
+let tournaments=[],registrations=[],manualTeams=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
 
 function setButtonContent(button,icon,label){
   if(!button)return;
@@ -176,6 +177,7 @@ async function openAccount(user){
   await loadSiteSettings();
   await loadTournaments();
   await loadApplications();
+  await loadManualTeams();
   renderTournaments();
   await Promise.all([loadUsers(),loadBracketImage()]);
 }
@@ -331,7 +333,7 @@ async function loadTournaments(){
 function renderTournaments(){
   if(!tournaments.length){tournamentList.innerHTML='<section class="panel empty">Турнірів ще немає. Створи перший вище.</section>';return}
   tournamentList.innerHTML=tournaments.map(t=>{
-    const approved=registrations.filter(r=>r.tournament_id===t.id&&r.status==="approved").length;
+    const approved=registrations.filter(r=>r.tournament_id===t.id&&r.status==="approved").length+manualTeams.filter(m=>m.tournament_id===t.id).length;
     const logo=safeUrl(t.logo_url);
     return `<article class="panel admin-tournament-card">
       <div class="admin-tournament-main">
@@ -387,9 +389,157 @@ function populateTournamentSelects(){
     : '<option value="">Спочатку створи турнір</option>';
 
   if(bracketTournament)bracketTournament.innerHTML=options;
+  if(manualTeamTournament)manualTeamTournament.innerHTML=options;
 }
 
 bracketTournament?.addEventListener("change",loadBracketImage);
+
+manualTeamLogoFile?.addEventListener("change",()=>{
+  const file=manualTeamLogoFile.files?.[0];
+  if(!file){
+    previewImage(manualTeamLogoPreview,null,manualTeamName?.value||"A");
+    return;
+  }
+  previewImage(manualTeamLogoPreview,URL.createObjectURL(file),manualTeamName?.value||"A");
+});
+
+manualTeamName?.addEventListener("input",()=>{
+  if(!manualTeamLogoFile?.files?.[0])previewImage(manualTeamLogoPreview,null,manualTeamName.value||"A");
+});
+
+async function loadManualTeams(){
+  if(!manualTeamsList)return;
+
+  const {data,error}=await supabase
+    .from("manual_tournament_teams")
+    .select("id,created_at,tournament_id,team_name,team_logo_url,tournaments(name)")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    manualTeamsList.innerHTML='<div class="empty-state error">Не вдалося завантажити ручні команди.</div>';
+    return;
+  }
+
+  manualTeams=data||[];
+  renderManualTeams();
+  renderTournaments();
+}
+
+function renderManualTeams(){
+  if(!manualTeamsList)return;
+
+  if(!manualTeams.length){
+    manualTeamsList.innerHTML='<div class="empty-state">Ручних команд поки немає.</div>';
+    return;
+  }
+
+  manualTeamsList.innerHTML=manualTeams.map(team=>{
+    const logo=safeUrl(team.team_logo_url);
+    return `<article class="manual-team-row">
+      <div class="manual-team-row-main">
+        <div class="manual-team-row-logo ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="${esc(team.team_name)} logo">`:esc(team.team_name.slice(0,1).toUpperCase())}</div>
+        <div><small>${esc(team.tournaments?.name||"Турнір")}</small><b>${esc(team.team_name)}</b></div>
+      </div>
+      <button class="btn reject" type="button" data-delete-manual-team="${team.id}"><i data-lucide="trash-2"></i><span>Видалити</span></button>
+    </article>`;
+  }).join("");
+
+  window.refreshIcons?.();
+
+  manualTeamsList.querySelectorAll("[data-delete-manual-team]").forEach(btn=>btn.addEventListener("click",async()=>{
+    const id=Number(btn.dataset.deleteManualTeam);
+    const team=manualTeams.find(x=>x.id===id);
+    if(!team||!confirm(`Видалити команду "${team.team_name}" з турніру?`))return;
+
+    btn.disabled=true;
+    const {error}=await supabase.from("manual_tournament_teams").delete().eq("id",id);
+
+    if(error){
+      console.error(error);
+      alert("Не вдалося видалити команду.");
+      btn.disabled=false;
+      return;
+    }
+
+    await loadManualTeams();
+    await loadTournaments();
+  }));
+}
+
+manualTeamForm?.addEventListener("submit",async e=>{
+  e.preventDefault();
+
+  const tournamentId=Number(manualTeamTournament?.value||0);
+  const teamName=String(manualTeamName?.value||"").trim();
+  const logoFile=manualTeamLogoFile?.files?.[0]||null;
+
+  manualTeamMessage.textContent="";
+  manualTeamMessage.className="";
+
+  if(!tournamentId){
+    manualTeamMessage.textContent="Обери турнір.";
+    manualTeamMessage.className="error";
+    return;
+  }
+
+  if(teamName.length<2){
+    manualTeamMessage.textContent="Вкажи назву команди.";
+    manualTeamMessage.className="error";
+    manualTeamName?.focus();
+    return;
+  }
+
+  if(!logoFile){
+    manualTeamMessage.textContent="Додай логотип команди.";
+    manualTeamMessage.className="error";
+    manualTeamLogoFile?.focus();
+    return;
+  }
+
+  manualTeamSubmitBtn.disabled=true;
+  setButtonContent(manualTeamSubmitBtn,"loader-circle","Завантажуємо...");
+
+  try{
+    const logoUrl=await uploadAsset(logoFile,`manual-teams/${tournamentId}`);
+
+    const {error}=await supabase
+      .from("manual_tournament_teams")
+      .insert({
+        tournament_id:tournamentId,
+        team_name:teamName,
+        team_logo_url:logoUrl
+      });
+
+    if(error)throw error;
+
+    manualTeamForm.reset();
+    previewImage(manualTeamLogoPreview,null,"A");
+    manualTeamMessage.textContent="Команду додано на турнір.";
+    manualTeamMessage.className="success";
+
+    await loadManualTeams();
+    await loadTournaments();
+  }catch(error){
+    console.error(error);
+    const msg=String(error?.message||"");
+
+    if(error?.code==="23505"||msg.includes("team_name_already_registered")){
+      manualTeamMessage.textContent="Команда з такою назвою вже є на цьому турнірі.";
+    }else if(msg.includes("tournament_team_limit_reached")){
+      manualTeamMessage.textContent="Ліміт команд на цьому турнірі вже заповнений.";
+    }else if(error?.code==="42501"){
+      manualTeamMessage.textContent="Немає прав для додавання команди.";
+    }else{
+      manualTeamMessage.textContent="Не вдалося додати команду.";
+    }
+
+    manualTeamMessage.className="error";
+  }finally{
+    manualTeamSubmitBtn.disabled=false;
+    setButtonContent(manualTeamSubmitBtn,"plus","Додати команду");
+  }
+});
 
 async function loadApplications(){
   const {data,error}=await supabase.from("team_registrations").select("*, tournaments(name,short_name)").order("created_at",{ascending:false});
