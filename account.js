@@ -84,6 +84,11 @@ function setupTabs(){
     document.querySelectorAll(".admin-tab").forEach(x=>x.classList.add("hidden"));
     btn.classList.add("active");$("#"+btn.dataset.tab).classList.remove("hidden");
   }));
+
+  $("#quickManualTeamBtn")?.addEventListener("click",()=>{
+    document.querySelector('[data-tab="manualTeamsTab"]')?.click();
+    $("#manualTeamsTab")?.scrollIntoView({behavior:"smooth",block:"start"});
+  });
 }
 
 const applicationStatusLabel=s=>({pending:"Очікує",approved:"Прийнята",rejected:"Відхилена"}[s]||String(s).toUpperCase());
