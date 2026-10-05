@@ -2724,3 +2724,24 @@ body{
     align-items:flex-start;
   }
 }
+
+
+/* MANUAL TEAM SEPARATE ADMIN TAB 2026-10-05 */
+.manual-team-only-form{
+  max-width:820px;
+}
+.admin-tabs button[data-tab="manualTeamsTab"]{
+  color:#d9d1cb;
+}
+.admin-tabs button[data-tab="manualTeamsTab"].active{
+  color:#fff;
+}
+@media(min-width:701px){
+  #manualTeamsTab{
+    display:grid;
+    gap:14px;
+  }
+  #manualTeamsTab.hidden{
+    display:none;
+  }
+}
