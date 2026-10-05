@@ -2745,3 +2745,24 @@ body{
     display:none;
   }
 }
+
+
+/* ADMIN QUICK MANUAL TEAM BUTTON 2026-10-05 */
+.admin-quick-team-btn{
+  min-height:36px;
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .admin-top{
+    align-items:stretch;
+  }
+  .admin-account{
+    width:100%;
+    flex-wrap:wrap;
+  }
+  .admin-quick-team-btn{
+    order:-1;
+    width:100%;
+    justify-content:center;
+  }
+}
