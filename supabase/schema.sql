@@ -100,7 +100,7 @@ to authenticated
 using (user_id = (select auth.uid()));
 
 
--- Auto-close registration when approved team limit is reached
+-- Auto-close registration when the combined team limit is reached
 create or replace function public.enforce_tournament_team_limit()
 returns trigger
 language plpgsql
@@ -109,7 +109,7 @@ set search_path = ''
 as $$
 declare
   v_max_teams integer;
-  v_approved_count integer;
+  v_total integer;
 begin
   if new.status <> 'approved' then
     return new;
@@ -122,29 +122,31 @@ begin
   end if;
 
   select t.max_teams
-    into v_max_teams
+  into v_max_teams
   from public.tournaments t
   where t.id = new.tournament_id
   for update;
 
   if v_max_teams is null then
-    raise exception using errcode = 'P0001', message = 'tournament_not_found';
+    raise exception using errcode='P0001', message='tournament_not_found';
   end if;
 
-  select count(*)::integer
-    into v_approved_count
-  from public.team_registrations r
-  where r.tournament_id = new.tournament_id
-    and r.status = 'approved';
+  select
+    (select count(*) from public.team_registrations r
+      where r.tournament_id=new.tournament_id and r.status='approved')
+    +
+    (select count(*) from public.manual_tournament_teams m
+      where m.tournament_id=new.tournament_id)
+  into v_total;
 
-  if v_approved_count >= v_max_teams then
-    raise exception using errcode = 'P0001', message = 'tournament_team_limit_reached';
+  if v_total >= v_max_teams then
+    raise exception using errcode='P0001', message='tournament_team_limit_reached';
   end if;
 
-  if v_approved_count + 1 >= v_max_teams then
+  if v_total + 1 >= v_max_teams then
     update public.tournaments
-    set registration_open = false
-    where id = new.tournament_id;
+    set registration_open=false
+    where id=new.tournament_id;
   end if;
 
   return new;
@@ -161,7 +163,7 @@ for each row
 execute function public.enforce_tournament_team_limit();
 
 
--- Prevent duplicate Steam players inside one tournament
+-- Prevent duplicate Steam players and duplicate names against manual teams
 create or replace function public.enforce_registration_duplicates()
 returns trigger
 language plpgsql
@@ -173,44 +175,74 @@ declare
   v_total integer;
   v_distinct integer;
 begin
-  if new.status = 'rejected' then return new; end if;
+  if new.status = 'rejected' then
+    return new;
+  end if;
+
+  if exists (
+    select 1
+    from public.manual_tournament_teams m
+    where m.tournament_id=new.tournament_id
+      and lower(btrim(m.team_name))=lower(btrim(new.team_name))
+  ) then
+    raise exception using errcode='P0001', message='team_name_already_registered';
+  end if;
 
   select coalesce(array_agg(normalized), '{}'::text[])
   into v_new_links
   from (
-    select regexp_replace(lower(rtrim(btrim(link), '/')), '^https://www\.', 'https://') as normalized
-    from unnest(coalesce(new.player_steam_links, '{}'::text[]) || coalesce(new.substitute_steam_links, '{}'::text[])) as u(link)
+    select regexp_replace(
+      lower(rtrim(btrim(link), '/')),
+      '^https://www\.',
+      'https://'
+    ) as normalized
+    from unnest(
+      coalesce(new.player_steam_links, '{}'::text[])
+      || coalesce(new.substitute_steam_links, '{}'::text[])
+    ) as u(link)
     where btrim(link) <> ''
   ) normalized_links;
 
   v_total := cardinality(v_new_links);
-  select count(distinct link)::integer into v_distinct from unnest(v_new_links) as u(link);
+  select count(distinct link)::integer
+  into v_distinct
+  from unnest(v_new_links) as u(link);
 
   if v_total <> v_distinct then
-    raise exception using errcode = 'P0001', message = 'duplicate_player_in_roster';
+    raise exception using errcode='P0001', message='duplicate_player_in_roster';
   end if;
 
   if exists (
     select 1
     from public.team_registrations r
-    cross join lateral unnest(coalesce(r.player_steam_links, '{}'::text[]) || coalesce(r.substitute_steam_links, '{}'::text[])) as existing(link)
+    cross join lateral unnest(
+      coalesce(r.player_steam_links, '{}'::text[])
+      || coalesce(r.substitute_steam_links, '{}'::text[])
+    ) as existing(link)
     where r.tournament_id = new.tournament_id
       and r.id <> coalesce(new.id, -1)
       and r.status <> 'rejected'
-      and regexp_replace(lower(rtrim(btrim(existing.link), '/')), '^https://www\.', 'https://') = any(v_new_links)
+      and regexp_replace(
+        lower(rtrim(btrim(existing.link), '/')),
+        '^https://www\.',
+        'https://'
+      ) = any(v_new_links)
   ) then
-    raise exception using errcode = 'P0001', message = 'duplicate_player_in_tournament';
+    raise exception using errcode='P0001', message='duplicate_player_in_tournament';
   end if;
 
   return new;
 end;
 $$;
 
-drop trigger if exists trg_enforce_registration_duplicates on public.team_registrations;
+drop trigger if exists trg_enforce_registration_duplicates
+on public.team_registrations;
+
 create trigger trg_enforce_registration_duplicates
 before insert or update of tournament_id, status, player_steam_links, substitute_steam_links
 on public.team_registrations
-for each row execute function public.enforce_registration_duplicates();
+for each row
+execute function public.enforce_registration_duplicates();
 
 
 -- Second bracket image for a tournament
