@@ -53,7 +53,14 @@ const tournamentTeams=(teams||[]).filter(t=>t.tournament_id===id);
 teamsCount.textContent=`${tournamentTeams.length} / ${tournament.max_teams}`;
 
 teamsRoot.innerHTML=tournamentTeams.length
-  ? tournamentTeams.map(t=>`<div class="detail-team-row"><span>${esc(t.team_tag)}</span><b>${esc(t.team_name)}</b></div>`).join("")
+  ? tournamentTeams.map(t=>{
+      const teamLogo=safeUrl(t.team_logo_url);
+      const fallback=(t.team_tag||t.team_name||"A").slice(0,2).toUpperCase();
+      return `<div class="detail-team-row">
+        <span class="detail-team-logo ${teamLogo?"has-logo":""}">${teamLogo?`<img src="${esc(teamLogo)}" alt="${esc(t.team_name)} logo">`:esc(fallback)}</span>
+        <b>${esc(t.team_name)}${t.team_tag?`<small>[${esc(t.team_tag)}]</small>`:""}</b>
+      </div>`;
+    }).join("")
   : '<div class="empty-state">Підтверджених команд ще немає.</div>';
 
 const bracketSlots=[
