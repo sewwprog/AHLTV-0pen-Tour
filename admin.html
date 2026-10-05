@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#171513"><title>AHLTV — Account</title>
-  <link rel="stylesheet" href="styles.css?v=20261004-05">
+  <link rel="stylesheet" href="styles.css?v=20261005-01">
 </head>
 <body>
 <header class="site-header"><div class="shell header-inner">
@@ -120,6 +120,44 @@
           <div class="form-actions"><button class="primary-btn" type="submit" id="saveTournamentBtn"><i data-lucide="plus"></i><span>Створити турнір</span></button><button class="secondary-btn hidden" type="button" id="cancelTournamentEdit"><i data-lucide="x"></i><span>Скасувати</span></button><p id="tournamentMessage"></p></div>
         </form>
       </section>
+
+      <section class="panel manual-team-panel">
+        <div class="panel-head"><span><i data-lucide="user-plus"></i> ДОДАТИ КОМАНДУ ВРУЧНУ</span><strong>ADMIN TEAM</strong></div>
+
+        <form id="manualTeamForm" class="team-form compact-form">
+          <div class="manual-team-form-grid">
+            <label>Турнір
+              <select id="manualTeamTournament" required>
+                <option value="">Обери турнір</option>
+              </select>
+            </label>
+
+            <label>Назва команди
+              <input id="manualTeamName" type="text" required minlength="2" maxlength="40" placeholder="Наприклад: Valkyrie Esports">
+            </label>
+
+            <div class="manual-team-logo-upload">
+              <div class="asset-preview manual-team-logo-preview" id="manualTeamLogoPreview"><span>A</span></div>
+              <div>
+                <label>Логотип команди
+                  <input id="manualTeamLogoFile" type="file" required accept="image/png,image/jpeg,image/webp,image/gif">
+                </label>
+                <small>Назва + лого — більше нічого заповнювати не потрібно.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" id="manualTeamSubmitBtn" type="submit"><i data-lucide="plus"></i><span>Додати команду</span></button>
+            <p id="manualTeamMessage"></p>
+          </div>
+        </form>
+
+        <div id="manualTeamsList" class="manual-teams-list">
+          <div class="empty-state">Ручних команд поки немає.</div>
+        </div>
+      </section>
+
       <div id="tournamentsAdminList" class="admin-card-list"></div>
     </section>
     <section id="applicationsTab" class="admin-tab hidden">
@@ -176,5 +214,5 @@
     </section>  </section>
 </main>
 <script type="module" src="ui.js?v=20260928-20"></script>
-<script type="module" src="account.js?v=20261004-05"></script>
+<script type="module" src="account.js?v=20261005-01"></script>
 </body></html>
