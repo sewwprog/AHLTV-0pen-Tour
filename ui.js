@@ -166,8 +166,17 @@ function updateAccountLinks(session){
   const label=isLoggedIn?"Акаунт":"Увійти";
   const icon=isLoggedIn?"circle-user-round":"log-in";
 
-  document.querySelectorAll('.account-btn, .mobile-drawer a[href="admin.html"]').forEach(link=>{
-    link.innerHTML=`<i data-lucide="${icon}"></i><span>${label}</span>${link.closest(".mobile-drawer")?'<i data-lucide="chevron-right"></i>':""}`;
+  document.querySelectorAll('.account-btn').forEach(link=>{
+    link.innerHTML=`<i data-lucide="${icon}"></i><span>${label}</span>`;
+    link.setAttribute("aria-label",label);
+  });
+  document.querySelectorAll('.mobile-drawer a[href="admin.html"]').forEach(link=>{
+    const iconContainer=link.querySelector(".drawer-link-icon");
+    const title=link.querySelector("[data-account-label]");
+    const description=link.querySelector("[data-account-description]");
+    if(iconContainer)iconContainer.innerHTML=`<i data-lucide="${icon}"></i>`;
+    if(title)title.textContent=label;
+    if(description)description.textContent=isLoggedIn?"Твої заявки та налаштування":"Твій особистий кабінет";
     link.setAttribute("aria-label",label);
   });
 

@@ -10,7 +10,7 @@ const reg=(id,name,tag,status,tournament_id)=>({id,team_name:name,team_tag:tag,s
 const registrations=[reg(1,'Nova Esports','NOVA','pending',1),reg(2,'Rivne Five','RF','approved',1),reg(3,'Night Owls','OWL','pending',2),reg(4,'Delta Team','DLT','rejected',2),reg(5,'Fox Academy','FOX','approved',1)];
 const manual=[{id:11,tournament_id:1,team_name:'Manual Team',team_logo_url:null,created_at:now}];
 const user={id:mode==='user'?'user-1':'admin-1',email:mode==='user'?'captain@example.com':'admin@ahltv.ua',created_at:now};
-window.__mock={mode,session:mode==='login'?null:{user,access_token:'test-token'},tables:{admin_users:mode==='user'?[]:[{user_id:'admin-1'}],site_settings:[{id:1,site_name:'AHLTV',site_subtitle:'TOURNAMENTS',home_title:'Турніри',home_description:'Турніри для команд',footer_text:'Tournament Platform',logo_url:null}],tournaments:mode==='empty'?[]:tournamentRows,team_registrations:mode==='empty'?[]:registrations,manual_tournament_teams:mode==='empty'?[]:manual},users:[{id:'admin-1',email:'admin@ahltv.ua',created_at:now,is_admin:true,is_self:true},{id:'user-1',email:'captain@example.com',created_at:now,is_admin:false,is_self:false}],errors:mode==='errors'?{tournaments:true,team_registrations:true,manual_tournament_teams:true}:mode==='auth-error'?{admin_users:true}:{},failNext:null,uploads:[],history:[]};
+window.__mock={mode,session:mode==='login'?null:{user,access_token:'test-token'},tables:{admin_users:mode==='user'?[]:[{user_id:'admin-1'}],site_settings:[{id:1,site_name:'AHLTV',site_subtitle:'TOURNAMENTS',home_title:'Турніри',home_description:'Турніри для команд',footer_text:'Tournament Platform',logo_url:null}],tournaments:mode==='empty'?[]:tournamentRows,team_registrations:mode==='empty'?[]:registrations,manual_tournament_teams:mode==='empty'?[]:manual,tournament_matches:[{id:21,tournament_id:1,team_one:'Nova Esports',team_two:'Rivne Five',best_of:3,status:'upcoming',starts_at:'2026-11-12T18:00:00Z',is_visible:true}]},users:[{id:'admin-1',email:'admin@ahltv.ua',created_at:now,is_admin:true,is_self:true},{id:'user-1',email:'captain@example.com',created_at:now,is_admin:false,is_self:false}],errors:mode==='errors'?{tournaments:true,team_registrations:true,manual_tournament_teams:true}:mode==='auth-error'?{admin_users:true}:{},failNext:null,uploads:[],history:[]};
 if(mode==='unsafe'){
   const item=window.__mock.tables.team_registrations[0];
   item.team_name='<img src=x onerror="window.__xss=true">';
@@ -21,6 +21,8 @@ if(mode==='unsafe'){
 if(mode==='long'){
   window.__mock.tables.tournaments[0].name='Надзвичайно довга назва турніру для перевірки адаптивності та перенесення слів без обрізання '.repeat(2);
   window.__mock.tables.team_registrations[0].team_name='ДужеДовгаНазваКомандиБезПробілів'.repeat(3);
+  window.__mock.tables.team_registrations[1].team_name='ДужеДовгаНазваКомандиБезПробілів'.repeat(3);
+  window.__mock.tables.tournament_matches[0].team_one='ДужеДовгаНазваКомандиБезПробілів'.repeat(3);
   window.__mock.tables.team_registrations[0].captain_email='verylongemailaddress'.repeat(4)+'@example.com';
   window.__mock.session.user.email='verylongadministratoraddress'.repeat(3)+'@example.com';
 }
@@ -37,6 +39,7 @@ class Query{
  constructor(name){this.name=name;this.action='select';this.filters=[];this.returning=false;this.singleMode=false;}
  select(){if(this.action!=='select')this.returning=true;return this}
  eq(field,value){this.filters.push([field,value]);return this}
+ in(field,values){this.filters.push([field,values,'in']);return this}
  order(){return this}
  insert(data){this.action='insert';this.payload=data;return this}
  update(data){this.action='update';this.payload=data;return this}
@@ -53,7 +56,7 @@ class Query{
    return {data:null,error:{message,code:'mock_error'}};
   }
   const list=m.tables[this.name]||[];
-  const matches=row=>this.filters.every(([field,value])=>row[field]===value);
+  const matches=row=>this.filters.every(([field,value,operator])=>operator==='in'?value.includes(row[field]):row[field]===value);
   let result;
   if(this.action==='select') result=list.filter(matches).map(row=>enrich(this.name,row));
   else if(this.action==='insert'){
@@ -85,12 +88,23 @@ export function createClient(){
  return {
   auth:{
    async getSession(){return {data:{session:window.__mock.session},error:null}},
-   onAuthStateChange(callback){return {data:{subscription:{unsubscribe(){}}}}},
-   async signInWithPassword({email}){window.__mock.session={user:{id:'admin-1',email},access_token:'test-token'};return {data:window.__mock.session,error:null}},
-   async signOut(){window.__mock.session=null;return {error:null}}
+   onAuthStateChange(callback){
+    const callbacks=window.__mock.authCallbacks||(window.__mock.authCallbacks=[]);
+    callbacks.push(callback);
+    return {data:{subscription:{unsubscribe(){const i=callbacks.indexOf(callback);if(i>=0)callbacks.splice(i,1)}}}};
+   },
+   async signInWithPassword({email}){window.__mock.session={user:{id:'admin-1',email},access_token:'test-token'};(window.__mock.authCallbacks||[]).forEach(callback=>callback('SIGNED_IN',window.__mock.session));return {data:window.__mock.session,error:null}},
+   async signOut(){window.__mock.session=null;(window.__mock.authCallbacks||[]).forEach(callback=>callback('SIGNED_OUT',null));return {error:null}}
   },
   from(name){return new Query(name)},
   storage:{from(bucket){return {async upload(path,file){window.__mock.uploads.push({bucket,path,name:file.name});if(window.__mock.failUpload){window.__mock.failUpload=false;return {error:{message:'mock upload error'}}}return {data:{path},error:null}},getPublicUrl(path){return {data:{publicUrl:`https://example.com/${path}`}}}}}},
-  async rpc(){return {data:true,error:null}}
+  async rpc(name){
+   if(name==='get_public_teams'){
+    const m=window.__mock;
+    const approved=m.tables.team_registrations.filter(row=>row.status==='approved');
+    return {data:[...approved,...m.tables.manual_tournament_teams],error:null};
+   }
+   return {data:true,error:null};
+  }
  };
 }
