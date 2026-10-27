@@ -91,6 +91,9 @@ function setupReveal(root=document){
   const selector=[
     ".page-title",
     ".tournament-card",
+    ".journey",
+    ".section-heading",
+    ".home-cta",
     ".panel",
     ".roster-card",
     ".application",
@@ -108,7 +111,7 @@ function setupReveal(root=document){
 
   elements.forEach((el,index)=>{
     el.classList.add("motion-reveal");
-    el.style.setProperty("--motion-delay",Math.min(index%7,6)*45+"ms");
+    el.style.setProperty("--motion-delay",Math.min(index%5,4)*30+"ms");
     revealObserver?.observe(el);
   });
 }
@@ -123,8 +126,9 @@ if(!reduceMotion&&"IntersectionObserver" in window){
       revealObserver.unobserve(entry.target);
     });
   },{
-    threshold:.08,
-    rootMargin:"0px 0px -36px 0px"
+    // Start just before the element enters; even very tall sections can reveal.
+    threshold:0,
+    rootMargin:"0px 0px 48px 0px"
   });
 
   requestAnimationFrame(()=>{
