@@ -1,0 +1,249 @@
+/* Admin-only workspace. The public site and captain cabinet keep their shared styles. */
+#dashboardView{margin:8px 0 24px}
+#dashboardView *{min-width:0}
+#dashboardView .admin-layout{display:grid;grid-template-columns:220px minmax(0,1fr);align-items:start;gap:28px}
+#dashboardView .admin-sidebar{position:sticky;top:90px;display:flex;flex-direction:column;padding:16px 10px 10px;border:1px solid rgba(255,255,255,.075);border-radius:10px;background:#17181b}
+#dashboardView .admin-sidebar-brand{display:flex;align-items:center;gap:10px;padding:2px 8px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+#dashboardView .admin-sidebar-mark{width:37px;height:37px;display:grid;place-items:center;flex:none;border:1px solid rgba(248,118,67,.22);border-radius:7px;background:rgba(248,118,67,.1);color:#f78e64}
+#dashboardView .admin-sidebar-mark svg{width:19px;height:19px}
+#dashboardView .admin-sidebar-brand b,#dashboardView .admin-sidebar-brand small{display:block}
+#dashboardView .admin-sidebar-brand b{color:#f6f5f2;font-size:13px;letter-spacing:.04em}
+#dashboardView .admin-sidebar-brand small{margin-top:3px;color:#999690;font-size:8px;font-weight:800;letter-spacing:.09em}
+#dashboardView .admin-nav-label{padding:20px 11px 8px;color:#85827d;font-size:9px;font-weight:800;letter-spacing:.12em}
+#dashboardView .admin-tabs{position:static;display:grid;gap:3px;overflow:visible;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none}
+#dashboardView .admin-tabs button{width:100%;min-height:42px;justify-content:flex-start;gap:11px;padding:0 11px;border:1px solid transparent;border-radius:6px;background:transparent;color:#aaa8a3;font-size:12px;font-weight:700;text-align:left}
+#dashboardView .admin-tabs button svg{width:16px;height:16px;flex:none;color:#8f8d88}
+#dashboardView .admin-tabs button:hover{background:#222327;color:#fff}
+#dashboardView .admin-tabs button.active{border-color:rgba(248,118,67,.12);background:rgba(248,118,67,.1);color:#fff;box-shadow:none}
+#dashboardView .admin-tabs button.active svg{color:#fa936b}
+#dashboardView .admin-tabs button b{min-width:21px;height:21px;margin-left:auto;border-radius:5px;background:#3e2b25;color:#ffad8c;font-size:10px}
+#dashboardView .admin-tabs button b:empty{display:none}
+#dashboardView .admin-back-link{display:flex;align-items:center;gap:9px;margin-top:20px;padding:15px 11px 5px;border-top:1px solid rgba(255,255,255,.07);color:#aaa8a3;text-decoration:none;font-size:11px;font-weight:700}
+#dashboardView .admin-back-link:hover{color:#fff}
+#dashboardView .admin-back-link svg{width:15px;height:15px}
+#dashboardView .admin-workspace{min-width:0}
+#dashboardView .admin-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;min-height:92px;margin:0 0 20px;padding:5px 0 20px;border-bottom:1px solid rgba(255,255,255,.08);background:transparent}
+#dashboardView .admin-heading small{display:block;color:#96938d;font:800 9px/1.4 Manrope,sans-serif;letter-spacing:.1em}
+#dashboardView .admin-heading small span:first-child{padding:0 5px;color:#5f5e5b}
+#dashboardView .admin-heading small span:last-child{color:#ef936d}
+#dashboardView .admin-top h1{margin:9px 0 5px;color:#f8f7f4;font:800 28px/1.15 Manrope,sans-serif;letter-spacing:-.045em}
+#dashboardView .admin-heading p{margin:0;color:#aaa8a3;font-size:12px;line-height:1.5}
+#dashboardView .admin-account{display:flex;align-items:center;gap:14px;color:#aaa8a3}
+#dashboardView .admin-account-copy{display:grid;gap:3px;text-align:right}
+#dashboardView .admin-account-copy b{color:#f2f0ec;font-size:11px}
+#dashboardView .admin-account-copy span{max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+#dashboardView .admin-account .secondary-btn{min-height:38px;padding:0 12px;font-size:11px}
+#dashboardView .admin-mobile-section{display:none}
+#dashboardView .admin-tab{min-width:0}
+#dashboardView .panel{margin:0;border-color:rgba(255,255,255,.075);border-radius:9px;background:#191a1e;box-shadow:none}
+#dashboardView .panel-head{min-height:50px;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.07);background:#1d1e22}
+#dashboardView .panel-head span{color:#e4e2de;font-size:10px;letter-spacing:.05em}
+#dashboardView .panel-head strong{color:#96928c;font-size:9px;letter-spacing:.07em}
+#dashboardView .primary-btn,#dashboardView .secondary-btn,#dashboardView .btn{min-height:38px;border-radius:6px;font-size:11px;font-weight:800}
+#dashboardView button:focus-visible,#dashboardView a:focus-visible,#dashboardView summary:focus-visible,#dashboardView select:focus-visible,#dashboardView input:focus-visible,#dashboardView textarea:focus-visible{outline:2px solid #ff9a72;outline-offset:3px}
+#dashboardView .admin-eyebrow{display:block;color:#f19570;font-size:9px;font-weight:800;letter-spacing:.11em}
+
+/* Overview */
+#dashboardView .overview-intro{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:142px;padding:24px 27px;border:1px solid rgba(248,118,67,.17);border-radius:9px;background:linear-gradient(110deg,rgba(248,118,67,.09),transparent 70%),#1b1b1e}
+#dashboardView .overview-intro h2{margin:10px 0 5px;color:#fff;font-size:23px;font-weight:800;letter-spacing:-.04em}
+#dashboardView .overview-intro p{margin:0;color:#b3b0aa;font-size:12px;line-height:1.6}
+#dashboardView .overview-intro-mark{width:54px;height:54px;display:grid;place-items:center;flex:none;border:1px solid rgba(248,118,67,.18);border-radius:9px;background:rgba(248,118,67,.075);color:#f3916a}
+#dashboardView .overview-intro-mark svg{width:22px;height:22px}
+#dashboardView .overview-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 22px}
+#dashboardView .overview-stat{display:flex;flex-direction:column;align-items:flex-start;min-height:132px;padding:17px;border:1px solid rgba(255,255,255,.075);border-radius:9px;background:#191a1e;color:#a9a7a1;text-align:left;cursor:pointer;transition:border-color .18s,background .18s}
+#dashboardView .overview-stat:hover{border-color:rgba(248,118,67,.4);background:#1e1e21}
+#dashboardView .overview-stat.is-attention{border-color:rgba(248,118,67,.21);background:#211c1b}
+#dashboardView .overview-stat-label{display:flex;align-items:center;gap:8px;width:100%;color:#dbd8d2;font-size:11px;font-weight:800}
+#dashboardView .overview-stat-label svg{width:15px;height:15px;color:#f19570}
+#dashboardView .overview-stat-label svg:last-child{margin-left:auto;color:#77746f}
+#dashboardView .overview-stat>b{margin:17px 0 5px;color:#f8f7f4;font-size:26px;line-height:1;letter-spacing:-.04em}
+#dashboardView .overview-stat>span:last-child{font-size:11px;line-height:1.4}
+#dashboardView .overview-action-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+#dashboardView .overview-action-list button{display:grid;grid-template-columns:34px minmax(0,1fr) 16px;align-items:center;gap:10px;min-height:87px;padding:14px 16px;border:0;border-right:1px solid rgba(255,255,255,.07);background:transparent;color:#e9e7e2;text-align:left;cursor:pointer}
+#dashboardView .overview-action-list button:last-child{border-right:0}
+#dashboardView .overview-action-list button:hover{background:rgba(255,255,255,.035)}
+#dashboardView .quick-action-icon{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:#25262a;color:#f19570}
+#dashboardView .quick-action-icon svg{width:16px;height:16px}
+#dashboardView .overview-action-list b,#dashboardView .overview-action-list small{display:block}
+#dashboardView .overview-action-list b{font-size:11px;line-height:1.35}
+#dashboardView .overview-action-list small{margin-top:4px;color:#9d9a94;font-size:10px;line-height:1.4}
+#dashboardView .overview-action-list button>svg{width:15px;height:15px;color:#85817b}
+#dashboardView .overview-footnote{display:flex;align-items:center;gap:7px;margin:16px 1px 0;color:#96938e;font-size:10px}
+#dashboardView .overview-footnote svg{width:14px;height:14px;color:#f19570}
+
+/* Tournament and application lists */
+#dashboardView .admin-section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:4px 0 20px}
+#dashboardView .admin-section-head h2{margin:7px 0 5px;color:#f8f7f4;font-size:20px;line-height:1.2;letter-spacing:-.035em}
+#dashboardView .admin-section-head p{margin:0;color:#a8a59f;font-size:12px;line-height:1.5}
+#dashboardView .admin-count{display:inline-grid;place-items:center;min-width:25px;height:23px;margin-left:4px;padding:0 6px;border-radius:5px;background:#292a2e;color:#c8c6c0;font-size:11px;vertical-align:3px}
+#dashboardView .admin-list-toolbar{display:flex;align-items:center;gap:11px;margin:0 0 12px;padding:12px 14px;border:1px solid rgba(255,255,255,.075);border-radius:8px;background:#191a1e}
+#dashboardView .admin-list-toolbar label{flex:none;color:#d0cdc7;font-size:11px;font-weight:800}
+#dashboardView .admin-list-toolbar input,#dashboardView .admin-list-toolbar select,#dashboardView .admin-mobile-section select{width:100%;min-height:40px;padding:9px 12px;border:1px solid rgba(255,255,255,.12);border-radius:6px;background:#111215;color:#f4f2ee;font:600 12px Manrope,sans-serif}
+#dashboardView .admin-list-toolbar input::placeholder{color:#85827d}
+#dashboardView .admin-list-toolbar input[type=search]{max-width:430px}
+#dashboardView .admin-feedback{margin:0 0 10px;font-size:12px;font-weight:700}
+#dashboardView .admin-feedback:empty{display:none}
+#dashboardView .success{color:#89d9a1!important}
+#dashboardView .error{color:#ff9690!important}
+#dashboardView .empty{padding:28px 16px;color:#aaa7a1;text-align:center;font-size:12px;line-height:1.5}
+#dashboardView .admin-card-list,#dashboardView .applications{gap:10px}
+#dashboardView .admin-tournament-card{overflow:hidden}
+#dashboardView .admin-tournament-main{grid-template-columns:46px minmax(0,1fr) auto;gap:13px;padding:17px}
+#dashboardView .admin-tournament-main .tournament-icon{width:46px;height:46px}
+#dashboardView .admin-tournament-copy small{color:#e99470;font-size:10px;font-weight:800}
+#dashboardView .admin-tournament-copy h3{margin:4px 0;color:#f4f2ee;font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+#dashboardView .admin-tournament-copy p{color:#aaa7a1;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+#dashboardView .admin-tournament-copy p span{padding:0 3px;color:#66645f}
+#dashboardView .status-badge{font-size:9px;white-space:nowrap}
+#dashboardView .admin-tournament-controls{gap:7px;padding:10px 16px;border-top:1px solid rgba(255,255,255,.06);background:#1c1d21}
+#dashboardView .admin-tournament-controls select{min-width:135px;min-height:36px;padding:7px 9px;font-size:11px}
+#dashboardView .admin-tournament-controls .btn{min-height:36px;padding:0 10px;font-size:10px}
+#dashboardView .admin-tournament-controls .reject{margin-left:auto}
+#dashboardView .tournament-editor{margin-top:14px;scroll-margin-top:90px}
+#dashboardView .tournament-editor summary{display:flex;align-items:center;gap:11px;padding:15px 17px;list-style:none;cursor:pointer}
+#dashboardView .tournament-editor summary::-webkit-details-marker,#dashboardView .application-head::-webkit-details-marker{display:none}
+#dashboardView .editor-summary-icon{width:34px;height:34px;display:grid;place-items:center;flex:none;border:1px solid rgba(248,118,67,.18);border-radius:6px;background:rgba(248,118,67,.09);color:#f19570}
+#dashboardView .editor-summary-icon svg{width:16px;height:16px}
+#dashboardView .tournament-editor summary b,#dashboardView .tournament-editor summary small{display:block}
+#dashboardView .tournament-editor summary b{color:#f1efeb;font-size:12px}
+#dashboardView .tournament-editor summary small{margin-top:3px;color:#a39f99;font-size:10px}
+#dashboardView .editor-summary-arrow{width:16px;height:16px;flex:none;margin-left:auto;color:#aaa7a1;transition:transform .2s}
+#dashboardView .tournament-editor[open] .editor-summary-arrow{transform:rotate(90deg)}
+#dashboardView .tournament-editor .team-form{border-top:1px solid rgba(255,255,255,.07)}
+#dashboardView .team-form{padding:18px}
+#dashboardView .team-form>label{margin-top:15px}
+#dashboardView .team-form input,#dashboardView .team-form textarea,#dashboardView .team-form select{min-height:42px}
+#dashboardView .team-form textarea{min-height:90px}
+#dashboardView .team-form input[type=checkbox]{width:18px;height:18px;min-height:18px;padding:0}
+#dashboardView .form-actions{flex-wrap:wrap}
+#dashboardView .form-actions p{font-size:11px;line-height:1.5}
+
+/* Clickable status filters and expandable applications */
+#dashboardView .admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+#dashboardView .application-filter{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:54px;padding:10px 13px;border:1px solid rgba(255,255,255,.075);border-radius:7px;background:#191a1e;color:#aaa7a1;text-align:left;cursor:pointer}
+#dashboardView .application-filter:hover{border-color:rgba(248,118,67,.3);color:#fff}
+#dashboardView .application-filter.active{border-color:rgba(248,118,67,.35);background:#29201d;color:#fff}
+#dashboardView .application-filter span{color:inherit;font-size:11px;font-weight:800}
+#dashboardView .application-filter b{color:#f5f3ee;font-size:17px;line-height:1}
+#dashboardView .application-filter.active b{color:#ff9b72}
+#dashboardView .applications-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,220px) auto;align-items:end;gap:10px}
+#dashboardView .admin-search-field,#dashboardView .admin-filter-field{display:grid;gap:6px}
+#dashboardView .applications-toolbar input[type=search]{max-width:none}
+#dashboardView #applicationResults{align-self:center;padding-top:17px;color:#a39f99;font-size:10px;white-space:nowrap}
+#dashboardView .application{overflow:hidden;border:1px solid rgba(255,255,255,.075);border-radius:9px;background:#191a1e}
+#dashboardView .application-head{align-items:center;gap:14px;padding:15px 17px;border:0;background:transparent;list-style:none;cursor:pointer}
+#dashboardView .application-head:hover{background:rgba(255,255,255,.018)}
+#dashboardView .application-team{gap:12px}
+#dashboardView .application-team-logo{width:44px;height:44px;flex-basis:44px;background:#111215}
+#dashboardView .application-copy small{margin-bottom:4px;color:#e99470;font-size:10px;line-height:1.3;overflow-wrap:anywhere}
+#dashboardView .application-name{display:block;color:#f7f5f2;font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+#dashboardView .application-copy .meta{display:block;margin-top:5px;color:#aaa7a1;font-size:10px;line-height:1.4;overflow-wrap:anywhere}
+#dashboardView .application-copy .meta span{padding:0 3px;color:#6c6964}
+#dashboardView .application-summary-side{display:flex;align-items:center;gap:14px;flex:none}
+#dashboardView .application-status{padding:5px 8px;border:1px solid rgba(255,255,255,.09);border-radius:5px;background:#25262a;color:#c7c4bf;font-size:10px;font-weight:800;white-space:nowrap}
+#dashboardView .application-status-pending{border-color:rgba(248,177,89,.25);background:rgba(248,177,89,.09);color:#f3c184}
+#dashboardView .application-status-approved{border-color:rgba(109,206,143,.24);background:rgba(109,206,143,.09);color:#9edfb0}
+#dashboardView .application-status-rejected{border-color:rgba(238,116,110,.24);background:rgba(238,116,110,.09);color:#f4a29b}
+#dashboardView .application-expand{display:flex;align-items:center;gap:3px;color:#aaa7a1;font-size:10px;font-weight:800;white-space:nowrap}
+#dashboardView .application-expand svg{width:14px;height:14px;transition:transform .2s}
+#dashboardView .application-details[open] .application-expand svg{transform:rotate(90deg)}
+#dashboardView .application-grid{gap:10px 16px;padding:15px 17px;border-top:1px solid rgba(255,255,255,.07);color:#e2dfda;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+#dashboardView .application-grid span{color:#a19e98}
+#dashboardView .application-grid a{color:#f49d79}
+#dashboardView .admin-roster-title{padding:10px 17px;color:#e7e4de;font-size:11px}
+#dashboardView .admin-roster-title span{color:#a19e98;font-size:10px}
+#dashboardView .admin-roster-row{padding:9px 17px}
+#dashboardView .admin-roster-row b{font-size:11px}
+#dashboardView .admin-roster-empty{padding:10px 17px;color:#a19e98;font-size:11px}
+#dashboardView .players{padding:12px 17px;overflow-wrap:anywhere;font-size:11px;line-height:1.6}
+#dashboardView .card-actions{gap:7px;padding:10px 16px;border-top:1px solid rgba(255,255,255,.06);background:#1c1d21}
+#dashboardView .card-actions .btn{min-height:35px;padding:0 10px;font-size:10px}
+#dashboardView .card-actions .application-delete{margin-left:auto}
+#dashboardView #emptyState{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px}
+#dashboardView #emptyState.hidden{display:none}
+
+/* Remaining editors */
+#dashboardView #manualTeamsTab{display:grid;gap:14px}
+#dashboardView #manualTeamsTab.hidden{display:none}
+#dashboardView .manual-team-row{padding:14px 18px}
+#dashboardView .user-row{padding:14px 18px}
+#dashboardView .user-email b{overflow-wrap:anywhere}
+#dashboardView .bracket-double-editor{padding:18px}
+#dashboardView .bracket-tournament-picker,#dashboardView .bracket-slot{border-color:rgba(255,255,255,.08);background:#151619}
+#dashboardView .bracket-tournament-picker>span{color:#aaa7a1}
+#dashboardView .bracket-image-preview{min-width:0}
+
+@media(max-width:850px){
+  #dashboardView .admin-layout{grid-template-columns:minmax(0,1fr);gap:0}
+  #dashboardView .admin-sidebar{display:none}
+  #dashboardView .admin-mobile-section{display:grid;gap:7px;margin:0 0 20px;color:#a9a6a0;font-size:9px;font-weight:800;letter-spacing:.1em}
+  #dashboardView .admin-mobile-section select{min-height:44px;background:#1a1b1e;font-size:13px;letter-spacing:0}
+  #dashboardView .admin-top{min-height:0}
+}
+@media(max-width:700px){
+  #dashboardView{margin-top:2px}
+  #dashboardView .admin-top{align-items:flex-start;flex-direction:row;gap:12px;padding:4px 0 17px}
+  #dashboardView .admin-top h1{font-size:23px}
+  #dashboardView .admin-heading p{font-size:11px}
+  #dashboardView .admin-account{width:auto;gap:8px}
+  #dashboardView .admin-account-copy{display:none}
+  #dashboardView .admin-account .secondary-btn{min-height:36px;padding:0 10px}
+  #dashboardView .admin-mobile-section{margin-bottom:18px}
+  #dashboardView .overview-intro{min-height:120px;padding:20px}
+  #dashboardView .overview-intro h2{font-size:20px}
+  #dashboardView .overview-intro-mark{width:44px;height:44px}
+  #dashboardView .overview-stats{gap:8px;margin-bottom:16px}
+  #dashboardView .overview-stat{min-height:115px;padding:13px}
+  #dashboardView .overview-stat>b{margin-top:14px;font-size:23px}
+  #dashboardView .overview-action-list{grid-template-columns:1fr}
+  #dashboardView .overview-action-list button{min-height:65px;border-right:0;border-bottom:1px solid rgba(255,255,255,.07)}
+  #dashboardView .overview-action-list button:last-child{border-bottom:0}
+  #dashboardView .admin-section-head{align-items:flex-start;flex-direction:column;margin-bottom:16px}
+  #dashboardView .admin-section-head .primary-btn{width:100%;justify-content:center}
+  #dashboardView .admin-list-toolbar{align-items:stretch;flex-direction:column;gap:7px;padding:12px}
+  #dashboardView .admin-list-toolbar input[type=search]{max-width:none;font-size:16px}
+  #dashboardView .applications-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+  #dashboardView .applications-toolbar .admin-search-field{grid-column:1/-1}
+  #dashboardView .applications-toolbar select{font-size:16px}
+  #dashboardView #applicationResults{justify-self:end;padding-top:18px}
+  #dashboardView .admin-tournament-main{grid-template-columns:44px minmax(0,1fr);gap:10px;padding:14px}
+  #dashboardView .admin-tournament-main .tournament-icon{width:44px;height:44px}
+  #dashboardView .admin-tournament-main .status-badge{grid-column:2;justify-self:start}
+  #dashboardView .admin-tournament-controls{display:grid;grid-template-columns:1fr 1fr;padding:10px 12px}
+  #dashboardView .admin-tournament-controls select{grid-column:1/-1;width:100%}
+  #dashboardView .admin-tournament-controls .btn{width:100%}
+  #dashboardView .admin-tournament-controls .reject{margin-left:0}
+  #dashboardView .admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #dashboardView .application-head{align-items:flex-start;flex-direction:column;gap:11px;padding:14px}
+  #dashboardView .application-summary-side{width:100%;justify-content:space-between;padding-left:56px}
+  #dashboardView .application-grid{grid-template-columns:1fr;gap:8px;padding:12px 14px}
+  #dashboardView .admin-roster-row{grid-template-columns:32px minmax(0,1fr) auto}
+  #dashboardView .admin-roster-row a{grid-column:auto}
+  #dashboardView .card-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:10px 12px}
+  #dashboardView .card-actions .btn{width:100%}
+  #dashboardView .card-actions .application-delete{margin-left:0}
+  #dashboardView .team-form{padding:15px}
+  #dashboardView .team-form input,#dashboardView .team-form textarea,#dashboardView .team-form select{font-size:16px}
+  #dashboardView .bracket-double-editor{padding:12px}
+}
+@media(max-width:400px){
+  #dashboardView .overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #dashboardView .overview-stat:last-child{grid-column:1/-1;min-height:102px}
+  #dashboardView .overview-stat-label svg:last-child{margin-left:auto}
+  #dashboardView .admin-top h1{font-size:21px}
+  #dashboardView .admin-heading small{font-size:8px}
+  #dashboardView .application-team-logo{width:40px;height:40px;flex-basis:40px}
+  #dashboardView .application-summary-side{padding-left:52px}
+}
+@media(prefers-reduced-motion:reduce){
+  #dashboardView *{scroll-behavior:auto!important;transition:none!important}
+}
+#dashboardView .application-extra-actions{padding:12px 17px;border-top:1px solid rgba(255,255,255,.06)}
+#dashboardView .application-extra-actions .btn{min-height:35px;padding:0 10px;font-size:10px}
+#dashboardView .users-toolbar{margin:14px 18px 0}
+#dashboardView .role-badge{white-space:nowrap}
+@media(max-width:700px){
+  #dashboardView .users-toolbar{margin:12px 14px 0}
+  #dashboardView .application-extra-actions{padding:10px 14px}
+}
+@media(min-width:701px){#dashboardView .user-row{grid-template-columns:minmax(0,1fr) auto auto}}
