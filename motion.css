@@ -1,0 +1,43 @@
+/* A small, self-contained intro: it never depends on the API or icon CDN. */
+.site-intro[hidden]{display:none}
+html.intro-active .site-intro[hidden]{
+  position:fixed;inset:0;z-index:10000;display:grid;place-items:center;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 43%,rgba(248,118,67,.12),transparent 38%),#101114;
+  animation:introExit .32s cubic-bezier(.4,0,.2,1) .82s forwards;
+}
+.site-intro::before,.site-intro::after{content:"";position:absolute;pointer-events:none}
+.site-intro::before{inset:24px;border:1px solid rgba(255,255,255,.035);border-radius:8px}
+.site-intro::after{left:50%;bottom:24px;width:36px;height:2px;background:#f87643;transform:translateX(-50%)}
+.intro-content{position:relative;display:grid;justify-items:center;width:min(320px,calc(100vw - 48px));text-align:center}
+.intro-emblem{position:relative;display:grid;place-items:center;width:108px;height:108px;margin-bottom:16px}
+.intro-orbit{position:absolute;inset:0;border:1px solid rgba(248,118,67,.34);border-right-color:transparent;border-bottom-color:rgba(248,118,67,.08);border-radius:50%;animation:introOrbit .9s cubic-bezier(.2,.75,.25,1) both}
+.intro-orbit::after{content:"";position:absolute;top:10px;right:13px;width:5px;height:5px;border-radius:50%;background:#ff9a70;box-shadow:0 0 16px #f87643}
+.site-intro .brand-mark{position:relative;display:grid;place-items:center;width:57px;height:57px;margin:0;border:0;border-radius:11px;background:#f87643;box-shadow:0 0 0 7px rgba(248,118,67,.09),0 12px 50px rgba(248,118,67,.2);color:#161310;font:800 31px/1 Manrope,system-ui,sans-serif;letter-spacing:-.08em;animation:introMark .7s cubic-bezier(.16,.84,.3,1) both}
+.site-intro .brand-mark.has-image{padding:5px;background:#242529}
+.site-intro .brand-copy{display:grid;justify-items:center;gap:7px;max-width:100%;line-height:1}
+.site-intro .brand-copy strong{max-width:100%;color:#f8f7f4;font:800 23px/1.1 Manrope,system-ui,sans-serif;letter-spacing:-.04em;overflow-wrap:anywhere}
+.site-intro .brand-copy small{max-width:100%;margin:0;color:#999690;font:800 9px/1.3 Manrope,system-ui,sans-serif;letter-spacing:.18em;white-space:normal;overflow-wrap:anywhere}
+.intro-line{width:148px;height:2px;overflow:hidden;margin-top:24px;background:rgba(255,255,255,.1)}
+.intro-line span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#f87643,#ffb08a);transform-origin:left;animation:introLine .82s cubic-bezier(.2,.75,.25,1) both}
+.intro-caption{display:flex;align-items:center;gap:8px;margin-top:13px;color:#8f8c87;font-size:9px;font-weight:800;letter-spacing:.11em}
+.intro-caption i{width:3px;height:3px;border-radius:50%;background:#f87643}
+@keyframes introOrbit{from{opacity:0;transform:rotate(-70deg) scale(.88)}to{opacity:1;transform:rotate(25deg) scale(1)}}
+@keyframes introMark{from{opacity:0;transform:translateY(8px) scale(.84)}to{opacity:1;transform:none}}
+@keyframes introLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes introExit{to{opacity:0;visibility:hidden}}
+
+/* Quiet feedback makes clicks and expanding sections feel more responsive. */
+.primary-btn,.secondary-btn,.account-btn,.menu-btn,.mobile-drawer nav a,.event-disclosure>summary{
+  transition:transform .18s cubic-bezier(.2,.75,.25,1),background-color .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease;
+}
+@media(prefers-reduced-motion:no-preference){
+  .primary-btn:active,.secondary-btn:active,.account-btn:active,.menu-btn:active,.mobile-drawer nav a:active{transform:scale(.98)}
+  .event-disclosure[open]>.event-team-list,.event-disclosure[open]>.event-match-list,
+  .application-details[open]>.admin-roster-block,#tournamentEditor[open]>:not(summary){
+    animation:contentUnfold .26s cubic-bezier(.2,.75,.25,1) backwards;
+  }
+}
+@keyframes contentUnfold{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  html.intro-active .site-intro[hidden]{display:none}
+}
