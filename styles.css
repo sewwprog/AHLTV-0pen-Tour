@@ -2783,7 +2783,12 @@ body{
   --primary-2:#df5e31;
   --success:#74c998;
   --danger:#f1837a;
-  --radius:12px;
+  /* A restrained corner scale: panels, cards, controls and the mobile sheet. */
+  --radius:8px;
+  --radius-card:6px;
+  --radius-control:4px;
+  --radius-mark:6px;
+  --radius-sheet:12px;
   --shadow:0 18px 50px rgba(0,0,0,.14);
 }
 html{scroll-padding-top:100px}
@@ -2825,10 +2830,10 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 .main-nav a:hover{background:none;color:#fff}
 .main-nav a.active{background:none;color:#fff;box-shadow:none}
 .main-nav a.active:after{content:"";position:absolute;right:15px;bottom:0;left:15px;height:2px;background:var(--primary)}
-.account-btn{height:40px;min-width:105px;margin-left:10px;padding:0 15px;border:1px solid #3a3938;border-radius:7px;background:#1b1c20;color:#f0eeea;font-size:12px}
+.account-btn{height:40px;min-width:105px;margin-left:10px;padding:0 15px;border:1px solid #3a3938;border-radius:var(--radius-control);background:#1b1c20;color:#f0eeea;font-size:12px}
 .account-btn svg{color:var(--primary)}
 .account-btn:hover{border-color:rgba(248,118,67,.55);background:#24211f;color:#fff}
-.menu-btn,.drawer-head button{border-radius:7px;background:#1c1d20;border-color:var(--line-2)}
+.menu-btn,.drawer-head button{border-radius:var(--radius-control);background:#1c1d20;border-color:var(--line-2)}
 .mobile-drawer{background:#17181c;border-color:var(--line-2);box-shadow:-20px 0 70px rgba(0,0,0,.35)}
 .mobile-drawer nav{gap:8px;padding:16px}
 .mobile-drawer nav a{min-height:54px;border-radius:7px;background:#202125;color:#deddda;font-size:13px}
@@ -2840,7 +2845,7 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 .panel-head strong{color:#85837e;font:800 10px/1 Manrope,sans-serif;letter-spacing:.06em}
 .loading-panel,.empty-state,.empty{padding:40px 20px;color:#aaa7a1;font-size:13px}
 .primary-btn,.secondary-btn,.btn{
-  min-height:44px;gap:9px;padding:0 17px;border-radius:7px;
+  min-height:44px;gap:9px;padding:0 17px;border-radius:var(--radius-control);
   font-size:12px;font-weight:800;letter-spacing:0;
 }
 .primary-btn{border-color:var(--primary);background:var(--primary);color:#17120f;box-shadow:none}
@@ -2859,7 +2864,7 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 /* Home: the arena, the journey, and real tournament data */
 .page-title.home-hero{
   position:relative;display:flex;min-height:402px;align-items:stretch;gap:0;
-  margin:0;padding:0;border:1px solid rgba(255,255,255,.1);border-radius:13px;
+  margin:0;padding:0;border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);
   background:linear-gradient(90deg,rgba(17,18,21,.98) 0%,rgba(17,18,21,.93) 30%,rgba(17,18,21,.36) 62%,rgba(17,18,21,.08) 100%),url("assets/arena-hero.webp") center 53%/cover no-repeat;
   box-shadow:0 25px 65px rgba(0,0,0,.23);
 }
@@ -2877,7 +2882,7 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 .hero-corner-label{position:absolute!important;right:27px;bottom:27px;z-index:1;display:grid;gap:5px;padding-right:12px;border-right:2px solid var(--primary);text-align:right}
 .hero-corner-label span{color:#aaa7a1;font:800 8px/1 Manrope,sans-serif;letter-spacing:.14em}
 .hero-corner-label b{color:#f5f2ec;font:800 9px/1 Manrope,sans-serif;letter-spacing:.08em}
-.journey{display:grid;grid-template-columns:225px minmax(0,1fr);margin:16px 0 62px;border:1px solid var(--line);border-radius:10px;background:#17181b}
+.journey{display:grid;grid-template-columns:225px minmax(0,1fr);margin:16px 0 62px;border:1px solid var(--line);border-radius:var(--radius-card);background:#17181b}
 .journey-intro{display:flex;flex-direction:column;justify-content:center;gap:7px;padding:20px 23px}
 .journey-intro>span,.journey-number{color:var(--primary);font:800 9px/1 Manrope,sans-serif;letter-spacing:.12em}
 .journey-intro strong{color:#f2f1ed;font-size:15px;letter-spacing:-.035em}
@@ -2894,12 +2899,12 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 .section-heading h2{margin:0 0 4px;color:#f9f8f5;font-size:30px;font-weight:800;line-height:1.2;letter-spacing:-.05em}
 .section-heading p{margin:0;color:#a3a19c;font-size:13px}
 .tournaments-list{gap:12px}
-.event-card{display:block;margin:0;overflow:hidden;border-radius:10px;background:#191a1e;box-shadow:none}
+.event-card{display:block;margin:0;overflow:hidden;border-radius:var(--radius-card);background:#191a1e;box-shadow:none}
 .event-card:before{display:none}
 .event-card:hover{transform:none}
 .event-main{min-width:0;padding:24px}
 .event-heading{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:start}
-.event-logo{width:56px;height:56px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line-2);border-radius:8px;background:#242326;color:#e69b7b;font-size:23px;font-weight:800}
+.event-logo{width:56px;height:56px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line-2);border-radius:var(--radius-mark);background:#242326;color:#e69b7b;font-size:23px;font-weight:800}
 .event-logo.has-logo{padding:5px;background:#121316}
 .event-logo img{width:100%;height:100%;object-fit:contain}
 .event-title{min-width:0}
@@ -2942,12 +2947,12 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 .event-actions .secondary-btn{background:transparent}
 .event-actions .secondary-btn:hover{background:#252528}
 .home-empty{display:grid;justify-items:center;gap:8px;padding:52px 24px;text-align:center}
-.home-empty-icon{width:47px;height:47px;display:grid;place-items:center;margin-bottom:6px;border:1px solid rgba(248,118,67,.2);border-radius:9px;background:rgba(248,118,67,.08);color:var(--primary)}
+.home-empty-icon{width:47px;height:47px;display:grid;place-items:center;margin-bottom:6px;border:1px solid rgba(248,118,67,.2);border-radius:var(--radius-mark);background:rgba(248,118,67,.08);color:var(--primary)}
 .home-empty-icon svg{width:22px;height:22px}
 .home-empty h3{margin:0;color:#f4f3ef;font-size:17px;font-weight:800}
 .home-empty p{margin:0;color:#aaa7a1;font-size:12px}
 .home-empty .secondary-btn{margin-top:10px}
-.home-cta{display:flex;align-items:center;justify-content:space-between;gap:25px;margin:58px 0 20px;padding:30px 34px;border:1px solid rgba(248,118,67,.15);border-radius:11px;background:radial-gradient(circle at 83% 30%,rgba(248,118,67,.16),transparent 28%),linear-gradient(110deg,#211c1a,#191a1d 65%)}
+.home-cta{display:flex;align-items:center;justify-content:space-between;gap:25px;margin:58px 0 20px;padding:30px 34px;border:1px solid rgba(248,118,67,.15);border-radius:var(--radius);background:radial-gradient(circle at 83% 30%,rgba(248,118,67,.16),transparent 28%),linear-gradient(110deg,#211c1a,#191a1d 65%)}
 .home-cta>div>span{color:#ed8b63;font-size:9px;font-weight:800;letter-spacing:.14em}
 .home-cta h2{margin:8px 0;color:#fff;font-size:24px;font-weight:800;line-height:1.23;letter-spacing:-.045em}
 .home-cta h2 em{color:#f8956e;font-style:normal}
@@ -2956,15 +2961,15 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 
 /* Forms, account and tournament detail use the same visual language */
 .apply-page{max-width:1080px}
-.page-title.compact,.apply-page .page-title{min-height:156px;margin-bottom:16px;padding:28px 32px;border:1px solid var(--line);border-radius:12px;background:radial-gradient(circle at 85% 0,rgba(248,118,67,.13),transparent 28%),linear-gradient(110deg,#201d1d,#191a1e 65%)}
+.page-title.compact,.apply-page .page-title{min-height:156px;margin-bottom:16px;padding:28px 32px;border:1px solid var(--line);border-radius:var(--radius);background:radial-gradient(circle at 85% 0,rgba(248,118,67,.13),transparent 28%),linear-gradient(110deg,#201d1d,#191a1e 65%)}
 .page-title small,.admin-top small{color:#f38b60;font:800 10px/1 Manrope,sans-serif;letter-spacing:.13em}
 .page-title.compact h1{margin:11px 0 7px;font:800 35px/1.1 Manrope,sans-serif;letter-spacing:-.055em}
 .page-title.compact h1 span{color:var(--primary)}
 .page-title.compact p{color:#aaa7a1;font-size:13px}
-.apply-title-mark{width:62px;height:62px;flex-basis:62px;border-color:rgba(248,118,67,.2);border-radius:9px;background:rgba(248,118,67,.08);color:#f58b60}
+.apply-title-mark{width:62px;height:62px;flex-basis:62px;border-color:rgba(248,118,67,.2);border-radius:var(--radius-mark);background:rgba(248,118,67,.08);color:#f58b60}
 .apply-title-mark svg{width:27px;height:27px}
 .auth-gate{grid-template-columns:64px minmax(0,1fr) auto;gap:20px;padding:26px}
-.auth-gate-icon{width:62px;height:62px;border-radius:9px;background:rgba(248,118,67,.1);color:var(--primary);border:1px solid rgba(248,118,67,.2)}
+.auth-gate-icon{width:62px;height:62px;border-radius:var(--radius-mark);background:rgba(248,118,67,.1);color:var(--primary);border:1px solid rgba(248,118,67,.2)}
 .auth-gate small{color:#e68a65;font-size:9px;font-weight:800;letter-spacing:.1em}
 .auth-gate h2{margin:5px 0;color:#fff;font:800 20px/1.25 Manrope,sans-serif;letter-spacing:-.04em}
 .auth-gate p{color:#aaa7a1;font-size:12px}
@@ -2972,22 +2977,22 @@ svg.lucide{width:17px;height:17px;stroke-width:1.8}
 .apply-account-bar a{color:#ff9870}
 .tournament-select-wrap,.team-form{padding:20px}
 .tournament-select-wrap label,.team-form label,.bracket-tools label,.bracket-tournament-picker label,.bracket-slot label{color:#ceccc7;font-size:12px;font-weight:700}
-.team-form fieldset{margin-bottom:18px;padding:18px;border-color:var(--line);border-radius:9px;background:#151619}
+.team-form fieldset{margin-bottom:18px;padding:18px;border-color:var(--line);border-radius:var(--radius-card);background:#151619}
 .team-form legend{padding:0 5px;color:#f2f0ec;font:800 12px/1.3 Manrope,sans-serif;letter-spacing:0}
 .form-grid{gap:16px}
 .tournament-select-wrap select,.team-form input,.team-form textarea,.team-form select,.admin-tournament-controls select,.bracket-tools select,.bracket-admin-controls select,.bracket-admin-controls input,.bracket-tournament-picker select,.bracket-slot input{
-  min-height:46px;padding:10px 12px;border:1px solid rgba(255,255,255,.13);border-radius:7px;background:#111215;color:#f3f2ee;
+  min-height:46px;padding:10px 12px;border:1px solid rgba(255,255,255,.13);border-radius:var(--radius-control);background:#111215;color:#f3f2ee;
 }
 input::placeholder,textarea::placeholder{color:#807f7b}
 .tournament-select-wrap select:focus,.team-form input:focus,.team-form textarea:focus,.team-form select:focus,.admin-tournament-controls select:focus,.bracket-tools select:focus,.bracket-admin-controls select:focus,.bracket-admin-controls input:focus{border-color:#ed8a61;box-shadow:0 0 0 3px rgba(248,118,67,.12)}
 .tournament-hint{border-color:rgba(248,118,67,.18);border-radius:7px;background:rgba(248,118,67,.06)}
 .tournament-hint:empty{display:none}
 .tournament-hint span{color:#aca8a2;font-size:11px}
-.team-logo-upload{border-color:rgba(248,118,67,.26);border-radius:8px;background:rgba(248,118,67,.035)}
+.team-logo-upload{border-color:rgba(248,118,67,.26);border-radius:var(--radius-card);background:rgba(248,118,67,.035)}
 .team-logo-preview,.asset-preview.has-image{background:#111215}
 .team-logo-copy small,.manual-team-logo-upload small,.asset-upload-copy small,.tournament-logo-editor small{color:#a29e98}
 .team-logo-file{min-height:38px;border-radius:6px;background:#272629!important}
-.roster-card{border-radius:8px;background:#17181b}
+.roster-card{border-radius:var(--radius-card);background:#17181b}
 .roster-card-title{min-height:40px;padding:0 12px;background:#202125}
 .roster-card-title>span{font-size:11px}
 .roster-fields{padding:12px}
@@ -3016,7 +3021,7 @@ input::placeholder,textarea::placeholder{color:#807f7b}
 .account-body p{color:#aaa7a1}
 .user-dashboard{max-width:1030px}
 .user-dashboard .account-panel{width:100%;max-width:none;margin:0}
-.user-application-card,.application{border-radius:8px;background:#17181b}
+.user-application-card,.application{border-radius:var(--radius-card);background:#17181b}
 .user-application-stats span,.user-application-meta,.user-application-footer{color:#aaa7a1}
 .user-application-footer{background:#151619}
 .admin-top{padding:22px;background:linear-gradient(110deg,#211d1c,#191a1e)}
@@ -3027,7 +3032,7 @@ input::placeholder,textarea::placeholder{color:#807f7b}
 .bracket-scroll,.bracket-image-preview{background:#121316}
 
 .tournament-detail-hero{grid-template-columns:94px minmax(0,1fr) auto;gap:22px;padding:28px;background:radial-gradient(circle at 90% 0,rgba(248,118,67,.12),transparent 28%),#1a1b1f}
-.detail-logo{width:92px;height:92px;border-radius:10px;background:#2c2421;color:#ff9870;font:800 38px/1 Manrope,sans-serif}
+.detail-logo{width:92px;height:92px;border-radius:var(--radius-mark);background:#2c2421;color:#ff9870;font:800 38px/1 Manrope,sans-serif}
 .detail-logo.has-logo{background:#121316}
 .detail-hero-copy small{color:#ef9169;font:800 10px/1 Manrope,sans-serif;letter-spacing:.1em}
 .detail-hero-copy h1{margin:8px 0;color:#fff;font:800 30px/1.15 Manrope,sans-serif;letter-spacing:-.05em;overflow-wrap:anywhere}
@@ -3071,7 +3076,7 @@ input::placeholder,textarea::placeholder{color:#807f7b}
   .home-page,.apply-page,.admin-shell,.tournament-detail-page{padding-top:17px;padding-bottom:16px}
   .page-topline{margin-bottom:12px;font-size:9px}
   .page-topline>span:last-child{display:none}
-  .page-title.home-hero{min-height:0;display:block;border-radius:10px;background-position:70% center;background-image:linear-gradient(90deg,rgba(17,18,21,.97),rgba(17,18,21,.88) 58%,rgba(17,18,21,.48)),url("assets/arena-hero.webp")}
+  .page-title.home-hero{min-height:0;display:block;border-radius:var(--radius);background-position:70% center;background-image:linear-gradient(90deg,rgba(17,18,21,.97),rgba(17,18,21,.88) 58%,rgba(17,18,21,.48)),url("assets/arena-hero.webp")}
   .home-hero-main{padding:36px 24px}
   .home-hero h1{margin:20px 0 5px;font-size:clamp(38px,10vw,52px)}
   .hero-manifesto{font-size:23px}
@@ -3090,7 +3095,7 @@ input::placeholder,textarea::placeholder{color:#807f7b}
   .section-heading{margin-bottom:16px}
   .section-heading h2{margin:0 0 4px;font-size:26px}
   .section-heading p{font-size:12px}
-  .event-card{border-radius:10px}
+  .event-card{border-radius:var(--radius-card)}
   .event-main{padding:18px}
   .event-heading{grid-template-columns:46px minmax(0,1fr);gap:10px 12px}
   .event-logo{width:46px;height:46px;font-size:20px}
@@ -3110,9 +3115,9 @@ input::placeholder,textarea::placeholder{color:#807f7b}
   .home-cta h2{font-size:22px}
   .home-cta>a{width:100%}
 
-  .panel{margin-bottom:12px;border-radius:10px}
+  .panel{margin-bottom:12px;border-radius:var(--radius)}
   .panel-head{min-height:48px;padding:0 15px}
-  .page-title.compact,.apply-page .page-title{min-height:0;padding:22px 20px;border-radius:10px}
+  .page-title.compact,.apply-page .page-title{min-height:0;padding:22px 20px;border-radius:var(--radius)}
   .page-title.compact h1{font-size:28px}
   .page-title.compact p{font-size:12px}
   .auth-gate{grid-template-columns:52px minmax(0,1fr);gap:13px;padding:18px}
@@ -3161,9 +3166,9 @@ input::placeholder,textarea::placeholder{color:#807f7b}
 }
 
 /* Consistent corners and compact empty bracket states. */
-.apply-page .panel{border-radius:10px}
-.apply-page .primary-btn,.apply-page .secondary-btn{border-radius:7px}
-.apply-page .tournament-select-wrap select,.apply-page .team-form input,.apply-page .team-form textarea,.apply-page .team-form select{border-radius:7px}
+.apply-page .panel{border-radius:var(--radius)}
+.apply-page .primary-btn,.apply-page .secondary-btn{border-radius:var(--radius-control)}
+.apply-page .tournament-select-wrap select,.apply-page .team-form input,.apply-page .team-form textarea,.apply-page .team-form select{border-radius:var(--radius-control)}
 .public-bracket-gallery .public-bracket-image,.bracket-slot,.bracket-tournament-picker{background:#151619}
 .public-bracket-image-head{background:#202125}
 .public-bracket-image.is-empty{min-height:220px}
