@@ -8,16 +8,25 @@ const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=s=>document.querySelector(s);
 const esc=(v="")=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 const safeUrl=v=>{try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)?u.href:null}catch{return null}};
-const statusLabel=s=>({upcoming:"UPCOMING",registration:"REGISTRATION",live:"LIVE",finished:"FINISHED"}[s]||String(s).toUpperCase());
+const statusLabel=s=>({upcoming:"Незабаром",registration:"Реєстрація",live:"Триває",finished:"Завершено"}[s]||String(s||"Невідомо"));
 
-function previewImage(container,url,fallback="A"){
+// Object URLs are accepted only when created here from a locally selected file.
+const localPreviews=new WeakMap();
+function previewUrl(container,url,isLocal=false){
+  const previous=localPreviews.get(container);
+  if(previous&&previous!==url){URL.revokeObjectURL(previous);localPreviews.delete(container)}
+  if(isLocal&&url){localPreviews.set(container,url);return url}
+  return safeUrl(url);
+}
+
+function previewImage(container,url,fallback="A",isLocal=false){
   if(!container)return;
   container.innerHTML="";
-  const safe=safeUrl(url);
+  const safe=previewUrl(container,url,isLocal);
   if(safe){
     const img=document.createElement("img");
     img.src=safe;
-    img.alt="Logo preview";
+    img.alt="Попередній перегляд логотипа";
     container.classList.add("has-image");
     container.appendChild(img);
   }else{
@@ -53,11 +62,15 @@ let authMode="login";
 const siteSettingsForm=$("#siteSettingsForm"),siteLogoFile=$("#siteLogoFile"),siteLogoPreview=$("#siteLogoPreview"),siteSettingsMessage=$("#siteSettingsMessage"),saveSiteSettingsBtn=$("#saveSiteSettingsBtn"),removeSiteLogo=$("#removeSiteLogo");
 const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview");
 const manualTeamForm=$("#manualTeamForm"),manualTeamTournament=$("#manualTeamTournament"),manualTeamName=$("#manualTeamName"),manualTeamLogoFile=$("#manualTeamLogoFile"),manualTeamLogoPreview=$("#manualTeamLogoPreview"),manualTeamSubmitBtn=$("#manualTeamSubmitBtn"),manualTeamMessage=$("#manualTeamMessage"),manualTeamsList=$("#manualTeamsList");
-const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge");
-const usersList=$("#usersList"),usersCount=$("#usersCount");
+const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge"),applicationSearch=$("#applicationSearch"),applicationTournamentFilter=$("#applicationTournamentFilter"),applicationResults=$("#applicationResults"),clearApplicationFilters=$("#clearApplicationFilters");
+const tournamentEditor=$("#tournamentEditor"),tournamentSearch=$("#tournamentSearch"),tournamentCount=$("#tournamentCount"),tournamentListMessage=$("#tournamentListMessage"),adminSectionSelect=$("#adminSectionSelect");
+const usersList=$("#usersList"),usersCount=$("#usersCount"),userSearch=$("#userSearch");
 const bracketTournament=$("#bracketTournament"),bracketImageFile=$("#bracketImageFile"),saveBracketImageBtn=$("#saveBracketImageBtn"),removeBracketImageBtn=$("#removeBracketImageBtn"),bracketImagePreview=$("#bracketImagePreview"),bracketImageFile2=$("#bracketImageFile2"),saveBracketImageBtn2=$("#saveBracketImageBtn2"),removeBracketImageBtn2=$("#removeBracketImageBtn2"),bracketImagePreview2=$("#bracketImagePreview2"),bracketMessage=$("#bracketMessage");
 
 let tournaments=[],registrations=[],manualTeams=[],editingTournamentId=null,tabsReady=false,siteSettings=null,siteLogoRemoved=false;
+let tournamentLoadState="loading",applicationLoadState="loading",manualTeamLoadState="loading";
+let applicationStatusFilter="all",tournamentFormDirty=false,tournamentSaving=false,userAccounts=[],usersLoaded=false;
+const applicationBusyIds=new Set();
 
 function setButtonContent(button,icon,label){
   if(!button)return;
@@ -74,21 +87,62 @@ function showLogin(message=""){
 
 async function isAdmin(userId){
   const {data,error}=await supabase.from("admin_users").select("user_id").eq("user_id",userId).maybeSingle();
-  return !error&&!!data;
+  if(error)throw error;
+  return !!data;
+}
+
+const adminSections={
+  overviewTab:["Огляд","Усе важливе про турніри та заявки в одному місці."],
+  tournamentsTab:["Турніри","Створюй події та керуй їх налаштуваннями."],
+  applicationsTab:["Заявки","Переглядай команди та приймай рішення."],
+  manualTeamsTab:["Додати команду","Додавай учасників на турніри вручну."],
+  matchesTab:["Сітки","Завантажуй та оновлюй сітки турнірів."],
+  usersTab:["Користувачі","Переглядай акаунти та керуй доступом."],
+  siteTab:["Налаштування сайту","Змінюй логотип і тексти платформи."]
+};
+
+function showAdminTab(id,scroll=false){
+  if(!adminSections[id])return;
+  document.querySelectorAll(".admin-tabs [data-tab]").forEach(btn=>{
+    const active=btn.dataset.tab===id;
+    btn.classList.toggle("active",active);
+    if(active)btn.setAttribute("aria-current","page");else btn.removeAttribute("aria-current");
+  });
+  document.querySelectorAll("#dashboardView .admin-tab").forEach(tab=>tab.classList.toggle("hidden",tab.id!==id));
+  if(adminSectionSelect)adminSectionSelect.value=id;
+  $("#adminSectionLabel").textContent=adminSections[id][0].toUpperCase();
+  $("#adminPageTitle").textContent=adminSections[id][0];
+  $("#adminPageDescription").textContent=adminSections[id][1];
+  if(scroll)dashboardView.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 function setupTabs(){
   if(tabsReady)return;tabsReady=true;
-  document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{
-    document.querySelectorAll("[data-tab]").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".admin-tab").forEach(x=>x.classList.add("hidden"));
-    btn.classList.add("active");$("#"+btn.dataset.tab).classList.remove("hidden");
+  document.querySelectorAll(".admin-tabs [data-tab]").forEach(btn=>btn.addEventListener("click",()=>showAdminTab(btn.dataset.tab,true)));
+  adminSectionSelect?.addEventListener("change",()=>showAdminTab(adminSectionSelect.value));
+  document.querySelectorAll("[data-open-tab]").forEach(btn=>btn.addEventListener("click",()=>{
+    if(btn.dataset.applicationStatus){
+      applicationStatusFilter=btn.dataset.applicationStatus;
+      applicationSearch.value="";
+      applicationTournamentFilter.value="";
+      renderApplications();
+    }
+    showAdminTab(btn.dataset.openTab,true);
   }));
+  $("#quickManualTeamBtn")?.addEventListener("click",()=>showAdminTab("manualTeamsTab",true));
+  $("#createTournamentBtn")?.addEventListener("click",openCreateTournament);
+  $("[data-overview-action='create-tournament']")?.addEventListener("click",openCreateTournament);
+}
 
-  $("#quickManualTeamBtn")?.addEventListener("click",()=>{
-    document.querySelector('[data-tab="manualTeamsTab"]')?.click();
-    $("#manualTeamsTab")?.scrollIntoView({behavior:"smooth",block:"start"});
-  });
+function updateOverview(){
+  const tournamentReady=tournamentLoadState==="ready";
+  const appsReady=applicationLoadState==="ready";
+  $("#overviewTournaments").textContent=tournamentReady?String(tournaments.length):"—";
+  $("#overviewTournamentsNote").textContent=tournamentLoadState==="error"?"Не вдалося завантажити":"Усього турнірів";
+  $("#overviewPending").textContent=appsReady?String(registrations.filter(x=>x.status==="pending").length):"—";
+  $("#overviewApproved").textContent=appsReady?String(registrations.filter(x=>x.status==="approved").length):"—";
+  $("#overviewPendingNote").textContent=applicationLoadState==="error"?"Не вдалося завантажити":"Заявки на розгляд";
+  $("#overviewApprovedNote").textContent=applicationLoadState==="error"?"Не вдалося завантажити":"Підтверджені заявки";
 }
 
 const applicationStatusLabel=s=>({pending:"Очікує",approved:"Прийнята",rejected:"Відхилена"}[s]||String(s).toUpperCase());
@@ -164,7 +218,13 @@ async function openAccount(user){
     return;
   }
 
-  const admin=await isAdmin(user.id);
+  let admin;
+  try{admin=await isAdmin(user.id)}catch(error){
+    console.error(error);
+    showLogin("Не вдалося перевірити права доступу. Онови сторінку та спробуй ще раз.");
+    loginMessage.className="error";
+    return;
+  }
   loginView.classList.add("hidden");
 
   if(!admin){
@@ -179,12 +239,7 @@ async function openAccount(user){
   dashboardView.classList.remove("hidden");
   adminEmail.textContent=user.email||"";
   setupTabs();
-  await loadSiteSettings();
-  await loadTournaments();
-  await loadApplications();
-  await loadManualTeams();
-  renderTournaments();
-  await Promise.all([loadUsers(),loadBracketImage()]);
+  await Promise.all([loadSiteSettings(),loadTournaments().then(loadBracketImage),loadApplications(),loadManualTeams(),loadUsers()]);
 }
 
 async function loadSiteSettings(){
@@ -211,7 +266,8 @@ async function loadSiteSettings(){
 siteLogoFile?.addEventListener("change",()=>{
   const file=siteLogoFile.files?.[0];
   siteLogoRemoved=false;
-  if(file)previewImage(siteLogoPreview,URL.createObjectURL(file),siteSettingsForm.elements.site_name.value||"A");
+  if(file)previewImage(siteLogoPreview,URL.createObjectURL(file),siteSettingsForm.elements.site_name.value||"A",true);
+  else previewImage(siteLogoPreview,siteSettings?.logo_url,siteSettingsForm.elements.site_name.value||"A");
 });
 
 removeSiteLogo?.addEventListener("click",()=>{
@@ -273,128 +329,236 @@ function tournamentPayload(form){
 }
 
 function resetTournamentForm(){
-  editingTournamentId=null;tournamentForm.reset();
+  editingTournamentId=null;
+  tournamentForm.reset();
+  tournamentFormDirty=false;
   tournamentForm.elements.game.value="CS2";tournamentForm.elements.format.value="BO3";tournamentForm.elements.max_teams.value="16";
   tournamentForm.elements.status.value="registration";tournamentForm.elements.registration_open.checked=true;tournamentForm.elements.is_visible.checked=true;
   previewImage(tournamentLogoPreview,null,"A");
-  setButtonContent(saveTournamentBtn,"plus","Створити турнір");cancelTournamentEdit.classList.add("hidden");tournamentFormTitle.textContent="ДОДАТИ ТУРНІР";tournamentMessage.textContent="";
+  setButtonContent(saveTournamentBtn,"plus","Створити турнір");
+  tournamentFormTitle.textContent="Додати турнір";
+  tournamentMessage.textContent="";tournamentMessage.className="";
 }
 
+function canDiscardTournamentDraft(){
+  return !tournamentFormDirty||confirm("Відкинути незбережені зміни турніру?");
+}
+
+function setTournamentSaving(saving){
+  tournamentSaving=saving;
+  tournamentForm.querySelectorAll("input,select,textarea,button").forEach(control=>{control.disabled=saving});
+  $("#createTournamentBtn").disabled=saving;
+  tournamentList.querySelectorAll("button,select").forEach(control=>{control.disabled=saving});
+  tournamentForm.setAttribute("aria-busy",String(saving));
+}
+
+tournamentEditor.querySelector("summary").addEventListener("click",event=>{
+  if(tournamentSaving)event.preventDefault();
+});
+
+function openCreateTournament(){
+  if(tournamentSaving)return;
+  if(editingTournamentId){
+    if(!canDiscardTournamentDraft())return;
+    resetTournamentForm();
+  }
+  tournamentListMessage.textContent="";
+  showAdminTab("tournamentsTab");
+  tournamentEditor.open=true;
+  tournamentEditor.scrollIntoView({behavior:"smooth",block:"start"});
+  tournamentForm.elements.name.focus({preventScroll:true});
+}
+
+tournamentForm.addEventListener("input",()=>{tournamentFormDirty=true});
+tournamentForm.addEventListener("change",()=>{tournamentFormDirty=true});
 tournamentLogoFile?.addEventListener("change",()=>{
   const file=tournamentLogoFile.files?.[0];
-  if(file)previewImage(tournamentLogoPreview,URL.createObjectURL(file),tournamentForm.elements.short_name.value||tournamentForm.elements.name.value||"A");
+  const fallback=tournamentForm.elements.short_name.value||tournamentForm.elements.name.value||"A";
+  if(file)previewImage(tournamentLogoPreview,URL.createObjectURL(file),fallback,true);
+  else previewImage(tournamentLogoPreview,tournaments.find(t=>t.id===editingTournamentId)?.logo_url,fallback);
 });
 
 tournamentForm.addEventListener("submit",async e=>{
   e.preventDefault();
   const payload=tournamentPayload(tournamentForm);
   const wasEditing=!!editingTournamentId;
-  saveTournamentBtn.disabled=true;
+  let saved=null;
+  tournamentListMessage.textContent="";
+  setTournamentSaving(true);
   tournamentMessage.textContent="Зберігаємо...";
   tournamentMessage.className="";
 
   try{
-    let saved;
-
     if(editingTournamentId){
-      const {data,error}=await supabase.from("tournaments").update(payload).eq("id",editingTournamentId).select("id,logo_url").single();
-      if(error)throw error;
-      saved=data;
+      const result=await supabase.from("tournaments").update(payload).eq("id",editingTournamentId).select("id,logo_url").single();
+      if(result.error)throw result.error;
+      saved=result.data;
     }else{
-      const {data,error}=await supabase.from("tournaments").insert(payload).select("id,logo_url").single();
-      if(error)throw error;
-      saved=data;
+      const result=await supabase.from("tournaments").insert(payload).select("id,logo_url").single();
+      if(result.error)throw result.error;
+      saved=result.data;
     }
 
     const logoFile=tournamentLogoFile.files?.[0];
-
     if(logoFile){
-      tournamentMessage.textContent="Завантажуємо лого...";
+      tournamentMessage.textContent="Завантажуємо логотип...";
       const logoUrl=await uploadAsset(logoFile,`tournaments/${saved.id}`);
-      const {error:logoError}=await supabase.from("tournaments").update({logo_url:logoUrl}).eq("id",saved.id);
-      if(logoError)throw logoError;
+      const {error}=await supabase.from("tournaments").update({logo_url:logoUrl}).eq("id",saved.id);
+      if(error)throw error;
     }
 
-    tournamentMessage.textContent=wasEditing?"Турнір оновлено.":"Турнір створено.";
-    tournamentMessage.className="success";
     resetTournamentForm();
+    tournamentEditor.open=false;
+    if(!wasEditing)tournamentSearch.value="";
     await loadTournaments();
+    tournamentListMessage.textContent=wasEditing?"Турнір оновлено.":"Турнір створено.";
+    tournamentListMessage.className="admin-feedback success";
   }catch(error){
     console.error(error);
-    tournamentMessage.textContent=error?.message||"Не вдалося зберегти турнір.";
+    // If the row was saved but the image failed, retry as an edit, never as a second insert.
+    if(saved){
+      editingTournamentId=saved.id;
+      tournamentFormDirty=true;
+      setButtonContent(saveTournamentBtn,"save","Зберегти зміни");
+      cancelTournamentEdit.classList.remove("hidden");
+      tournamentFormTitle.textContent="Редагувати турнір";
+      await loadTournaments();
+      tournamentMessage.textContent="Дані турніру збережено, але логотип не завантажено. Перевір файл і повтори збереження.";
+    }else{
+      tournamentMessage.textContent=error?.message||"Не вдалося зберегти турнір.";
+    }
     tournamentMessage.className="error";
   }finally{
-    saveTournamentBtn.disabled=false;
+    setTournamentSaving(false);
   }
 });
-cancelTournamentEdit.addEventListener("click",resetTournamentForm);
+cancelTournamentEdit.addEventListener("click",()=>{
+  if(!canDiscardTournamentDraft())return;
+  resetTournamentForm();tournamentEditor.open=false;
+});
+
+tournamentSearch?.addEventListener("input",renderTournaments);
 
 async function loadTournaments(){
   const {data,error}=await supabase.from("tournaments").select("*").order("created_at",{ascending:false});
-  if(error){tournamentList.innerHTML='<section class="panel empty error">Не вдалося завантажити турніри.</section>';return}
-  tournaments=data||[];renderTournaments();populateTournamentSelects();
+  if(error){
+    console.error(error);tournamentLoadState="error";renderTournaments();updateOverview();return;
+  }
+  tournaments=data||[];tournamentLoadState="ready";
+  renderTournaments();populateTournamentSelects();updateOverview();
 }
 
 function renderTournaments(){
-  if(!tournaments.length){tournamentList.innerHTML='<section class="panel empty">Турнірів ще немає. Створи перший вище.</section>';return}
-  tournamentList.innerHTML=tournaments.map(t=>{
-    const approved=registrations.filter(r=>r.tournament_id===t.id&&r.status==="approved").length+manualTeams.filter(m=>m.tournament_id===t.id).length;
+  if(tournamentLoadState==="loading")return;
+  if(tournamentLoadState==="error"){
+    tournamentCount.textContent="—";
+    tournamentList.innerHTML='<section class="panel empty error">Не вдалося завантажити турніри. Онови сторінку та спробуй ще раз.</section>';
+    return;
+  }
+  tournamentCount.textContent=String(tournaments.length);
+  const query=tournamentSearch.value.trim().toLocaleLowerCase("uk");
+  const visible=tournaments.filter(t=>[t.name,t.short_name,t.game,t.format].some(v=>String(v||"").toLocaleLowerCase("uk").includes(query)));
+  if(!visible.length){
+    tournamentList.innerHTML=`<section class="panel empty">${tournaments.length?"Нічого не знайдено. Спробуй інший запит.":"Турнірів ще немає. Створи перший турнір."}</section>`;
+    return;
+  }
+  tournamentList.innerHTML=visible.map(t=>{
+    const teamCount=applicationLoadState==="ready"&&manualTeamLoadState==="ready"
+      ?registrations.filter(r=>r.tournament_id===t.id&&r.status==="approved").length+manualTeams.filter(m=>m.tournament_id===t.id).length:"—";
     const logo=safeUrl(t.logo_url);
     return `<article class="panel admin-tournament-card">
       <div class="admin-tournament-main">
-        <div class="tournament-icon small ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="${esc(t.name)} logo">`:esc((t.short_name||t.name).slice(0,1).toUpperCase())}</div>
-        <div><small>${esc(t.game)} · ${esc(t.format)}</small><h3>${esc(t.name)}</h3><p>${approved} / ${t.max_teams} команд · ${t.registration_open?"реєстрація відкрита":"реєстрація закрита"} · ${t.is_visible?"видимий":"прихований"}</p></div>
-        <span class="status-badge status-${t.status}">${statusLabel(t.status)}</span>
+        <div class="tournament-icon small ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="Логотип ${esc(t.name)}">`:esc((t.short_name||t.name||"A").slice(0,1).toUpperCase())}</div>
+        <div class="admin-tournament-copy"><small>${esc(t.game)} · ${esc(t.format)}</small><h3>${esc(t.name)}</h3><p>${teamCount} / ${esc(t.max_teams)} команд <span>·</span> ${t.registration_open?"реєстрація відкрита":"реєстрація закрита"} <span>·</span> ${t.is_visible?"видимий на сайті":"прихований"}</p></div>
+        <span class="status-badge status-${esc(t.status)}">${esc(statusLabel(t.status))}</span>
       </div>
       <div class="admin-tournament-controls">
-        <select data-status-id="${t.id}">
-          <option value="upcoming" ${t.status==="upcoming"?"selected":""}>Upcoming</option>
-          <option value="registration" ${t.status==="registration"?"selected":""}>Registration</option>
-          <option value="live" ${t.status==="live"?"selected":""}>Live</option>
-          <option value="finished" ${t.status==="finished"?"selected":""}>Finished</option>
+        <select data-status-id="${esc(t.id)}" aria-label="Статус турніру ${esc(t.name)}">
+          <option value="upcoming" ${t.status==="upcoming"?"selected":""}>Незабаром</option>
+          <option value="registration" ${t.status==="registration"?"selected":""}>Реєстрація</option>
+          <option value="live" ${t.status==="live"?"selected":""}>Триває</option>
+          <option value="finished" ${t.status==="finished"?"selected":""}>Завершено</option>
         </select>
-        <button class="btn" data-edit-tournament="${t.id}"><i data-lucide="pencil"></i><span>Редагувати</span></button>
-        <button class="btn" data-toggle-registration="${t.id}"><i data-lucide="${t.registration_open?"x-circle":"check"}"></i><span>${t.registration_open?"Закрити реєстрацію":"Відкрити реєстрацію"}</span></button>
-        <button class="btn" data-toggle-visible="${t.id}"><i data-lucide="${t.is_visible?"eye-off":"eye"}"></i><span>${t.is_visible?"Сховати":"Показати"}</span></button>
-        <button class="btn reject" data-delete-tournament="${t.id}"><i data-lucide="trash-2"></i><span>Видалити</span></button>
+        <button type="button" class="btn" data-edit-tournament="${esc(t.id)}"><i data-lucide="pencil"></i><span>Редагувати</span></button>
+        <button type="button" class="btn" data-toggle-registration="${esc(t.id)}"><i data-lucide="${t.registration_open?"x-circle":"check"}"></i><span>${t.registration_open?"Закрити реєстрацію":"Відкрити реєстрацію"}</span></button>
+        <button type="button" class="btn" data-toggle-visible="${esc(t.id)}"><i data-lucide="${t.is_visible?"eye-off":"eye"}"></i><span>${t.is_visible?"Сховати":"Показати"}</span></button>
+        <button type="button" class="btn reject" data-delete-tournament="${esc(t.id)}"><i data-lucide="trash-2"></i><span>Видалити</span></button>
       </div>
     </article>`;
   }).join("");
 
   window.refreshIcons?.();
+  if(tournamentSaving)tournamentList.querySelectorAll("button,select").forEach(control=>{control.disabled=true});
   tournamentList.querySelectorAll("[data-status-id]").forEach(el=>el.addEventListener("change",async()=>{
-    await supabase.from("tournaments").update({status:el.value}).eq("id",Number(el.dataset.statusId));await loadTournaments();
+    const t=tournaments.find(x=>x.id===Number(el.dataset.statusId));if(!t)return;
+    await updateTournamentControl(t,{status:el.value},el,"Статус турніру оновлено.");
   }));
   tournamentList.querySelectorAll("[data-edit-tournament]").forEach(btn=>btn.addEventListener("click",()=>{
-    const t=tournaments.find(x=>x.id===Number(btn.dataset.editTournament));if(!t)return;
+    const t=tournaments.find(x=>x.id===Number(btn.dataset.editTournament));if(!t||!canDiscardTournamentDraft())return;
     editingTournamentId=t.id;const f=tournamentForm.elements;
     f.name.value=t.name;f.short_name.value=t.short_name||"";f.description.value=t.description||"";f.rules_text.value=t.rules_text||"";f.game.value=t.game;f.format.value=t.format;f.max_teams.value=t.max_teams;f.status.value=t.status;f.registration_open.checked=t.registration_open;f.is_visible.checked=t.is_visible;
     f.starts_at.value=t.starts_at?new Date(new Date(t.starts_at).getTime()-new Date(t.starts_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
     if(tournamentLogoFile)tournamentLogoFile.value="";
     previewImage(tournamentLogoPreview,t.logo_url,t.short_name||t.name||"A");
-    setButtonContent(saveTournamentBtn,"save","Зберегти зміни");cancelTournamentEdit.classList.remove("hidden");tournamentFormTitle.textContent="РЕДАГУВАТИ ТУРНІР";tournamentForm.scrollIntoView({behavior:"smooth",block:"start"});
+    tournamentFormDirty=false;tournamentMessage.textContent="";tournamentMessage.className="";tournamentListMessage.textContent="";
+    setButtonContent(saveTournamentBtn,"save","Зберегти зміни");cancelTournamentEdit.classList.remove("hidden");tournamentFormTitle.textContent="Редагувати турнір";
+    tournamentEditor.open=true;tournamentEditor.scrollIntoView({behavior:"smooth",block:"start"});f.name.focus({preventScroll:true});
   }));
   tournamentList.querySelectorAll("[data-toggle-registration]").forEach(btn=>btn.addEventListener("click",async()=>{
     const t=tournaments.find(x=>x.id===Number(btn.dataset.toggleRegistration));if(!t)return;
-    await supabase.from("tournaments").update({registration_open:!t.registration_open}).eq("id",t.id);await loadTournaments();
+    await updateTournamentControl(t,{registration_open:!t.registration_open},btn,"Реєстрацію оновлено.");
   }));
   tournamentList.querySelectorAll("[data-toggle-visible]").forEach(btn=>btn.addEventListener("click",async()=>{
     const t=tournaments.find(x=>x.id===Number(btn.dataset.toggleVisible));if(!t)return;
-    await supabase.from("tournaments").update({is_visible:!t.is_visible}).eq("id",t.id);await loadTournaments();
+    await updateTournamentControl(t,{is_visible:!t.is_visible},btn,"Видимість турніру оновлено.");
   }));
   tournamentList.querySelectorAll("[data-delete-tournament]").forEach(btn=>btn.addEventListener("click",async()=>{
     const t=tournaments.find(x=>x.id===Number(btn.dataset.deleteTournament));if(!t||!confirm(`Видалити турнір "${t.name}" разом із його заявками та сіткою?`))return;
-    await supabase.from("tournaments").delete().eq("id",t.id);await Promise.all([loadTournaments(),loadApplications()]);await loadBracketImage();
+    btn.disabled=true;tournamentListMessage.textContent="";
+    try{
+      const {error}=await supabase.from("tournaments").delete().eq("id",t.id);
+      if(error)throw error;
+      if(editingTournamentId===t.id){resetTournamentForm();tournamentEditor.open=false}
+      await Promise.all([loadTournaments(),loadApplications(),loadManualTeams()]);
+      await loadBracketImage();
+      tournamentListMessage.textContent="Турнір видалено.";tournamentListMessage.className="admin-feedback success";
+    }catch(error){
+      console.error(error);tournamentListMessage.textContent="Не вдалося видалити турнір.";tournamentListMessage.className="admin-feedback error";
+    }finally{btn.disabled=false}
   }));
+}
+
+async function updateTournamentControl(t,payload,control,success){
+  control.disabled=true;tournamentListMessage.textContent="";
+  try{
+    const {error}=await supabase.from("tournaments").update(payload).eq("id",t.id);
+    if(error)throw error;
+    await loadTournaments();
+    tournamentListMessage.textContent=success;tournamentListMessage.className="admin-feedback success";
+  }catch(error){
+    console.error(error);
+    if(control.matches("select"))control.value=t.status;
+    tournamentListMessage.textContent="Не вдалося оновити турнір. Спробуй ще раз.";tournamentListMessage.className="admin-feedback error";
+  }finally{
+    control.disabled=tournamentSaving;
+  }
 }
 
 function populateTournamentSelects(){
   const options=tournaments.length
-    ? '<option value="">Обери турнір</option>'+tournaments.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")
+    ? '<option value="">Обери турнір</option>'+tournaments.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("")
     : '<option value="">Спочатку створи турнір</option>';
-
-  if(bracketTournament)bracketTournament.innerHTML=options;
-  if(manualTeamTournament)manualTeamTournament.innerHTML=options;
+  [bracketTournament,manualTeamTournament].filter(Boolean).forEach(select=>{
+    const selected=select.value;
+    select.innerHTML=options;
+    if([...select.options].some(option=>option.value===selected))select.value=selected;
+  });
+  if(applicationTournamentFilter){
+    const selected=applicationTournamentFilter.value;
+    applicationTournamentFilter.innerHTML='<option value="">Усі турніри</option>'+tournaments.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("");
+    if([...applicationTournamentFilter.options].some(option=>option.value===selected))applicationTournamentFilter.value=selected;
+    if(selected!==applicationTournamentFilter.value)renderApplications();
+  }
 }
 
 bracketTournament?.addEventListener("change",loadBracketImage);
@@ -405,7 +569,7 @@ manualTeamLogoFile?.addEventListener("change",()=>{
     previewImage(manualTeamLogoPreview,null,manualTeamName?.value||"A");
     return;
   }
-  previewImage(manualTeamLogoPreview,URL.createObjectURL(file),manualTeamName?.value||"A");
+  previewImage(manualTeamLogoPreview,URL.createObjectURL(file),manualTeamName?.value||"A",true);
 });
 
 manualTeamName?.addEventListener("input",()=>{
@@ -422,11 +586,13 @@ async function loadManualTeams(){
 
   if(error){
     console.error(error);
+    manualTeamLoadState="error";
     manualTeamsList.innerHTML='<div class="empty-state error">Не вдалося завантажити ручні команди.</div>';
+    renderTournaments();
     return;
   }
 
-  manualTeams=data||[];
+  manualTeams=data||[];manualTeamLoadState="ready";
   renderManualTeams();
   renderTournaments();
 }
@@ -548,16 +714,62 @@ manualTeamForm?.addEventListener("submit",async e=>{
 
 async function loadApplications(){
   const {data,error}=await supabase.from("team_registrations").select("*, tournaments(name,short_name)").order("created_at",{ascending:false});
-  if(error){applications.innerHTML='<p class="error">Не вдалося завантажити заявки.</p>';return}
-  registrations=data||[];const pending=registrations.filter(x=>x.status==="pending").length,approved=registrations.filter(x=>x.status==="approved").length;
+  if(error){
+    console.error(error);applicationLoadState="error";pendingBadge.textContent="";
+    renderApplications();renderTournaments();updateOverview();return;
+  }
+  registrations=data||[];applicationLoadState="ready";
+  const pending=registrations.filter(x=>x.status==="pending").length;
   pendingBadge.textContent=pending?String(pending):"";
-  stats.innerHTML=`<div><b>${registrations.length}</b><span>всього</span></div><div><b>${pending}</b><span>очікують</span></div><div><b>${approved}</b><span>підтверджені</span></div>`;
-  emptyState.classList.toggle("hidden",registrations.length!==0);
-  applications.innerHTML=registrations.map(renderApplication).join("");
+  renderApplications();renderTournaments();updateOverview();
+}
+
+function renderApplications(){
+  if(applicationLoadState==="loading")return;
+  if(applicationLoadState==="error"){
+    stats.innerHTML="";applicationResults.textContent="";emptyState.classList.add("hidden");
+    applications.innerHTML='<div class="panel empty error">Не вдалося завантажити заявки. Онови сторінку та спробуй ще раз.</div>';
+    return;
+  }
+  const filters=[
+    ["all","Усі",registrations.length],
+    ["pending","Очікують",registrations.filter(x=>x.status==="pending").length],
+    ["approved","Прийняті",registrations.filter(x=>x.status==="approved").length],
+    ["rejected","Відхилені",registrations.filter(x=>x.status==="rejected").length]
+  ];
+  stats.innerHTML=filters.map(([value,label,count])=>`<button type="button" class="application-filter ${applicationStatusFilter===value?"active":""}" data-application-filter="${value}" aria-pressed="${applicationStatusFilter===value}"><span>${label}</span><b>${count}</b></button>`).join("");
+
+  const query=applicationSearch.value.trim().toLocaleLowerCase("uk");
+  const tournamentId=applicationTournamentFilter.value;
+  const visible=registrations.filter(item=>{
+    const matchesStatus=applicationStatusFilter==="all"||item.status===applicationStatusFilter;
+    const matchesTournament=!tournamentId||String(item.tournament_id)===tournamentId;
+    const matchesQuery=[item.team_name,item.team_tag,item.captain_nick,item.captain_email,item.contact,item.tournaments?.name,item.tournaments?.short_name]
+      .some(value=>String(value||"").toLocaleLowerCase("uk").includes(query));
+    return matchesStatus&&matchesTournament&&matchesQuery;
+  });
+  applicationResults.textContent=`Показано ${visible.length} з ${registrations.length}`;
+  const hasFilters=!!query||!!tournamentId||applicationStatusFilter!=="all";
+  emptyState.classList.toggle("hidden",visible.length!==0);
+  $("#emptyStateText").textContent=hasFilters?"Нічого не знайдено. Спробуй інший запит або фільтр.":"Заявок поки немає.";
+  clearApplicationFilters.classList.toggle("hidden",!hasFilters);
+  applications.innerHTML=visible.map(renderApplication).join("");
+  applicationBusyIds.forEach(id=>setApplicationBusy(id,true));
   window.refreshIcons?.();
   applications.querySelectorAll("[data-app-action]").forEach(btn=>btn.addEventListener("click",handleApplicationAction));
-  renderTournaments();
 }
+
+stats?.addEventListener("click",event=>{
+  const filter=event.target.closest("[data-application-filter]");
+  if(!filter)return;
+  applicationStatusFilter=filter.dataset.applicationFilter;renderApplications();
+  stats.querySelector(`[data-application-filter="${applicationStatusFilter}"]`)?.focus({preventScroll:true});
+});
+applicationSearch?.addEventListener("input",renderApplications);
+applicationTournamentFilter?.addEventListener("change",renderApplications);
+clearApplicationFilters?.addEventListener("click",()=>{
+  applicationStatusFilter="all";applicationSearch.value="";applicationTournamentFilter.value="";renderApplications();
+});
 
 function renderApplication(item){
   const logo=safeUrl(item.team_logo_url);
@@ -565,6 +777,8 @@ function renderApplication(item){
   const playerSteam=Array.isArray(item.player_steam_links)?item.player_steam_links:[];
   const substitutes=Array.isArray(item.substitutes)?item.substitutes:[];
   const substituteSteam=Array.isArray(item.substitute_steam_links)?item.substitute_steam_links:[];
+  const status=["pending","approved","rejected"].includes(item.status)?item.status:"unknown";
+  const date=item.created_at?new Date(item.created_at).toLocaleString("uk-UA"):"Дата не вказана";
 
   const rosterHtml=players.map((nick,index)=>{
     const steam=safeUrl(playerSteam[index]);
@@ -585,55 +799,59 @@ function renderApplication(item){
   }).join("");
 
   return `<article class="application">
-    <div class="application-head">
-      <div class="application-team">
-        <div class="application-team-logo ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="${esc(item.team_name)} logo">`:esc((item.team_tag||item.team_name||"A").slice(0,1).toUpperCase())}</div>
-        <div><small>${esc(item.tournaments?.name||"Турнір")}</small><h3>${esc(item.team_name)} <span class="muted">[${esc(item.team_tag)}]</span></h3><div class="meta">#${item.id} · ${new Date(item.created_at).toLocaleString("uk-UA")}</div></div>
+    <details class="application-details">
+      <summary class="application-head">
+        <span class="application-team">
+          <span class="application-team-logo ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="Логотип ${esc(item.team_name)}">`:esc((item.team_tag||item.team_name||"A").slice(0,1).toUpperCase())}</span>
+          <span class="application-copy"><small>${esc(item.tournaments?.name||"Турнір")}</small><strong class="application-name">${esc(item.team_name)} ${item.team_tag?`<span class="muted">[${esc(item.team_tag)}]</span>`:""}</strong><span class="meta">Капітан: ${esc(item.captain_nick||"—")} <span>·</span> #${esc(item.id)} · ${esc(date)}</span></span>
+        </span>
+        <span class="application-summary-side"><span class="application-status application-status-${status}">${esc(applicationStatusLabel(item.status))}</span><span class="application-expand">Деталі <i data-lucide="chevron-right"></i></span></span>
+      </summary>
+      <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick||"—")}</div><div><span>Email:</span> ${esc(item.captain_email||"—")}</div><div><span>Контакт:</span> ${esc(item.contact||"—")}</div><div><span>Логотип:</span> ${logo?'<a href="'+esc(logo)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
+      <div class="admin-roster-block">
+        <div class="admin-roster-title"><b>Основний склад</b><span>${players.length} гравців</span></div>
+        ${rosterHtml||'<div class="admin-roster-empty">Склад не вказано.</div>'}
+        <div class="admin-roster-title subs"><b>Заміни</b><span>${substitutes.length}</span></div>
+        ${subsHtml||'<div class="admin-roster-empty">Заміни не вказані.</div>'}
       </div>
-      <span class="pill">${esc(item.status)}</span>
+      ${item.note?`<div class="players"><b>Коментар:</b> ${esc(item.note)}</div>`:""}
+      <div class="application-extra-actions"><button type="button" class="btn reject" data-app-action="delete" data-id="${esc(item.id)}"><i data-lucide="trash-2"></i><span>Видалити заявку</span></button></div>
+    </details>
+    <div class="card-actions">
+      ${status!=="approved"?`<button type="button" class="btn approve" data-app-action="approved" data-id="${esc(item.id)}"><i data-lucide="check"></i><span>Підтвердити</span></button>`:""}
+      ${status!=="rejected"?`<button type="button" class="btn reject" data-app-action="rejected" data-id="${esc(item.id)}"><i data-lucide="x-circle"></i><span>Відхилити</span></button>`:""}
+      ${status!=="pending"?`<button type="button" class="btn" data-app-action="pending" data-id="${esc(item.id)}"><i data-lucide="clock-3"></i><span>В очікування</span></button>`:""}
     </div>
-    <div class="application-grid"><div><span>Капітан:</span> ${esc(item.captain_nick)}</div><div><span>Email:</span> ${esc(item.captain_email)}</div><div><span>Контакт:</span> ${esc(item.contact)}</div><div><span>Логотип:</span> ${logo?'<a href="'+esc(logo)+'" target="_blank" rel="noopener noreferrer">відкрити</a>':"—"}</div></div>
-    <div class="admin-roster-block">
-      <div class="admin-roster-title"><b>Основний склад</b><span>5 гравців</span></div>
-      ${rosterHtml}
-      <div class="admin-roster-title subs"><b>Заміни</b><span>${substitutes.length}</span></div>
-      ${subsHtml}
-    </div>
-    ${item.note?`<div class="players"><b>Коментар:</b> ${esc(item.note)}</div>`:""}
-    <div class="card-actions"><button class="btn approve" data-app-action="approved" data-id="${item.id}"><i data-lucide="check"></i><span>Підтвердити</span></button><button class="btn reject" data-app-action="rejected" data-id="${item.id}"><i data-lucide="x-circle"></i><span>Відхилити</span></button><button class="btn" data-app-action="pending" data-id="${item.id}"><i data-lucide="clock-3"></i><span>Pending</span></button><button class="btn" data-app-action="delete" data-id="${item.id}"><i data-lucide="trash-2"></i><span>Видалити</span></button></div>
   </article>`;
 }
+function setApplicationBusy(id,busy){
+  applications.querySelectorAll("[data-app-action]").forEach(button=>{
+    if(Number(button.dataset.id)!==id)return;
+    button.disabled=busy;
+    button.closest(".application")?.setAttribute("aria-busy",String(busy));
+  });
+}
+
 async function handleApplicationAction(e){
   const id=Number(e.currentTarget.dataset.id),action=e.currentTarget.dataset.appAction;
-  e.currentTarget.disabled=true;
-
+  if(applicationBusyIds.has(id))return;
+  if(action==="delete"&&!confirm("Видалити заявку?"))return;
+  applicationBusyIds.add(id);setApplicationBusy(id,true);
   try{
     let error=null;
-
     if(action==="delete"){
-      if(!confirm("Видалити заявку?")){
-        e.currentTarget.disabled=false;
-        return;
-      }
       ({error}=await supabase.from("team_registrations").delete().eq("id",id));
     }else{
       ({error}=await supabase.from("team_registrations").update({status:action}).eq("id",id));
     }
-
-    if(error){
-      console.error(error);
-      if(String(error.message||"").includes("tournament_team_limit_reached")){
-        alert("Ліміт команд на цьому турнірі вже заповнений. Реєстрація закрита.");
-      }else{
-        alert("Не вдалося змінити статус заявки.");
-      }
-      return;
-    }
-
-    await loadTournaments();
-    await loadApplications();
+    if(error)throw error;
+    await Promise.all([loadTournaments(),loadApplications()]);
+  }catch(error){
+    console.error(error);
+    if(String(error.message||"").includes("tournament_team_limit_reached"))alert("Ліміт команд на цьому турнірі вже заповнений. Реєстрація закрита.");
+    else alert(action==="delete"?"Не вдалося видалити заявку.":"Не вдалося змінити статус заявки.");
   }finally{
-    e.currentTarget.disabled=false;
+    applicationBusyIds.delete(id);setApplicationBusy(id,false);
   }
 }
 
@@ -646,17 +864,37 @@ async function usersRequest(method="GET",body=null){
 async function loadUsers(){
   usersList.innerHTML='<div class="empty-state">Завантаження...</div>';
   try{
-    const data=await usersRequest();usersCount.textContent=String(data.users.length);
-    usersList.innerHTML=data.users.length?data.users.map(u=>`<div class="user-row"><div class="user-email"><b>${esc(u.email||"Без email")}</b><small>${new Date(u.created_at).toLocaleString("uk-UA")}${u.is_self?" · це ви":""}</small></div><span class="role-badge ${u.is_admin?"admin":""}">${u.is_admin?"ADMIN":"USER"}</span><button class="btn ${u.is_admin?"reject":"approve"} user-action" data-user-id="${u.id}" data-make-admin="${u.is_admin?"false":"true"}"><i data-lucide="${u.is_admin?"user-x":"user-check"}"></i><span>${u.is_admin?"Забрати адмінку":"Дати адмінку"}</span></button></div>`).join(""):'<div class="empty-state">Акаунтів немає.</div>';
-    window.refreshIcons?.();
-    usersList.querySelectorAll("[data-user-id]").forEach(btn=>btn.addEventListener("click",async()=>{btn.disabled=true;try{await usersRequest("POST",{user_id:btn.dataset.userId,make_admin:btn.dataset.makeAdmin==="true"});await loadUsers()}catch(e){alert(e.code==="last_admin"?"Не можна забрати права в останнього адміністратора.":"Не вдалося змінити права.");btn.disabled=false}}));
-  }catch(e){console.error(e);usersList.innerHTML='<div class="empty-state error">Не вдалося завантажити користувачів.</div>'}
+    const data=await usersRequest();
+    userAccounts=Array.isArray(data.users)?data.users:[];usersLoaded=true;
+    usersCount.textContent=String(userAccounts.length);
+    renderUsers();
+  }catch(e){
+    console.error(e);usersLoaded=false;usersCount.textContent="";
+    usersList.innerHTML='<div class="empty-state error">Не вдалося завантажити користувачів.</div>';
+  }
 }
 
-function renderBracketPreview(container,url,slot=1){
+function renderUsers(){
+  if(!usersLoaded)return;
+  const query=userSearch.value.trim().toLocaleLowerCase("uk");
+  const visible=userAccounts.filter(user=>String(user.email||"").toLocaleLowerCase("uk").includes(query));
+  usersList.innerHTML=visible.length?visible.map(u=>`<div class="user-row"><div class="user-email"><b>${esc(u.email||"Без email")}</b><small>${esc(new Date(u.created_at).toLocaleString("uk-UA"))}${u.is_self?" · це ви":""}</small></div><span class="role-badge ${u.is_admin?"admin":""}">${u.is_admin?"Адміністратор":"Користувач"}</span><button type="button" class="btn ${u.is_admin?"reject":"approve"} user-action" data-user-id="${esc(u.id)}" data-make-admin="${u.is_admin?"false":"true"}"><i data-lucide="${u.is_admin?"user-x":"user-check"}"></i><span>${u.is_admin?"Забрати адмінку":"Дати адмінку"}</span></button></div>`).join(""):`<div class="empty-state">${userAccounts.length?"Користувачів за цим запитом не знайдено.":"Акаунтів немає."}</div>`;
+  window.refreshIcons?.();
+  usersList.querySelectorAll("[data-user-id]").forEach(btn=>btn.addEventListener("click",async()=>{
+    const user=userAccounts.find(item=>String(item.id)===btn.dataset.userId);
+    const makeAdmin=btn.dataset.makeAdmin==="true";
+    if(!user||!confirm(`${makeAdmin?"Надати права адміністратора":"Забрати права адміністратора"} для ${user.email||"цього користувача"}?`))return;
+    btn.disabled=true;
+    try{await usersRequest("POST",{user_id:user.id,make_admin:makeAdmin});await loadUsers()}
+    catch(error){console.error(error);alert(error.code==="last_admin"?"Не можна забрати права в останнього адміністратора.":"Не вдалося змінити права.");btn.disabled=false}
+  }));
+}
+userSearch?.addEventListener("input",renderUsers);
+
+function renderBracketPreview(container,url,slot=1,isLocal=false){
   if(!container)return;
 
-  const safe=safeUrl(url);
+  const safe=previewUrl(container,url,isLocal);
 
   if(!safe){
     container.innerHTML=`
@@ -729,8 +967,12 @@ function setupBracketFilePreview(slot){
   const config=getBracketSlot(slot);
   config.file?.addEventListener("change",()=>{
     const file=config.file.files?.[0];
-    if(!file)return;
-    renderBracketPreview(config.preview,URL.createObjectURL(file),slot);
+    if(!file){
+      const tournament=tournaments.find(t=>t.id===Number(bracketTournament?.value||0));
+      renderBracketPreview(config.preview,tournament?.[config.column],slot);
+      return;
+    }
+    renderBracketPreview(config.preview,URL.createObjectURL(file),slot,true);
   });
 }
 
