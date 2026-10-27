@@ -7,6 +7,7 @@ const supabase=createClient(
 const ASSET_BUCKET="ahltv-assets";
 
 const authGate=document.querySelector("#authGate");
+const authGateLink=document.querySelector("#authGateLink");
 const applicationContent=document.querySelector("#applicationContent");
 const applyUserEmail=document.querySelector("#applyUserEmail");
 const select=document.querySelector("#tournamentSelect");
@@ -118,10 +119,10 @@ teamLogoFile?.addEventListener("change",()=>{
 });
 
 const statusLabel=s=>({
-  registration:"REGISTRATION",
+  registration:"РЕЄСТРАЦІЯ",
   live:"LIVE",
-  upcoming:"UPCOMING",
-  finished:"FINISHED"
+  upcoming:"НЕЗАБАРОМ",
+  finished:"ЗАВЕРШЕНО"
 }[s]||String(s).toUpperCase());
 
 function isSteamUrl(value){
@@ -135,6 +136,9 @@ function isSteamUrl(value){
 }
 
 function showAuthGate(){
+  const tournamentId=new URLSearchParams(location.search).get("tournament");
+  const next="apply.html"+(tournamentId&&/^\d+$/.test(tournamentId)?`?tournament=${encodeURIComponent(tournamentId)}`:"");
+  if(authGateLink)authGateLink.href=`admin.html?next=${encodeURIComponent(next)}`;
   authGate.classList.remove("hidden");
   applicationContent.classList.add("hidden");
 }
@@ -177,9 +181,8 @@ async function loadTournaments(){
 
   tournaments=data||[];
 
-  select.innerHTML=tournaments.length
-    ? '<option value="">Обери турнір</option>'+tournaments.map(t=>`<option value="${t.id}">${t.name} — ${statusLabel(t.status)}</option>`).join("")
-    : '<option value="">Немає відкритих турнірів</option>';
+  select.replaceChildren(new Option(tournaments.length?"Обери турнір":"Немає відкритих турнірів",""));
+  tournaments.forEach(t=>select.add(new Option(t.name,String(t.id))));
 
   if(!tournaments.length)submit.disabled=true;
 
@@ -192,9 +195,14 @@ async function loadTournaments(){
 function updateInfo(){
   const t=tournaments.find(x=>String(x.id)===select.value);
   statusEl.textContent=t?statusLabel(t.status):"";
-  hint.innerHTML=t
-    ? `<b>${t.name}</b><span>${t.game} · ${t.format} · до ${t.max_teams} команд</span>`
-    : "";
+  hint.replaceChildren();
+  if(t){
+    const title=document.createElement("b");
+    const details=document.createElement("span");
+    title.textContent=t.name;
+    details.textContent=`${t.game} · ${t.format} · до ${t.max_teams} команд`;
+    hint.append(title,details);
+  }
 }
 
 select.addEventListener("change",updateInfo);
@@ -325,7 +333,7 @@ form.addEventListener("submit",async e=>{
 
   if(!currentUser){
     showAuthGate();
-    location.href="admin.html?next=apply.html";
+    location.href=authGateLink?.href||"admin.html?next=apply.html";
     return;
   }
 

@@ -31,6 +31,12 @@ if(tErr||!tournament){
 }
 
 const logo=safeUrl(tournament.logo_url);
+const statusLabel=({upcoming:"НЕЗАБАРОМ",registration:"РЕЄСТРАЦІЯ",live:"LIVE",finished:"ЗАВЕРШЕНО"})[tournament.status]||String(tournament.status||"ТУРНІР").toUpperCase();
+const startDate=tournament.starts_at?new Date(tournament.starts_at):null;
+const startLabel=startDate&&!Number.isNaN(startDate.getTime())
+  ? startDate.toLocaleString("uk-UA",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})
+  : "Дату не вказано";
+const registrationOpen=tournament.registration_open&&["registration","live"].includes(tournament.status);
 hero.innerHTML=`
   <div class="detail-logo ${logo?"has-logo":""}">
     ${logo?`<img src="${esc(logo)}" alt="${esc(tournament.name)} logo">`:esc((tournament.short_name||tournament.name).slice(0,1).toUpperCase())}
@@ -43,16 +49,19 @@ hero.innerHTML=`
       <span><i data-lucide="gamepad-2"></i>${esc(tournament.game)}</span>
       <span><i data-lucide="swords"></i>${esc(tournament.format)}</span>
       <span><i data-lucide="users"></i>до ${tournament.max_teams} команд</span>
-      <span><i data-lucide="circle-dot"></i>${tournament.status.toUpperCase()}</span>
+      <span><i data-lucide="circle-dot"></i>${esc(statusLabel)}</span>
+      <span><i data-lucide="calendar-days"></i>${esc(startLabel)}</span>
     </div>
   </div>
-  ${tournament.registration_open?'<a class="primary-btn detail-apply" href="apply.html?tournament='+tournament.id+'"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>':""}
+  ${registrationOpen?'<a class="primary-btn detail-apply" href="apply.html?tournament='+encodeURIComponent(tournament.id)+'"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>':""}
 `;
 
 const tournamentTeams=(teams||[]).filter(t=>t.tournament_id===id);
-teamsCount.textContent=`${tournamentTeams.length} / ${tournament.max_teams}`;
+teamsCount.textContent=teamErr?"—":`${tournamentTeams.length} / ${tournament.max_teams}`;
 
-teamsRoot.innerHTML=tournamentTeams.length
+teamsRoot.innerHTML=teamErr
+  ? '<div class="empty-state">Не вдалося завантажити команди.</div>'
+  : tournamentTeams.length
   ? tournamentTeams.map(t=>{
       const teamLogo=safeUrl(t.team_logo_url);
       const fallback=(t.team_tag||t.team_name||"A").slice(0,2).toUpperCase();
