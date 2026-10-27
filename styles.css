@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+/* Manrope is served locally so the interface remains legible without a font CDN. */
+@font-face{font-family:Manrope;src:url("assets/fonts/manrope-cyrillic-ext-wght-normal.woff2") format("woff2");font-style:normal;font-weight:200 800;font-display:swap;unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
+@font-face{font-family:Manrope;src:url("assets/fonts/manrope-cyrillic-wght-normal.woff2") format("woff2");font-style:normal;font-weight:200 800;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Manrope;src:url("assets/fonts/manrope-latin-ext-wght-normal.woff2") format("woff2");font-style:normal;font-weight:200 800;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Manrope;src:url("assets/fonts/manrope-latin-wght-normal.woff2") format("woff2");font-style:normal;font-weight:200 800;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 
 :root{
   --bg:#171513;
@@ -2766,3 +2770,437 @@ body{
     justify-content:center;
   }
 }
+
+/* AHLTV design system: shared surfaces, typography and controls */
+:root{
+  --bg:#101114;
+  --bg-2:#121317;
+  --card:#191a1e;
+  --card-2:#202126;
+  --card-3:#141519;
+  --text:#f5f4f1;
+  --muted:#aaa9a5;
+  --muted-2:#858580;
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.13);
+  --primary:#f87643;
+  --primary-2:#df5e31;
+  --success:#74c998;
+  --danger:#f1837a;
+  --radius:12px;
+  --shadow:0 18px 50px rgba(0,0,0,.14);
+}
+html{scroll-padding-top:100px}
+body{
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(ellipse at 50% -15%,#25211f 0,transparent 48rem),var(--bg);
+  color:var(--text);
+  font:500 14px/1.6 Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+body>main{flex:1 0 auto}
+.shell{width:min(1200px,calc(100% - 48px))}
+::selection{background:rgba(248,118,67,.35);color:#fff}
+:focus-visible{outline:2px solid #ff9469;outline-offset:3px}
+button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}
+svg.lucide{width:17px;height:17px;stroke-width:1.8}
+
+.site-header{
+  background:rgba(16,17,20,.94);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+.header-inner{height:76px;gap:16px}
+.brand{min-width:190px;gap:10px}
+.brand-mark{
+  width:39px;height:39px;border:0;border-radius:7px;
+  background:var(--primary);color:#161310;
+  font:800 22px/1 Manrope,sans-serif;letter-spacing:-.08em;
+}
+.brand-mark.has-image{padding:4px;background:#222327}
+.brand-mark.has-image img{border-radius:3px}
+.brand-copy strong{font:800 20px/1 Manrope,sans-serif;letter-spacing:-.055em}
+.brand-copy small{margin-top:5px;color:#918e89;font:800 8px/1 Manrope,sans-serif;letter-spacing:.19em}
+.main-nav{height:100%;gap:8px;margin-left:auto;padding:0;border:0;border-radius:0;background:none}
+.main-nav a{position:relative;height:100%;min-width:0;gap:8px;padding:0 15px;border-radius:0;color:#a9a8a4;font-size:12px;font-weight:700}
+.main-nav a svg{width:15px;height:15px}
+.main-nav a:hover{background:none;color:#fff}
+.main-nav a.active{background:none;color:#fff;box-shadow:none}
+.main-nav a.active:after{content:"";position:absolute;right:15px;bottom:0;left:15px;height:2px;background:var(--primary)}
+.account-btn{height:40px;min-width:105px;margin-left:10px;padding:0 15px;border:1px solid #3a3938;border-radius:7px;background:#1b1c20;color:#f0eeea;font-size:12px}
+.account-btn svg{color:var(--primary)}
+.account-btn:hover{border-color:rgba(248,118,67,.55);background:#24211f;color:#fff}
+.menu-btn,.drawer-head button{border-radius:7px;background:#1c1d20;border-color:var(--line-2)}
+.mobile-drawer{background:#17181c;border-color:var(--line-2);box-shadow:-20px 0 70px rgba(0,0,0,.35)}
+.mobile-drawer nav{gap:8px;padding:16px}
+.mobile-drawer nav a{min-height:54px;border-radius:7px;background:#202125;color:#deddda;font-size:13px}
+.mobile-drawer nav a[aria-current="page"]{border-color:rgba(248,118,67,.3);color:#fff}
+.drawer-backdrop{background:rgba(0,0,0,.68);backdrop-filter:blur(4px)}
+
+.panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
+.panel-head{min-height:54px;padding:0 20px;border-bottom:1px solid var(--line);background:#1d1e22;color:#ecebe8;font:800 10px/1.3 Manrope,sans-serif;letter-spacing:.1em}
+.panel-head strong{color:#85837e;font:800 10px/1 Manrope,sans-serif;letter-spacing:.06em}
+.loading-panel,.empty-state,.empty{padding:40px 20px;color:#aaa7a1;font-size:13px}
+.primary-btn,.secondary-btn,.btn{
+  min-height:44px;gap:9px;padding:0 17px;border-radius:7px;
+  font-size:12px;font-weight:800;letter-spacing:0;
+}
+.primary-btn{border-color:var(--primary);background:var(--primary);color:#17120f;box-shadow:none}
+.primary-btn:hover{border-color:#ff976d;background:#ff976d;color:#17120f}
+.secondary-btn,.btn{border-color:rgba(255,255,255,.13);background:#242529;color:#efeeeb}
+.secondary-btn:hover,.btn:hover{border-color:rgba(248,118,67,.45);background:#2a2928;color:#fff}
+.primary-btn:disabled,.secondary-btn:disabled,.btn:disabled{opacity:.5}
+
+.home-page,.apply-page,.admin-shell,.tournament-detail-page{padding-top:22px;padding-bottom:24px}
+.page-topline{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:17px;color:#8c8a85;font:800 9px/1.4 Manrope,sans-serif;letter-spacing:.14em}
+.page-topline b{padding:0 6px;color:var(--primary);font-weight:800}
+.page-topline a{color:#aaa8a3;text-decoration:none}
+.page-topline a:hover{color:#fff}
+.page-topline>span:last-child{color:#787771}
+
+/* Home: the arena, the journey, and real tournament data */
+.page-title.home-hero{
+  position:relative;display:flex;min-height:402px;align-items:stretch;gap:0;
+  margin:0;padding:0;border:1px solid rgba(255,255,255,.1);border-radius:13px;
+  background:linear-gradient(90deg,rgba(17,18,21,.98) 0%,rgba(17,18,21,.93) 30%,rgba(17,18,21,.36) 62%,rgba(17,18,21,.08) 100%),url("assets/arena-hero.webp") center 53%/cover no-repeat;
+  box-shadow:0 25px 65px rgba(0,0,0,.23);
+}
+.home-hero-main{max-width:670px;justify-content:center;padding:48px 54px}
+.home-hero-main:before{display:none}
+.hero-kicker,.login-kicker{display:flex;align-items:center;gap:9px;margin:0;color:#f58a5e;font:800 10px/1.4 Manrope,sans-serif;letter-spacing:.14em}
+.hero-kicker-dot,.login-kicker>span{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 4px rgba(248,118,67,.12)}
+.home-hero h1{margin:24px 0 4px;color:#fff;font:800 clamp(48px,5.2vw,70px)/1.05 Manrope,sans-serif;letter-spacing:-.065em;overflow-wrap:anywhere}
+.hero-manifesto{color:#f5f4f1;font-size:clamp(23px,2.55vw,34px);font-weight:800;letter-spacing:-.045em;line-height:1.25}
+.hero-manifesto span{color:var(--primary)}
+.home-hero p{max-width:450px;margin:16px 0 0;color:#bbb9b4;font-size:13px;line-height:1.75}
+.hero-actions{gap:10px;margin-top:24px}
+.hero-actions .primary-btn,.hero-actions .secondary-btn{min-height:46px;padding:0 18px}
+.hero-actions .secondary-btn{border-color:rgba(255,255,255,.2);background:rgba(28,29,31,.8);color:#f1f0ec}
+.hero-corner-label{position:absolute!important;right:27px;bottom:27px;z-index:1;display:grid;gap:5px;padding-right:12px;border-right:2px solid var(--primary);text-align:right}
+.hero-corner-label span{color:#aaa7a1;font:800 8px/1 Manrope,sans-serif;letter-spacing:.14em}
+.hero-corner-label b{color:#f5f2ec;font:800 9px/1 Manrope,sans-serif;letter-spacing:.08em}
+.journey{display:grid;grid-template-columns:225px minmax(0,1fr);margin:16px 0 62px;border:1px solid var(--line);border-radius:10px;background:#17181b}
+.journey-intro{display:flex;flex-direction:column;justify-content:center;gap:7px;padding:20px 23px}
+.journey-intro>span,.journey-number{color:var(--primary);font:800 9px/1 Manrope,sans-serif;letter-spacing:.12em}
+.journey-intro strong{color:#f2f1ed;font-size:15px;letter-spacing:-.035em}
+.journey-intro strong span{color:var(--primary)}
+.journey-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;padding:0;list-style:none}
+.journey-steps li{display:flex;align-items:center;gap:12px;min-width:0;padding:20px;border-left:1px solid var(--line)}
+.journey-number{align-self:flex-start;margin-top:4px;color:#ec8054}
+.journey-steps li div{display:grid;gap:3px;min-width:0}
+.journey-steps b{color:#eae9e5;font-size:12px;line-height:1.35}
+.journey-steps small{color:#93918d;font-size:11px;line-height:1.4}
+.tournament-section{scroll-margin-top:100px}
+.section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}
+.section-kicker{display:flex;align-items:center;gap:8px;color:#e98860;font:800 9px/1 Manrope,sans-serif;letter-spacing:.14em}
+.section-kicker>span{width:17px;height:2px;background:var(--primary)}
+.section-heading h2{margin:10px 0 3px;color:#f9f8f5;font-size:32px;font-weight:800;line-height:1.2;letter-spacing:-.055em}
+.section-heading h2 span{color:var(--primary)}
+.section-heading p{margin:0;color:#a3a19c;font-size:13px}
+.section-count{display:flex;align-items:center;gap:14px;padding:10px 14px;border:1px solid var(--line);border-radius:7px;background:#191a1e}
+.section-count span{color:#93918d;font-size:9px;font-weight:800;letter-spacing:.09em}
+.section-count strong{color:#fff;font-size:20px;line-height:1}
+.home-registration-summary{min-height:58px;margin:0 0 14px;padding:10px 16px;border:1px solid rgba(117,201,152,.17);border-left:3px solid #74c998;border-radius:8px;background:#1a201c;box-shadow:none}
+.home-registration-copy{color:#acaea8;font-size:11px}
+.home-registration-copy b{color:#f0f1ed}
+.home-registration-copy strong{color:#fff}
+.home-registration-summary>a{border-color:rgba(255,255,255,.09);background:#252a26;color:#e9ece7}
+.home-registration-summary>a:hover{border-color:rgba(116,201,152,.4);background:#29332c}
+.tournaments-list{gap:14px}
+.event-card{display:grid;grid-template-columns:minmax(0,1fr) 260px;margin:0;overflow:hidden;background:#191a1e}
+.event-card:before{display:none}
+.event-main{min-width:0;padding:24px}
+.event-heading{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:16px;align-items:start}
+.event-logo{width:64px;height:64px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(248,118,67,.22);border-radius:9px;background:#2c2421;color:#ff9469;font-size:28px;font-weight:800}
+.event-logo.has-logo{padding:6px;border-color:var(--line-2);background:#121316}
+.event-logo img{width:100%;height:100%;object-fit:contain}
+.event-title{min-width:0}
+.event-category{color:#ed8b63;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.event-category i{padding:0 4px;color:#77736e;font-style:normal}
+.event-title h3{margin:5px 0 4px;color:#fff;font-size:23px;font-weight:800;line-height:1.25;letter-spacing:-.045em;overflow-wrap:anywhere}
+.event-title h3 a{text-decoration:none}
+.event-title h3 a:hover{color:#ff9b74}
+.event-title p{max-width:650px;margin:7px 0 0;color:#a9a7a2;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.event-card .status-badge{align-self:start;display:inline-flex;gap:7px;min-height:28px;padding:0 9px;border-radius:5px;font:800 9px/1 Manrope,sans-serif;letter-spacing:.06em;white-space:nowrap}
+.event-card .status-badge>span{width:6px;height:6px;border-radius:50%;background:currentColor}
+.status-registration{color:#ff9d77;background:rgba(248,118,67,.1);border-color:rgba(248,118,67,.25)}
+.status-live{color:#ff8a82;background:rgba(235,107,100,.1);border-color:rgba(235,107,100,.28)}
+.status-upcoming,.status-finished,.status-unknown{color:#bbb9b4;background:rgba(255,255,255,.035);border-color:var(--line-2)}
+.event-meta{display:grid;grid-template-columns:1fr .8fr 1.4fr;gap:0;margin-top:24px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.event-meta>div{display:grid;gap:5px;padding:0 18px;border-left:1px solid var(--line)}
+.event-meta>div:first-child{padding-left:0;border:0}
+.event-meta>div:last-child{padding-right:0}
+.event-meta span,.event-list-heading,.event-seats-label{color:#928f89;font-size:9px;font-weight:800;letter-spacing:.1em}
+.event-meta strong{color:#eae9e5;font-size:12px;font-weight:800}
+.event-meta strong i{color:#827c75;font-style:normal}
+.event-teams{margin-top:18px}
+.event-list-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.event-list-heading b{color:#b0ada7;font-size:10px;letter-spacing:0}
+.event-team-list{display:flex;flex-wrap:wrap;gap:7px}
+.event-team{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:#222327;color:#deddd9;font-size:11px;overflow-wrap:anywhere}
+.event-team b{color:#ff9870}
+.event-team img{width:20px;height:20px;object-fit:contain;border-radius:3px}
+.event-empty{color:#aaa7a1;font-size:12px}
+.event-matches{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.event-match{display:grid;grid-template-columns:minmax(100px,150px) minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 0;color:#b2afa9;font-size:11px}
+.event-match b{color:#e8e7e4;overflow-wrap:anywhere}
+.event-match i{padding:0 4px;color:#928d86;font-style:normal}
+.event-match strong{color:#ed956e;font-size:10px}
+.event-aside{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:24px;border-left:1px solid var(--line);background:linear-gradient(160deg,#202025,#17181b)}
+.event-seats{margin-top:8px;color:#fff;font-size:32px;font-weight:800;line-height:1;letter-spacing:-.05em}
+.event-seats span{color:#94918b;font-size:17px}
+.event-progress{height:5px;overflow:hidden;margin-top:15px;border-radius:5px;background:#363538}
+.event-progress span{display:block;height:100%;border-radius:inherit;background:var(--primary)}
+.event-seats-caption{margin-top:8px;color:#a4a19b;font-size:11px}
+.event-registration{display:flex;align-items:center;gap:8px;margin:20px 0;color:#74c998;font-size:11px;font-weight:800}
+.event-registration span{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:currentColor}
+.event-registration.is-closed{color:#b5aaa2}
+.event-actions{display:grid;gap:8px;margin-top:auto}
+.event-actions a{justify-content:space-between;width:100%}
+.home-empty{display:grid;justify-items:center;gap:8px;padding:52px 24px;text-align:center}
+.home-empty-icon{width:47px;height:47px;display:grid;place-items:center;margin-bottom:6px;border:1px solid rgba(248,118,67,.2);border-radius:9px;background:rgba(248,118,67,.08);color:var(--primary)}
+.home-empty-icon svg{width:22px;height:22px}
+.home-empty h3{margin:0;color:#f4f3ef;font-size:17px;font-weight:800}
+.home-empty p{margin:0;color:#aaa7a1;font-size:12px}
+.home-empty .secondary-btn{margin-top:10px}
+.home-cta{display:flex;align-items:center;justify-content:space-between;gap:25px;margin:58px 0 20px;padding:30px 34px;border:1px solid rgba(248,118,67,.15);border-radius:11px;background:radial-gradient(circle at 83% 30%,rgba(248,118,67,.16),transparent 28%),linear-gradient(110deg,#211c1a,#191a1d 65%)}
+.home-cta>div>span{color:#ed8b63;font-size:9px;font-weight:800;letter-spacing:.14em}
+.home-cta h2{margin:8px 0;color:#fff;font-size:24px;font-weight:800;line-height:1.23;letter-spacing:-.045em}
+.home-cta h2 em{color:#f8956e;font-style:normal}
+.home-cta p{margin:0;color:#aaa7a1;font-size:12px}
+.home-cta>a{min-width:190px;justify-content:space-between}
+
+/* Forms, account and tournament detail use the same visual language */
+.apply-page{max-width:1080px}
+.page-title.compact,.apply-page .page-title{min-height:156px;margin-bottom:16px;padding:28px 32px;border:1px solid var(--line);border-radius:12px;background:radial-gradient(circle at 85% 0,rgba(248,118,67,.13),transparent 28%),linear-gradient(110deg,#201d1d,#191a1e 65%)}
+.page-title small,.admin-top small{color:#f38b60;font:800 10px/1 Manrope,sans-serif;letter-spacing:.13em}
+.page-title.compact h1{margin:11px 0 7px;font:800 35px/1.1 Manrope,sans-serif;letter-spacing:-.055em}
+.page-title.compact h1 span{color:var(--primary)}
+.page-title.compact p{color:#aaa7a1;font-size:13px}
+.apply-title-mark{width:62px;height:62px;flex-basis:62px;border-color:rgba(248,118,67,.2);border-radius:9px;background:rgba(248,118,67,.08);color:#f58b60}
+.apply-title-mark svg{width:27px;height:27px}
+.auth-gate{grid-template-columns:64px minmax(0,1fr) auto;gap:20px;padding:26px}
+.auth-gate-icon{width:62px;height:62px;border-radius:9px;background:rgba(248,118,67,.1);color:var(--primary);border:1px solid rgba(248,118,67,.2)}
+.auth-gate small{color:#e68a65;font-size:9px;font-weight:800;letter-spacing:.1em}
+.auth-gate h2{margin:5px 0;color:#fff;font:800 20px/1.25 Manrope,sans-serif;letter-spacing:-.04em}
+.auth-gate p{color:#aaa7a1;font-size:12px}
+.apply-account-bar{min-height:48px;margin-bottom:14px;padding:10px 16px;border-radius:8px;border-color:rgba(248,118,67,.18);background:#231e1c;color:#b6aea8;font-size:12px}
+.apply-account-bar a{color:#ff9870}
+.tournament-select-wrap,.team-form{padding:20px}
+.tournament-select-wrap label,.team-form label,.bracket-tools label,.bracket-tournament-picker label,.bracket-slot label{color:#ceccc7;font-size:12px;font-weight:700}
+.team-form fieldset{margin-bottom:18px;padding:18px;border-color:var(--line);border-radius:9px;background:#151619}
+.team-form legend{padding:0 5px;color:#f2f0ec;font:800 12px/1.3 Manrope,sans-serif;letter-spacing:0}
+.form-grid{gap:16px}
+.tournament-select-wrap select,.team-form input,.team-form textarea,.team-form select,.admin-tournament-controls select,.bracket-tools select,.bracket-admin-controls select,.bracket-admin-controls input,.bracket-tournament-picker select,.bracket-slot input{
+  min-height:46px;padding:10px 12px;border:1px solid rgba(255,255,255,.13);border-radius:7px;background:#111215;color:#f3f2ee;
+}
+input::placeholder,textarea::placeholder{color:#807f7b}
+.tournament-select-wrap select:focus,.team-form input:focus,.team-form textarea:focus,.team-form select:focus,.admin-tournament-controls select:focus,.bracket-tools select:focus,.bracket-admin-controls select:focus,.bracket-admin-controls input:focus{border-color:#ed8a61;box-shadow:0 0 0 3px rgba(248,118,67,.12)}
+.tournament-hint{border-color:rgba(248,118,67,.18);border-radius:7px;background:rgba(248,118,67,.06)}
+.tournament-hint:empty{display:none}
+.tournament-hint span{color:#aca8a2;font-size:11px}
+.team-logo-upload{border-color:rgba(248,118,67,.26);border-radius:8px;background:rgba(248,118,67,.035)}
+.team-logo-preview,.asset-preview.has-image{background:#111215}
+.team-logo-copy small,.manual-team-logo-upload small,.asset-upload-copy small,.tournament-logo-editor small{color:#a29e98}
+.team-logo-file{min-height:38px;border-radius:6px;background:#272629!important}
+.roster-card{border-radius:8px;background:#17181b}
+.roster-card-title{min-height:40px;padding:0 12px;background:#202125}
+.roster-card-title>span{font-size:11px}
+.roster-fields{padding:12px}
+.fieldset-heading>span{color:#aaa7a1;font-size:11px}
+.agreement,.check-inline{color:#c3c0bb!important;font-size:12px!important}
+
+.admin-shell{max-width:1200px}
+.login-panel{display:grid;grid-template-columns:1.05fr 1fr;max-width:1030px;min-height:470px;margin:10px auto 50px}
+.login-intro{position:relative;display:flex;flex-direction:column;justify-content:center;min-height:100%;padding:45px;border-right:1px solid var(--line);background:linear-gradient(90deg,rgba(20,20,23,.97),rgba(20,20,23,.7) 65%,rgba(20,20,23,.25)),url("assets/arena-hero.webp") 69% center/cover}
+.login-intro h1{margin:22px 0 12px;color:#fff;font-size:37px;font-weight:800;line-height:1.14;letter-spacing:-.055em}
+.login-intro h1 em{color:#f58b60;font-style:normal}
+.login-intro p{max-width:300px;margin:0;color:#b9b5af;font-size:13px;line-height:1.7}
+.login-intro-bottom{position:absolute;right:30px;bottom:27px;left:45px;display:flex;justify-content:space-between;gap:10px;color:#aaa39b;font-size:9px;font-weight:800;letter-spacing:.12em}
+.login-intro-bottom b{color:#e98b64}
+.login-body{align-self:center;padding:44px 48px}
+.login-heading>span{color:#eb8c65;font-size:9px;font-weight:800;letter-spacing:.12em}
+.login-heading h2{margin:8px 0;color:#fff;font-size:26px;font-weight:800;line-height:1.2;letter-spacing:-.05em}
+.login-heading p{margin:0;color:#a9a6a0;font-size:12px}
+.auth-mode-switch{gap:4px;margin-top:25px;padding:4px;border-radius:8px;background:#111215}
+.auth-mode-switch button{min-height:42px;border-radius:5px;color:#aaa7a1;font-size:12px}
+.auth-mode-switch button.active{background:#303035;color:#fff;box-shadow:none}
+.login-form{gap:14px;padding:20px 0 0}
+.login-form .primary-btn{margin-top:4px}
+.account-body{padding:24px}
+.account-body h2,.admin-top h1{font-family:Manrope,sans-serif;font-weight:800;letter-spacing:-.04em}
+.account-body p{color:#aaa7a1}
+.user-dashboard{max-width:1030px}
+.user-dashboard .account-panel{width:100%;max-width:none;margin:0}
+.user-application-card,.application{border-radius:8px;background:#17181b}
+.user-application-stats span,.user-application-meta,.user-application-footer{color:#aaa7a1}
+.user-application-footer{background:#151619}
+.admin-top{padding:22px;background:linear-gradient(110deg,#211d1c,#191a1e)}
+.admin-top h1{font-size:25px}
+.admin-tabs,.detail-tabs{top:84px;gap:4px;padding:6px;border-radius:9px;background:rgba(27,28,32,.96);backdrop-filter:blur(12px)}
+.admin-tabs button,.detail-tabs a{min-height:42px;padding:0 14px;border-radius:6px;color:#b8b6b1;font-size:12px}
+.admin-tabs button.active,.detail-tabs a:hover{background:rgba(248,118,67,.12);color:#fff;box-shadow:inset 0 0 0 1px rgba(248,118,67,.16)}
+.bracket-scroll,.bracket-image-preview{background:#121316}
+
+.tournament-detail-hero{grid-template-columns:94px minmax(0,1fr) auto;gap:22px;padding:28px;background:radial-gradient(circle at 90% 0,rgba(248,118,67,.12),transparent 28%),#1a1b1f}
+.detail-logo{width:92px;height:92px;border-radius:10px;background:#2c2421;color:#ff9870;font:800 38px/1 Manrope,sans-serif}
+.detail-logo.has-logo{background:#121316}
+.detail-hero-copy small{color:#ef9169;font:800 10px/1 Manrope,sans-serif;letter-spacing:.1em}
+.detail-hero-copy h1{margin:8px 0;color:#fff;font:800 30px/1.15 Manrope,sans-serif;letter-spacing:-.05em;overflow-wrap:anywhere}
+.detail-hero-copy p{color:#aaa7a1;font-size:12px}
+.tournament-meta span{min-height:29px;padding:0 9px;border-radius:5px;background:#242529;color:#c2bfb9;font-size:10px}
+.detail-teams{background:#191a1e}
+.detail-team-row{padding:14px 18px}
+.detail-team-row .detail-team-logo{border-radius:6px;background:#111215}
+.rules-content{padding:22px;color:#c1beb8;font-size:13px;line-height:1.8}
+#teamsSection,#bracketSection,#rulesSection{scroll-margin-top:150px}
+.public-bracket-empty{color:#a39f99}
+.public-bracket-empty b{font-family:Manrope,sans-serif}
+
+/* Footer */
+.site-footer{margin-top:40px;border-top:1px solid var(--line);background:#0c0d0f}
+.footer-main{display:flex;justify-content:space-between;gap:30px;padding:34px 0}
+.footer-brand{min-width:0}
+.footer-main p{margin:12px 0 0;color:#979590;font-size:11px}
+.footer-main nav{display:flex;align-items:flex-start;gap:26px;padding-top:11px}
+.footer-main nav a{color:#b7b5b0;text-decoration:none;font-size:11px;font-weight:700}
+.footer-main nav a:hover{color:#fff}
+.footer-inner{min-height:52px;gap:15px;border-top:1px solid var(--line);color:#94918b;font-size:10px}
+.footer-inner span:last-child{font-size:9px;font-weight:800;letter-spacing:.1em}
+.footer-inner b{color:var(--primary)}
+
+@media(max-width:900px){
+  .journey{grid-template-columns:190px minmax(0,1fr)}
+  .journey-steps li{gap:9px;padding:16px 12px}
+  .journey-steps small{font-size:10px}
+  .event-card{grid-template-columns:minmax(0,1fr) 225px}
+  .event-main,.event-aside{padding:20px}
+  .login-body{padding:35px}
+}
+@media(max-width:700px){
+  body{font-size:13px}
+  .shell{width:calc(100% - 32px)}
+  .header-inner{height:64px}
+  .brand{min-width:0}
+  .brand-mark{width:36px;height:36px;border-radius:6px;font-size:20px}
+  .brand-copy strong{font-size:19px}
+  .brand-copy small{display:block;font-size:7px}
+  .home-page,.apply-page,.admin-shell,.tournament-detail-page{padding-top:17px;padding-bottom:16px}
+  .page-topline{margin-bottom:12px;font-size:9px}
+  .page-topline>span:last-child{display:none}
+  .page-title.home-hero{min-height:0;display:block;border-radius:10px;background-position:70% center;background-image:linear-gradient(90deg,rgba(17,18,21,.97),rgba(17,18,21,.88) 58%,rgba(17,18,21,.48)),url("assets/arena-hero.webp")}
+  .home-hero-main{padding:36px 24px}
+  .home-hero h1{margin:20px 0 5px;font-size:clamp(38px,10vw,52px)}
+  .hero-manifesto{font-size:23px}
+  .home-hero p{max-width:330px;margin-top:13px;font-size:12px}
+  .hero-kicker{font-size:9px}
+  .hero-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:20px}
+  .hero-actions .primary-btn,.hero-actions .secondary-btn{width:100%;justify-content:space-between}
+  .hero-corner-label{display:none}
+  .journey{grid-template-columns:1fr;margin:12px 0 42px}
+  .journey-intro{gap:5px;padding:16px 18px}
+  .journey-steps{grid-template-columns:1fr}
+  .journey-steps li{gap:14px;padding:12px 18px;border-top:1px solid var(--line);border-left:0}
+  .journey-number{min-width:22px}
+  .journey-steps li div{gap:1px}
+  .journey-steps small{font-size:11px}
+  .section-heading{align-items:flex-end;gap:10px;margin-bottom:16px}
+  .section-heading h2{margin:8px 0 4px;font-size:26px}
+  .section-heading p{font-size:12px}
+  .section-count{gap:8px;padding:9px}
+  .section-count span{max-width:52px;font-size:8px;line-height:1.3}
+  .section-count strong{font-size:18px}
+  .home-registration-summary{align-items:flex-start;gap:10px;padding:13px}
+  .home-registration-copy{display:flex;flex-wrap:wrap;gap:7px;font-size:11px}
+  .home-registration-summary>a{width:100%;min-width:0;justify-content:space-between}
+  .event-card{grid-template-columns:1fr;border-radius:10px}
+  .event-main{padding:17px}
+  .event-heading{grid-template-columns:49px minmax(0,1fr);gap:12px}
+  .event-logo{width:49px;height:49px;font-size:22px}
+  .event-title h3{font-size:18px}
+  .event-title p{font-size:12px}
+  .event-card .status-badge{grid-column:2;justify-self:start;margin-top:0}
+  .event-meta{grid-template-columns:1fr 1fr;row-gap:14px;margin-top:18px;padding:14px 0}
+  .event-meta>div{padding:0 12px}
+  .event-meta>div:nth-child(3){grid-column:1/-1;padding:0;border:0}
+  .event-meta span,.event-list-heading{font-size:9px}
+  .event-aside{padding:17px;border-top:1px solid var(--line);border-left:0}
+  .event-seats{font-size:27px}
+  .event-registration{margin:16px 0}
+  .event-actions{grid-template-columns:1fr 1fr}
+  .event-actions a:only-child{grid-column:1/-1}
+  .event-actions a{padding:0 10px;font-size:11px}
+  .event-match{grid-template-columns:1fr auto;gap:3px 10px}
+  .event-match>span{grid-column:1/-1}
+  .home-empty{padding:38px 18px}
+  .home-cta{align-items:flex-start;flex-direction:column;gap:20px;margin:40px 0 12px;padding:24px}
+  .home-cta h2{font-size:22px}
+  .home-cta>a{width:100%}
+
+  .panel{margin-bottom:12px;border-radius:10px}
+  .panel-head{min-height:48px;padding:0 15px}
+  .page-title.compact,.apply-page .page-title{min-height:0;padding:22px 20px;border-radius:10px}
+  .page-title.compact h1{font-size:28px}
+  .page-title.compact p{font-size:12px}
+  .auth-gate{grid-template-columns:52px minmax(0,1fr);gap:13px;padding:18px}
+  .auth-gate-icon{width:50px;height:50px}
+  .auth-gate h2{font-size:17px}
+  .auth-gate .primary-btn{grid-column:1/-1;width:100%}
+  .tournament-select-wrap,.team-form{padding:15px}
+  .team-form fieldset{padding:14px}
+  .team-form input,.team-form textarea,.team-form select,.tournament-select-wrap select{font-size:16px}
+  .form-grid{gap:13px}
+  .roster-fields{gap:12px}
+  .apply-account-bar{font-size:11px}
+  .login-panel{grid-template-columns:1fr;min-height:0;margin:0 auto 24px}
+  .login-intro{min-height:225px;padding:26px;border-right:0;border-bottom:1px solid var(--line)}
+  .login-intro h1{margin:18px 0 8px;font-size:28px}
+  .login-intro p{font-size:12px}
+  .login-intro-bottom{right:26px;bottom:17px;left:26px}
+  .login-body{padding:25px}
+  .login-heading h2{font-size:22px}
+  .admin-tabs,.detail-tabs{top:71px;margin-bottom:12px}
+  .admin-tabs button{padding:0 12px}
+  .admin-tabs button span{display:inline}
+  .admin-top{padding:18px}
+  .admin-top h1{font-size:21px}
+  .tournament-detail-hero{grid-template-columns:58px minmax(0,1fr);gap:13px;padding:17px}
+  .detail-logo{width:58px;height:58px;font-size:25px}
+  .detail-hero-copy h1{font-size:20px}
+  .detail-hero-copy p{font-size:12px}
+  .detail-apply{grid-column:1/-1;width:100%}
+  .tournament-meta span{font-size:10px}
+  .detail-teams{grid-template-columns:1fr}
+  .detail-team-row{padding:12px 15px}
+  .rules-content{padding:17px;font-size:12px}
+  .footer-main{flex-direction:column;gap:22px;padding:27px 0}
+  .footer-main nav{flex-wrap:wrap;gap:12px 22px;padding:0}
+  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding:14px 0}
+  .footer-inner span{margin:0}
+  .footer-inner span:last-child{width:100%}
+}
+@media(max-width:360px){
+  .event-actions{grid-template-columns:1fr}
+  .event-actions a:only-child{grid-column:auto}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
+/* Consistent corners and compact empty bracket states. */
+.apply-page .panel{border-radius:10px}
+.apply-page .primary-btn,.apply-page .secondary-btn{border-radius:7px}
+.apply-page .tournament-select-wrap select,.apply-page .team-form input,.apply-page .team-form textarea,.apply-page .team-form select{border-radius:7px}
+.public-bracket-gallery .public-bracket-image,.bracket-slot,.bracket-tournament-picker{background:#151619}
+.public-bracket-image-head{background:#202125}
+.public-bracket-image.is-empty{min-height:220px}
+.public-bracket-empty{min-height:160px}
+@media(max-width:700px){
+  .tournament-meta span:nth-child(4){display:inline-flex}
+  .public-bracket-image.is-empty{min-height:190px}
+  .public-bracket-empty{min-height:130px}
+}
+.team-form input[type="checkbox"]{width:18px;height:18px;min-height:18px;flex:0 0 18px;margin:2px 0 0;padding:0}
+.team-logo-file:focus-within{outline:2px solid #ff9469;outline-offset:3px}

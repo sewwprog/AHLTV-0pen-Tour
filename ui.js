@@ -38,7 +38,16 @@ import {
   UserCheck,
   UserX,
   ListChecks,
-  CircleUserRound
+  CircleUserRound,
+  ArrowRight,
+  BadgeCheck,
+  CircleCheck,
+  CircleX,
+  ClipboardPlus,
+  ImagePlus,
+  Images,
+  LoaderCircle,
+  ShieldCheck
 } from "https://esm.sh/lucide@0.468.0";
 
 const SUPABASE_URL="https://hfxzdifqcjbslmxffvlf.supabase.co";
@@ -50,7 +59,8 @@ const icons={
   GitBranch,Globe2,ClipboardList,CalendarDays,Gamepad2,ExternalLink,Eye,EyeOff,
   Pencil,Trash2,Check,XCircle,Upload,Image,Save,Shield,CircleDot,Clock3,Swords,
   LayoutDashboard,ScrollText,ChevronRight,Plus,LockKeyhole,UserCheck,UserX,
-  ListChecks,CircleUserRound
+  ListChecks,CircleUserRound,ArrowRight,BadgeCheck,CircleCheck,CircleX,
+  ClipboardPlus,ImagePlus,Images,LoaderCircle,ShieldCheck
 };
 
 function renderIcons(){
@@ -91,8 +101,10 @@ function setupReveal(root=document){
     ".bracket-image-preview"
   ].join(",");
 
-  const elements=[...root.querySelectorAll?.(selector)||[]]
-    .filter(el=>!el.classList.contains("motion-reveal"));
+  const elements=[
+    ...(root instanceof Element&&root.matches(selector)?[root]:[]),
+    ...root.querySelectorAll?.(selector)||[]
+  ].filter(el=>!el.classList.contains("motion-reveal"));
 
   elements.forEach((el,index)=>{
     el.classList.add("motion-reveal");
@@ -101,7 +113,7 @@ function setupReveal(root=document){
   });
 }
 
-if(!reduceMotion){
+if(!reduceMotion&&"IntersectionObserver" in window){
   document.documentElement.classList.add("motion-ready");
 
   revealObserver=new IntersectionObserver(entries=>{
@@ -190,16 +202,32 @@ const backdrop=document.querySelector("#drawerBackdrop");
 const closeBtn=document.querySelector("#drawerClose");
 
 function setDrawer(open){
+  const wasOpen=body.classList.contains("drawer-open");
   body.classList.toggle("drawer-open",open);
+  drawer?.toggleAttribute("inert",!open);
   drawer?.setAttribute("aria-hidden",open?"false":"true");
   menuBtn?.setAttribute("aria-expanded",open?"true":"false");
+  if(open)closeBtn?.focus();
+  else if(wasOpen&&drawer?.contains(document.activeElement))menuBtn?.focus();
 }
 
 menuBtn?.addEventListener("click",()=>setDrawer(true));
 closeBtn?.addEventListener("click",()=>setDrawer(false));
 backdrop?.addEventListener("click",()=>setDrawer(false));
 drawer?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>setDrawer(false)));
-document.addEventListener("keydown",e=>{if(e.key==="Escape")setDrawer(false)});
+document.addEventListener("keydown",e=>{
+  if(!body.classList.contains("drawer-open"))return;
+  if(e.key==="Escape"){setDrawer(false);return}
+  if(e.key!=="Tab"||!drawer)return;
+  const focusable=[...drawer.querySelectorAll('a[href],button:not([disabled])')];
+  if(!focusable.length)return;
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+});
+window.matchMedia("(min-width: 701px)").addEventListener("change",event=>{
+  if(event.matches)setDrawer(false);
+});
 
 function safeHttpUrl(value){
   if(!value)return null;
@@ -261,7 +289,7 @@ async function loadSiteBranding(){
   if(homeTitle)homeTitle.textContent=data.home_title||"Турніри";
   if(homeDescription)homeDescription.textContent=data.home_description||"";
   if(footerText)footerText.textContent=data.footer_text||"";
-  if(copyright)copyright.textContent="© 2026 "+(data.site_name||"AHLTV");
+  if(copyright)copyright.textContent="© "+new Date().getFullYear()+" "+(data.site_name||"AHLTV");
 
   if(data.site_name&&document.title.startsWith("AHLTV")){
     document.title=data.site_name+document.title.slice(5);
