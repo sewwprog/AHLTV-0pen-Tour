@@ -12,7 +12,7 @@ module.exports=defineConfig({
     reducedMotion:'reduce',
     launchOptions:executablePath?{
       executablePath,
-      args:['--no-sandbox','--single-process','--no-zygote','--disable-dev-shm-usage','--disable-site-isolation-trials']
+      args:['--no-sandbox','--no-zygote','--disable-dev-shm-usage','--disable-site-isolation-trials']
     }:{}
   },
   webServer:{

@@ -1,0 +1,90 @@
+/* Mobile navigation and homepage; desktop layouts remain unchanged. */
+.home-section-kicker{display:none}
+
+@media(max-width:700px){
+  /* A labelled, thumb-friendly entry point in the shared header. */
+  .site-header .header-inner{height:64px;gap:12px}
+  .site-header .brand{flex:1;min-width:0;overflow:hidden}
+  .site-header .brand-mark{flex:0 0 36px}
+  .site-header .brand-copy{min-width:0}
+  .site-header .brand-copy strong{white-space:nowrap}
+  .menu-btn{width:auto;min-width:88px;min-height:44px;height:44px;gap:9px;padding:0 12px;border-radius:8px;background:#1c1d21;color:#f5f3ef;font-size:12px;font-weight:800}
+  .menu-btn svg{width:18px;height:18px;color:#f69269}
+  .menu-btn:focus-visible,.drawer-head button:focus-visible,.mobile-drawer a:focus-visible{outline:2px solid #ff9469;outline-offset:3px}
+
+  /* A short bottom sheet keeps the destinations close to the user's thumb. */
+  .drawer-backdrop{background:rgba(5,6,8,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .mobile-drawer{top:auto;right:0;bottom:0;left:0;width:100%;height:auto;max-height:calc(100vh - 12px);max-height:calc(100dvh - 12px);overflow-y:auto;overscroll-behavior:contain;padding:0 0 max(14px,env(safe-area-inset-bottom));border:1px solid rgba(255,255,255,.1);border-bottom:0;border-radius:20px 20px 0 0;background:#17181c;box-shadow:0 -20px 70px rgba(0,0,0,.42);transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.2,.75,.25,1),visibility 0s linear .28s;backdrop-filter:none}
+  .drawer-open .mobile-drawer{transform:translateY(0);visibility:visible;transition:transform .28s cubic-bezier(.2,.75,.25,1),visibility 0s}
+  .drawer-grip{width:38px;height:4px;margin:11px auto 0;border-radius:99px;background:#55545a}
+  .drawer-head{height:auto;min-height:76px;align-items:center;padding:12px 20px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .drawer-title span{display:block;color:#ec906a;font-size:9px;font-weight:800;letter-spacing:.13em}
+  .drawer-title h2{margin:5px 0 0;color:#f8f7f4;font-size:23px;font-weight:800;line-height:1.15;letter-spacing:-.04em}
+  .drawer-head button{width:44px;height:44px;flex:0 0 44px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:#242529;color:#f4f2ee;cursor:pointer}
+  .drawer-head button svg{width:19px;height:19px}
+  .mobile-drawer nav{display:grid;gap:8px;padding:16px 16px 12px}
+  .mobile-drawer nav a{min-height:68px;grid-template-columns:40px minmax(0,1fr) 18px;gap:12px;padding:10px 12px;border:1px solid rgba(255,255,255,.075);border-radius:10px;background:#202125;color:#f1efeb}
+  .mobile-drawer nav a[aria-current="page"]{border-color:rgba(248,118,67,.35);background:linear-gradient(90deg,rgba(248,118,67,.09),transparent 80%),#202125}
+  .drawer-link-icon{width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.07);border-radius:8px;background:#292a2e;color:#f39770}
+  .mobile-drawer nav a .drawer-link-icon svg{width:18px;height:18px;color:#f39770}
+  .drawer-link-copy{display:grid;gap:3px;min-width:0}
+  .drawer-link-copy strong{color:#f4f3ef;font-size:13px;line-height:1.3}
+  .drawer-link-copy small{color:#aaa7a1;font-size:11px;font-weight:500;line-height:1.35}
+  .mobile-drawer nav a>svg:last-child{width:17px;height:17px;color:#8b8882}
+  .drawer-footer{display:flex;align-items:center;gap:9px;margin:5px 20px 0;padding:14px 0 2px;border-top:1px solid rgba(255,255,255,.07);color:#9f9c96;font-size:9px;font-weight:800;letter-spacing:.09em}
+  .drawer-footer-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#f78e64}
+  .drawer-footer b{margin-left:auto;color:#f78e64;font-size:14px}
+
+  /* Put the actual tournaments before the explanatory steps on small screens. */
+  .home-page{display:flex;flex-direction:column;padding-top:12px}
+  .home-page>.page-topline{display:none}
+  .home-page>.home-hero{order:0}
+  .home-page>.tournament-section{order:1}
+  .home-page>.journey{order:2}
+  .home-page>.home-cta{order:3}
+  .page-title.home-hero{min-height:0;border-radius:12px;background-position:67% center;background-image:linear-gradient(90deg,rgba(17,18,21,.97),rgba(17,18,21,.86) 52%,rgba(17,18,21,.38)),url("assets/arena-hero.webp")}
+  .home-hero-main{max-width:none;padding:26px 20px 22px}
+  .home-hero .hero-kicker{gap:8px;font-size:9px;letter-spacing:.09em}
+  .home-hero h1{margin:18px 0 5px;font-size:clamp(36px,10vw,46px);line-height:1.05}
+  .home-hero .hero-manifesto{max-width:280px;font-size:clamp(20px,5.5vw,24px);line-height:1.22}
+  .home-hero p{max-width:265px;margin-top:10px;font-size:12px;line-height:1.6}
+  .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;margin-top:19px}
+  .hero-actions .primary-btn,.hero-actions .secondary-btn{min-height:46px;justify-content:space-between;gap:5px;padding:0 10px;font-size:11px;white-space:nowrap}
+  .hero-actions svg{width:15px;height:15px}
+  .home-page .tournament-section{margin-top:28px;scroll-margin-top:78px}
+  .home-section-kicker{display:block;margin-bottom:7px;color:#f1946c;font-size:9px;font-weight:800;letter-spacing:.12em}
+  .home-page .section-heading{margin-bottom:14px}
+  .home-page .section-heading h2{font-size:24px}
+  .home-page .section-heading p{font-size:12px}
+  .home-page .tournaments-list{gap:10px}
+  .home-page .event-main{padding:16px}
+  .home-page .event-heading{gap:10px 11px}
+  .home-page .event-title h3{font-size:16px;line-height:1.3}
+  .home-page .event-meta{gap:4px 10px;font-size:11px;line-height:1.5}
+  .home-page .event-title p{margin-top:8px;font-size:12px;line-height:1.55}
+  .home-page .event-status{font-size:11px;line-height:1.4;white-space:normal}
+  .home-page .event-footer{gap:12px;margin-top:14px;padding-top:12px}
+  .home-page .event-disclosures{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+  .home-page .event-disclosure{flex:0 1 auto}
+  .home-page .event-disclosure[open]{flex-basis:100%}
+  .home-page .event-disclosure>summary{min-height:44px;padding:0 11px;border:1px solid rgba(255,255,255,.09);border-radius:7px;background:#222327;font-size:11px}
+  .home-page .event-disclosure>summary svg{width:14px;height:14px}
+  .home-page .event-team-list{margin-top:10px}
+  .home-page .event-empty{padding:4px 0;line-height:1.5}
+  .home-page .event-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .home-page .event-actions a{min-height:44px;gap:4px;padding:0 9px;font-size:10px}
+  .home-page .event-actions a:only-child{grid-column:1/-1}
+  .home-page .event-actions a svg{width:15px;height:15px}
+  .home-page .journey{margin:28px 0 0}
+  .home-page .journey-intro{padding:15px 17px}
+  .home-page .journey-steps li{padding:12px 17px}
+  .home-page .home-cta{margin:18px 0 10px;padding:22px 20px}
+}
+
+@media(max-width:340px){
+  .hero-actions .primary-btn,.hero-actions .secondary-btn{font-size:10px;padding:0 8px}
+  .home-page .event-actions a{font-size:10px;padding:0 7px}
+}
+@media(prefers-reduced-motion:reduce){
+  .mobile-drawer,.drawer-backdrop{transition:none}
+}

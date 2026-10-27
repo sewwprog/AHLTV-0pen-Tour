@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#101114">
   <title>AHLTV — Турнір</title>
   <link rel="stylesheet" href="styles.css?v=20261027-01">
+  <link rel="stylesheet" href="mobile.css?v=20261027-01">
 </head>
 <body>
 <header class="site-header">
@@ -13,13 +14,22 @@
     <a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a>
     <nav class="main-nav" aria-label="Основна навігація"><a href="./"><i data-lucide="trophy"></i><span>Турніри</span></a><a href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a></nav>
     <a class="account-btn desktop-only" href="admin.html"><i data-lucide="circle-user-round"></i><span>Акаунт</span></a>
-    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="mobileDrawer"><i data-lucide="menu"></i></button>
+    <button class="menu-btn" id="menuBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="mobileDrawer"><span>Меню</span><i data-lucide="menu"></i></button>
   </div>
 </header>
-<div class="drawer-backdrop" id="drawerBackdrop"></div>
-<aside class="mobile-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-label="Мобільне меню" aria-hidden="true" inert>
-  <div class="drawer-head"><a class="brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong></span></a><button id="drawerClose" aria-label="Закрити меню"><i data-lucide="x"></i></button></div>
-  <nav aria-label="Мобільна навігація"><a href="./"><i data-lucide="trophy"></i><span>Турніри</span><i data-lucide="chevron-right"></i></a><a href="apply.html"><i data-lucide="send-horizontal"></i><span>Подати заявку</span><i data-lucide="chevron-right"></i></a><a href="admin.html"><i data-lucide="circle-user-round"></i><span>Акаунт</span><i data-lucide="chevron-right"></i></a></nav>
+<div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+<aside class="mobile-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true" inert>
+  <div class="drawer-grip" aria-hidden="true"></div>
+  <div class="drawer-head">
+    <div class="drawer-title"><span>НАВІГАЦІЯ</span><h2 id="drawerTitle">Меню</h2></div>
+    <button id="drawerClose" type="button" aria-label="Закрити меню"><i data-lucide="x"></i></button>
+  </div>
+  <nav aria-label="Мобільна навігація">
+    <a href="./"><span class="drawer-link-icon"><i data-lucide="trophy"></i></span><span class="drawer-link-copy"><strong>Турніри</strong><small>Обирай своє змагання</small></span><i data-lucide="chevron-right"></i></a>
+    <a href="apply.html"><span class="drawer-link-icon"><i data-lucide="send-horizontal"></i></span><span class="drawer-link-copy"><strong>Подати заявку</strong><small>Зареєструвати команду</small></span><i data-lucide="chevron-right"></i></a>
+    <a href="admin.html"><span class="drawer-link-icon"><i data-lucide="log-in"></i></span><span class="drawer-link-copy"><strong data-account-label>Увійти</strong><small data-account-description>Твій особистий кабінет</small></span><i data-lucide="chevron-right"></i></a>
+  </nav>
+  <div class="drawer-footer"><span class="drawer-footer-dot"></span><span>ТВОЯ КОМАНДА. ТВОЯ СЦЕНА.</span><b aria-hidden="true">✳</b></div>
 </aside>
 
 <main class="shell tournament-detail-page">
@@ -56,7 +66,7 @@
   </div>
 </footer>
 
-<script type="module" src="ui.js?v=20261027-01"></script>
+<script type="module" src="ui.js?v=20261027-02"></script>
 <script type="module" src="tournament.js?v=20261027-01"></script>
 </body>
 </html>
