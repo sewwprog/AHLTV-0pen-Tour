@@ -742,6 +742,34 @@ input[type="file"]::file-selector-button{
 .tournament-name-preview .tnp-label small{color:#ff9b74;font-size:9px;font-weight:700}
 .tournament-name-preview b{overflow-wrap:anywhere;line-height:1.2}
 
+/* Tournament detail UI */
+.detail-tabs a.is-active{color:#fff;background:rgba(248,118,67,.14);box-shadow:inset 0 0 0 1px rgba(248,118,67,.2)}
+.detail-hero-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.detail-status-pill{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:6px 10px;border-radius:999px;background:#242529;color:#c2bfb9;font-size:10px;font-weight:800;letter-spacing:.04em}
+.detail-status-pill span{width:7px;height:7px;border-radius:999px;background:currentColor}
+.detail-status-pill.status-registration{background:rgba(99,193,132,.14);color:#7fd6ab}
+.detail-status-pill.status-registration span{background:#7fd6ab;animation:pulseDot 1.6s ease-in-out infinite}
+.detail-status-pill.status-live{background:rgba(240,106,59,.16);color:#ff9b74}
+.detail-status-pill.status-live span{background:#ff7a4d;animation:pulseDot 1.6s ease-in-out infinite}
+.detail-status-pill.status-upcoming{background:rgba(226,162,76,.14);color:#e8bd74}
+.detail-status-pill.status-finished{opacity:.72}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
+.detail-teams-toolbar{display:flex;gap:10px;padding:12px 14px 0}
+.detail-teams-search{position:relative;flex:1;display:flex;align-items:center}
+.detail-teams-search svg{position:absolute;left:11px;width:15px;height:15px;color:#7d746e;pointer-events:none}
+.detail-teams-search input{width:100%;min-height:40px;padding:0 12px 0 34px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#111215;color:#f4f2ee;font-size:13px}
+.detail-teams-toolbar select{min-height:40px;padding:0 12px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#111215;color:#f4f2ee;font-size:13px}
+.bracket-zoom{display:block}
+.bracket-zoom img{cursor:zoom-in}
+.rules-list{margin:0 0 13px;padding-left:20px;list-style:none;color:#aaa19b}
+.rules-list li{position:relative;padding-left:16px;margin-bottom:6px}
+.rules-list li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:999px;background:var(--primary)}
+.bracket-lightbox{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:24px;background:rgba(8,7,6,.92);backdrop-filter:blur(6px)}
+.bracket-lightbox.is-open{display:grid}
+.bracket-lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.bracket-lightbox-close{position:absolute;top:18px;right:18px;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;cursor:pointer}
+body.lightbox-open{overflow:hidden}
+
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:15px;background:#161412}
 .bracket-board{min-width:max-content;display:flex;gap:16px;align-items:stretch}
@@ -3211,3 +3239,11 @@ input::placeholder,textarea::placeholder{color:#807f7b}
 }
 .team-form input[type="checkbox"]{width:18px;height:18px;min-height:18px;flex:0 0 18px;margin:2px 0 0;padding:0}
 .team-logo-file:focus-within{outline:2px solid #ff9469;outline-offset:3px}
+
+@media(max-width:700px){
+  .detail-teams-toolbar{flex-direction:column;align-items:stretch}
+  .detail-teams-toolbar select{width:100%}
+  .detail-hero-title-row{flex-direction:column;gap:8px}
+  .detail-status-pill{align-self:flex-start}
+  .bracket-lightbox{padding:14px}
+}
