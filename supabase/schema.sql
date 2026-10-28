@@ -249,6 +249,11 @@ execute function public.enforce_registration_duplicates();
 alter table public.tournaments
   add column if not exists bracket_image_url_2 text;
 
+-- Display font used for the tournament title on the public site.
+-- Must match a key in fonts.js; unknown values fall back to Manrope.
+alter table public.tournaments
+  add column if not exists name_font text not null default 'manrope';
+
 
 -- Manual teams added directly by an AHLTV admin
 create table if not exists public.manual_tournament_teams (

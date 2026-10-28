@@ -34,7 +34,7 @@ body{
     radial-gradient(circle at 92% 8%,rgba(201,137,69,.045),transparent 28rem),
     linear-gradient(180deg,var(--bg),var(--bg-2));
   color:var(--text);
-  font:13px/1.5 "Rubik",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font:13px/1.5 "Manrope",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 a{color:inherit}
 button,input,textarea,select{font:inherit}
@@ -712,13 +712,35 @@ input[type="file"]::file-selector-button{
   border-radius:10px;color:#958b85;text-decoration:none;font-size:11px;font-weight:800
 }
 .detail-tabs a:hover{color:#fff;background:rgba(240,106,59,.09)}
-.detail-teams{display:grid;grid-template-columns:1fr 1fr}
+.detail-teams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .detail-team-row{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.05)}
 .detail-team-row:nth-child(odd){border-right:1px solid rgba(255,255,255,.05)}
 .detail-team-row span{min-width:48px;padding:4px 6px;border:1px solid rgba(240,106,59,.17);border-radius:8px;background:rgba(240,106,59,.07);color:#ff9368;text-align:center;font-size:9px;font-weight:900}
 .rules-content{padding:17px 18px;color:#aaa19b;line-height:1.7}
 .rules-content p{margin:0 0 13px}
 .rules-content p:last-child{margin-bottom:0}
+
+/* Tournament detail enhancements */
+.detail-font-badge{display:inline-flex;align-items:center;gap:5px;padding:0 9px;border:1px solid rgba(240,106,59,.25);border-radius:5px;background:rgba(240,106,59,.08);color:#ff9b74;font-size:10px;font-weight:700;white-space:nowrap}
+.detail-font-badge svg{width:11px;height:11px}
+.detail-progress{display:flex;align-items:center;gap:10px;margin-top:12px}
+.detail-progress-track{flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.detail-progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#f06a3b,#f5a25e)}
+.detail-progress span{color:#a99f99;font-size:10px;font-weight:700;white-space:nowrap}
+.detail-team-card{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:#191a1e}
+.detail-team-card .detail-team-index{color:#6f6760;font-size:10px;font-weight:800;min-width:20px;letter-spacing:.05em}
+.detail-team-card .detail-team-logo{min-width:48px;padding:4px 6px;border:1px solid rgba(240,106,59,.17);border-radius:8px;background:rgba(240,106,59,.07);color:#ff9368;text-align:center;font-size:9px;font-weight:900}
+.detail-team-card .detail-team-logo.has-logo{padding:3px;background:#111215}
+.detail-team-card .detail-team-logo.has-logo img{width:100%;height:34px;object-fit:contain}
+.detail-team-card b{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+.detail-team-card small{color:#ff9368;font-weight:700}
+
+/* Tournament title font preview in the admin editor */
+.tournament-name-preview{display:flex;flex-direction:column;gap:8px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:#151619;margin-bottom:14px}
+.tournament-name-preview .tnp-label{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tournament-name-preview .tnp-label span{color:#8c8a85;font:800 9px/1 Manrope,sans-serif;letter-spacing:.14em}
+.tournament-name-preview .tnp-label small{color:#ff9b74;font-size:9px;font-weight:700}
+.tournament-name-preview b{overflow-wrap:anywhere;line-height:1.2}
 
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:15px;background:#161412}
@@ -3038,9 +3060,15 @@ input::placeholder,textarea::placeholder{color:#807f7b}
 .detail-hero-copy h1{margin:8px 0;color:#fff;font:800 30px/1.15 Manrope,sans-serif;letter-spacing:-.05em;overflow-wrap:anywhere}
 .detail-hero-copy p{color:#aaa7a1;font-size:12px}
 .tournament-meta span{min-height:29px;padding:0 9px;border-radius:5px;background:#242529;color:#c2bfb9;font-size:10px}
-.detail-teams{background:#191a1e}
+.detail-teams{background:#191a1e;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .detail-team-row{padding:14px 18px}
 .detail-team-row .detail-team-logo{border-radius:6px;background:#111215}
+.detail-team-card{padding:14px 18px}
+.detail-team-card .detail-team-logo{min-width:54px;padding:5px 7px;border-radius:6px}
+.detail-team-card .detail-team-logo.has-logo img{height:40px}
+.detail-team-card b{font-size:13px}
+.detail-progress{margin-top:14px}
+.detail-progress-track{height:8px}
 .rules-content{padding:22px;color:#c1beb8;font-size:13px;line-height:1.8}
 #teamsSection,#bracketSection,#rulesSection{scroll-margin-top:150px}
 .public-bracket-empty{color:#a39f99}
@@ -3150,6 +3178,9 @@ input::placeholder,textarea::placeholder{color:#807f7b}
   .tournament-meta span{font-size:10px}
   .detail-teams{grid-template-columns:1fr}
   .detail-team-row{padding:12px 15px}
+  .detail-team-card{padding:13px 15px}
+  .detail-team-card .detail-team-logo{min-width:44px}
+  .detail-team-card .detail-team-logo.has-logo img{height:36px}
   .rules-content{padding:17px;font-size:12px}
   .footer-main{flex-direction:column;gap:22px;padding:27px 0}
   .footer-main nav{flex-wrap:wrap;gap:12px 22px;padding:0}
