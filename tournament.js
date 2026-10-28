@@ -1,4 +1,5 @@
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import {fontCss,fontLabel} from "./fonts.js";
 
 const supabase=createClient(
   "https://hfxzdifqcjbslmxffvlf.supabase.co",
@@ -37,38 +38,45 @@ const startLabel=startDate&&!Number.isNaN(startDate.getTime())
   ? startDate.toLocaleString("uk-UA",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})
   : "Дату не вказано";
 const registrationOpen=tournament.registration_open&&["registration","live"].includes(tournament.status);
+const tournamentTeams=(teams||[]).filter(t=>t.tournament_id===id);
+const maxTeams=Number(tournament.max_teams)||0;
+const progressPct=maxTeams>0?Math.min(100,Math.round((tournamentTeams.length/maxTeams)*100)):0;
+teamsCount.textContent=teamErr?"—":`${tournamentTeams.length} / ${maxTeams}`;
 hero.innerHTML=`
   <div class="detail-logo ${logo?"has-logo":""}">
     ${logo?`<img src="${esc(logo)}" alt="${esc(tournament.name)} logo">`:esc((tournament.short_name||tournament.name).slice(0,1).toUpperCase())}
   </div>
   <div class="detail-hero-copy">
     <small>${esc(tournament.game)} · ${esc(tournament.format)}</small>
-    <h1>${esc(tournament.name)}</h1>
+    <h1 style="${fontCss(tournament.name_font)}">${esc(tournament.name)}</h1>
     <p>${esc(tournament.description||"")}</p>
     <div class="tournament-meta">
       <span><i data-lucide="gamepad-2"></i>${esc(tournament.game)}</span>
       <span><i data-lucide="swords"></i>${esc(tournament.format)}</span>
-      <span><i data-lucide="users"></i>до ${tournament.max_teams} команд</span>
+      <span><i data-lucide="users"></i>${tournamentTeams.length} / ${maxTeams} команд</span>
       <span><i data-lucide="circle-dot"></i>${esc(statusLabel)}</span>
       <span><i data-lucide="calendar-days"></i>${esc(startLabel)}</span>
+      <span class="detail-font-badge"><i data-lucide="type"></i>${esc(fontLabel(tournament.name_font))}</span>
+    </div>
+    <div class="detail-progress">
+      <div class="detail-progress-track"><div class="detail-progress-bar" style="width:${progressPct}%"></div></div>
+      <span>Заповнено ${progressPct}%</span>
     </div>
   </div>
   ${registrationOpen?'<a class="primary-btn detail-apply" href="apply.html?tournament='+encodeURIComponent(tournament.id)+'"><i data-lucide="send-horizontal"></i><span>Подати заявку</span></a>':""}
 `;
 
-const tournamentTeams=(teams||[]).filter(t=>t.tournament_id===id);
-teamsCount.textContent=teamErr?"—":`${tournamentTeams.length} / ${tournament.max_teams}`;
-
 teamsRoot.innerHTML=teamErr
   ? '<div class="empty-state">Не вдалося завантажити команди.</div>'
   : tournamentTeams.length
-  ? tournamentTeams.map(t=>{
+  ? tournamentTeams.map((t,index)=>{
       const teamLogo=safeUrl(t.team_logo_url);
       const fallback=(t.team_tag||t.team_name||"A").slice(0,2).toUpperCase();
-      return `<div class="detail-team-row">
+      return `<article class="detail-team-card">
+        <span class="detail-team-index">${String(index+1).padStart(2,"0")}</span>
         <span class="detail-team-logo ${teamLogo?"has-logo":""}">${teamLogo?`<img src="${esc(teamLogo)}" alt="${esc(t.team_name)} logo">`:esc(fallback)}</span>
         <b>${esc(t.team_name)}${t.team_tag?`<small>[${esc(t.team_tag)}]</small>`:""}</b>
-      </div>`;
+      </article>`;
     }).join("")
   : '<div class="empty-state">Підтверджених команд ще немає.</div>';
 

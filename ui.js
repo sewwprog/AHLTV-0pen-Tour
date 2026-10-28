@@ -47,7 +47,8 @@ import {
   ImagePlus,
   Images,
   LoaderCircle,
-  ShieldCheck
+  ShieldCheck,
+  Type
 } from "https://esm.sh/lucide@0.468.0";
 
 const SUPABASE_URL="https://hfxzdifqcjbslmxffvlf.supabase.co";
@@ -60,7 +61,7 @@ const icons={
   Pencil,Trash2,Check,XCircle,Upload,Image,Save,Shield,CircleDot,Clock3,Swords,
   LayoutDashboard,ScrollText,ChevronRight,Plus,LockKeyhole,UserCheck,UserX,
   ListChecks,CircleUserRound,ArrowRight,BadgeCheck,CircleCheck,CircleX,
-  ClipboardPlus,ImagePlus,Images,LoaderCircle,ShieldCheck
+  ClipboardPlus,ImagePlus,Images,LoaderCircle,ShieldCheck,Type
 };
 
 function renderIcons(){
@@ -100,6 +101,7 @@ function setupReveal(root=document){
     ".user-row",
     ".admin-tournament-card",
     ".detail-team-row",
+    ".detail-team-card",
     ".admin-roster-row",
     ".bracket-image-preview"
   ].join(",");
