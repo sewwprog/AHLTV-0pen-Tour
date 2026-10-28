@@ -57,6 +57,13 @@
 
   <section id="teamsSection" class="panel">
     <div class="panel-head"><span><i data-lucide="users"></i> КОМАНДИ</span><strong id="detailTeamsCount"></strong></div>
+    <div class="detail-teams-toolbar">
+      <label class="detail-teams-search"><i data-lucide="search"></i><input id="detailTeamSearch" type="search" placeholder="Пошук команди" aria-label="Пошук команди" autocomplete="off"></label>
+      <select id="detailTeamSort" aria-label="Сортувати команди">
+        <option value="name">А — Я</option>
+        <option value="-name">Я — А</option>
+      </select>
+    </div>
     <div id="detailTeams" class="detail-teams"></div>
   </section>
 
@@ -70,6 +77,11 @@
     <div id="rulesContent" class="rules-content"></div>
   </section>
 </main>
+
+<div class="bracket-lightbox" id="bracketLightbox" role="dialog" aria-modal="true" aria-label="Повний перегляд сітки" aria-hidden="true">
+  <button class="bracket-lightbox-close" id="bracketLightboxClose" type="button" aria-label="Закрити перегляд"><i data-lucide="x"></i></button>
+  <img id="bracketLightboxImg" src="" alt="Сітка турніру">
+</div>
 <footer class="site-footer">
   <div class="shell">
     <div class="footer-main"><div><a class="brand footer-brand" href="./"><span class="brand-mark">A</span><span class="brand-copy"><strong>AHLTV</strong><small>TOURNAMENTS</small></span></a><p>Місце, де команди виходять на свою сцену.</p></div><nav aria-label="Навігація у підвалі"><a href="./">Турніри</a><a href="apply.html">Подати заявку</a><a href="admin.html">Акаунт</a></nav></div>
