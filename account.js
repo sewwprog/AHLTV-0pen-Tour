@@ -1,4 +1,5 @@
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import {FONTS,DEFAULT_FONT,fontCss,fontLabel} from "./fonts.js";
 const SUPABASE_URL="https://hfxzdifqcjbslmxffvlf.supabase.co";
 const SUPABASE_KEY="sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi";
 const USERS_URL=SUPABASE_URL+"/functions/v1/admin-users";
@@ -37,6 +38,23 @@ function previewImage(container,url,fallback="A",isLocal=false){
   }
 }
 
+function buildFontOptions(){
+  if(!tournamentNameFont)return;
+  tournamentNameFont.innerHTML=FONTS.map(f=>`<option value="${esc(f.key)}">${esc(f.label)}</option>`).join("");
+  tournamentNameFont.value=DEFAULT_FONT;
+}
+
+function updateNamePreview(){
+  const name=(tournamentForm?.elements.name.value||"").trim()||"AHLTV Open Tour";
+  const fontKey=tournamentNameFont?.value||DEFAULT_FONT;
+  if(tournamentNamePreviewText){
+    tournamentNamePreviewText.textContent=name;
+    tournamentNamePreviewText.style.cssText=fontCss(fontKey);
+  }
+  if(tournamentNamePreviewFont)tournamentNamePreviewFont.textContent=fontLabel(fontKey);
+  if(tournamentNamePreview)tournamentNamePreview.dataset.font=fontKey;
+}
+
 async function uploadAsset(file,folder){
   if(!file)return null;
   if(file.size>5*1024*1024)throw new Error("Файл завеликий. Максимум 5 МБ.");
@@ -60,7 +78,7 @@ const nextParam=new URLSearchParams(location.search).get("next");
 const safeNext=nextParam&&/^apply\.html(?:\?.*)?$/.test(nextParam)?nextParam:null;
 let authMode="login";
 const siteSettingsForm=$("#siteSettingsForm"),siteLogoFile=$("#siteLogoFile"),siteLogoPreview=$("#siteLogoPreview"),siteSettingsMessage=$("#siteSettingsMessage"),saveSiteSettingsBtn=$("#saveSiteSettingsBtn"),removeSiteLogo=$("#removeSiteLogo");
-const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview");
+const tournamentForm=$("#tournamentForm"),tournamentList=$("#tournamentsAdminList"),tournamentMessage=$("#tournamentMessage"),saveTournamentBtn=$("#saveTournamentBtn"),cancelTournamentEdit=$("#cancelTournamentEdit"),tournamentFormTitle=$("#tournamentFormTitle"),tournamentLogoFile=$("#tournamentLogoFile"),tournamentLogoPreview=$("#tournamentLogoPreview"),tournamentNameFont=$("#tournamentNameFont"),tournamentNamePreview=$("#tournamentNamePreview"),tournamentNamePreviewText=$("#tournamentNamePreviewText"),tournamentNamePreviewFont=$("#tournamentNamePreviewFont");
 const manualTeamForm=$("#manualTeamForm"),manualTeamTournament=$("#manualTeamTournament"),manualTeamName=$("#manualTeamName"),manualTeamLogoFile=$("#manualTeamLogoFile"),manualTeamLogoPreview=$("#manualTeamLogoPreview"),manualTeamSubmitBtn=$("#manualTeamSubmitBtn"),manualTeamMessage=$("#manualTeamMessage"),manualTeamsList=$("#manualTeamsList");
 const applications=$("#applications"),stats=$("#stats"),emptyState=$("#emptyState"),pendingBadge=$("#pendingBadge"),applicationSearch=$("#applicationSearch"),applicationTournamentFilter=$("#applicationTournamentFilter"),applicationResults=$("#applicationResults"),clearApplicationFilters=$("#clearApplicationFilters");
 const tournamentEditor=$("#tournamentEditor"),tournamentSearch=$("#tournamentSearch"),tournamentCount=$("#tournamentCount"),tournamentListMessage=$("#tournamentListMessage"),adminSectionSelect=$("#adminSectionSelect");
@@ -323,6 +341,7 @@ function tournamentPayload(form){
     name:d.name.trim(),short_name:d.short_name.trim()||null,description:d.description.trim()||null,
     rules_text:d.rules_text.trim()||null,
     game:d.game.trim(),format:d.format.trim(),max_teams:Number(d.max_teams),status:d.status,
+    name_font:form.elements.name_font?.value||DEFAULT_FONT,
     registration_open:form.elements.registration_open.checked,is_visible:form.elements.is_visible.checked,
     starts_at:d.starts_at?new Date(d.starts_at).toISOString():null
   };
@@ -334,6 +353,8 @@ function resetTournamentForm(){
   tournamentFormDirty=false;
   tournamentForm.elements.game.value="CS2";tournamentForm.elements.format.value="BO3";tournamentForm.elements.max_teams.value="16";
   tournamentForm.elements.status.value="registration";tournamentForm.elements.registration_open.checked=true;tournamentForm.elements.is_visible.checked=true;
+  if(tournamentNameFont)tournamentNameFont.value=DEFAULT_FONT;
+  updateNamePreview();
   previewImage(tournamentLogoPreview,null,"A");
   setButtonContent(saveTournamentBtn,"plus","Створити турнір");
   tournamentFormTitle.textContent="Додати турнір";
@@ -369,8 +390,11 @@ function openCreateTournament(){
   tournamentForm.elements.name.focus({preventScroll:true});
 }
 
-tournamentForm.addEventListener("input",()=>{tournamentFormDirty=true});
-tournamentForm.addEventListener("change",()=>{tournamentFormDirty=true});
+tournamentForm.addEventListener("input",()=>{tournamentFormDirty=true;updateNamePreview()});
+tournamentForm.addEventListener("change",()=>{tournamentFormDirty=true;updateNamePreview()});
+tournamentNameFont?.addEventListener("change",updateNamePreview);
+buildFontOptions();
+updateNamePreview();
 tournamentLogoFile?.addEventListener("change",()=>{
   const file=tournamentLogoFile.files?.[0];
   const fallback=tournamentForm.elements.short_name.value||tournamentForm.elements.name.value||"A";
@@ -469,7 +493,7 @@ function renderTournaments(){
     return `<article class="panel admin-tournament-card">
       <div class="admin-tournament-main">
         <div class="tournament-icon small ${logo?"has-logo":""}">${logo?`<img src="${esc(logo)}" alt="Логотип ${esc(t.name)}">`:esc((t.short_name||t.name||"A").slice(0,1).toUpperCase())}</div>
-        <div class="admin-tournament-copy"><small>${esc(t.game)} · ${esc(t.format)}</small><h3>${esc(t.name)}</h3><p>${teamCount} / ${esc(t.max_teams)} команд <span>·</span> ${t.registration_open?"реєстрація відкрита":"реєстрація закрита"} <span>·</span> ${t.is_visible?"видимий на сайті":"прихований"}</p></div>
+        <div class="admin-tournament-copy"><small>${esc(t.game)} · ${esc(t.format)}</small><h3 style="${fontCss(t.name_font)}">${esc(t.name)}</h3><p>${teamCount} / ${esc(t.max_teams)} команд <span>·</span> ${t.registration_open?"реєстрація відкрита":"реєстрація закрита"} <span>·</span> ${t.is_visible?"видимий на сайті":"прихований"}</p></div>
         <span class="status-badge status-${esc(t.status)}">${esc(statusLabel(t.status))}</span>
       </div>
       <div class="admin-tournament-controls">
@@ -497,6 +521,8 @@ function renderTournaments(){
     const t=tournaments.find(x=>x.id===Number(btn.dataset.editTournament));if(!t||!canDiscardTournamentDraft())return;
     editingTournamentId=t.id;const f=tournamentForm.elements;
     f.name.value=t.name;f.short_name.value=t.short_name||"";f.description.value=t.description||"";f.rules_text.value=t.rules_text||"";f.game.value=t.game;f.format.value=t.format;f.max_teams.value=t.max_teams;f.status.value=t.status;f.registration_open.checked=t.registration_open;f.is_visible.checked=t.is_visible;
+    if(tournamentNameFont)tournamentNameFont.value=t.name_font||DEFAULT_FONT;
+    updateNamePreview();
     f.starts_at.value=t.starts_at?new Date(new Date(t.starts_at).getTime()-new Date(t.starts_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
     if(tournamentLogoFile)tournamentLogoFile.value="";
     previewImage(tournamentLogoPreview,t.logo_url,t.short_name||t.name||"A");

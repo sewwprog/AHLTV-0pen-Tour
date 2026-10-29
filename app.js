@@ -1,4 +1,5 @@
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import {fontCss} from "./fonts.js";
 
 const supabase=createClient("https://hfxzdifqcjbslmxffvlf.supabase.co","sb_publishable_Z3cDbEmw_8OcJsXAwypOfw_-IwC-RFi");
 const root=document.querySelector("#tournamentsList");
@@ -43,7 +44,7 @@ function renderCard(t,allTeams,allMatches,teamsAvailable){
       <div class="event-heading">
         ${tournamentLogo(t)}
         <div class="event-title">
-          <h3><a href="${detailUrl(t)}">${esc(t.name)}</a></h3>
+          <h3 style="${fontCss(t.name_font)}"><a href="${detailUrl(t)}">${esc(t.name)}</a></h3>
           <div class="event-meta" role="group" aria-label="Інформація про турнір">
             <span>${esc(t.game||"Гра не вказана")} · ${esc(t.format||"—")}</span>
             <span>${teamCount} / ${maxTeams||"—"} команд</span>

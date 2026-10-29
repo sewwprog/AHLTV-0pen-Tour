@@ -3,7 +3,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 
 const supabaseMock=fs.readFileSync(path.join(__dirname,'fixtures/supabase-mock.js'),'utf8');
-const iconNames=['Trophy','SendHorizontal','LogIn','Menu','X','UserRound','UserPlus','LogOut','Settings','Users','GitBranch','Globe2','ClipboardList','CalendarDays','Gamepad2','ExternalLink','Eye','EyeOff','Pencil','Trash2','Check','XCircle','Upload','Image','Save','Shield','CircleDot','Clock3','Swords','LayoutDashboard','ScrollText','ChevronRight','Plus','LockKeyhole','UserCheck','UserX','ListChecks','CircleUserRound','ArrowRight','BadgeCheck','CircleCheck','CircleX','ClipboardPlus','ImagePlus','Images','LoaderCircle','ShieldCheck'];
+const iconNames=['Trophy','SendHorizontal','LogIn','Menu','X','UserRound','UserPlus','LogOut','Settings','Users','GitBranch','Globe2','ClipboardList','CalendarDays','Gamepad2','ExternalLink','Eye','EyeOff','Pencil','Trash2','Check','XCircle','Upload','Image','Save','Shield','CircleDot','Clock3','Swords','LayoutDashboard','ScrollText','ChevronRight','Plus','LockKeyhole','UserCheck','UserX','ListChecks','CircleUserRound','ArrowRight','BadgeCheck','CircleCheck','CircleX','ClipboardPlus','ImagePlus','Images','LoaderCircle','ShieldCheck','Type','Search'];
 const lucideMock='export function createIcons(){};'+iconNames.map(name=>`export const ${name}={};`).join('');
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64');
 
@@ -43,12 +43,12 @@ test('phone details show real tournament data, easy section links and the correc
   await expect(page.locator('.detail-heading p')).toHaveText('Головний турнір сезону');
   await expect(page.locator('.tournament-meta')).toContainText('CS2');
   await expect(page.locator('.tournament-meta')).toContainText('BO3');
-  await expect(page.locator('.tournament-meta')).toContainText('до 16 команд');
-  await expect(page.locator('.detail-meta-status')).toHaveText('РЕЄСТРАЦІЯ ВІДКРИТА');
+  await expect(page.locator('.tournament-meta')).toContainText('3 / 16 команд');
+  await expect(page.locator('.detail-status-pill')).toHaveText('РЕЄСТРАЦІЯ ВІДКРИТА');
   await expect(page.locator('.tournament-meta')).toContainText('2026');
   await expect(page.locator('#detailTeamsCount')).toHaveText('3 / 16');
   await expect(page.locator('#detailTeamsCount')).toHaveAttribute('aria-label','3 з 16 команд');
-  await expect(page.locator('.detail-team-row')).toHaveCount(3);
+  await expect(page.locator('.detail-team-card')).toHaveCount(3);
   await expect(page.locator('#detailTeams')).toContainText('Rivne Five');
   await expect(page.locator('#detailTeams')).toContainText('Fox Academy');
   await expect(page.locator('#detailTeams')).toContainText('Manual Team');
@@ -94,17 +94,49 @@ test('phone details show real tournament data, easy section links and the correc
   expect(errors).toEqual([]);
 });
 
+test('team search and sorting remain usable on a narrow phone',async({page})=>{
+  await page.setViewportSize({width:320,height:800});
+  await mockServices(page);
+  await page.goto('/tournament.html?id=1');
+  const search=page.getByRole('searchbox',{name:'Пошук команди'});
+  const sort=page.getByRole('combobox',{name:'Сортувати команди'});
+  await expect(search).toBeVisible();
+  await expect(sort).toBeVisible();
+  for(const control of [search,sort])expect((await control.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect(await search.evaluate(el=>getComputedStyle(el).fontSize)).toBe('16px'); // avoids iOS input zoom
+  await expect(page.locator('.detail-progress-track')).toHaveAttribute('aria-valuenow','19');
+  await expect(page.locator('.detail-font-badge')).toHaveText('Manrope');
+  await search.fill('rf');
+  await expect(page.locator('.detail-team-card')).toHaveCount(1);
+  await expect(page.locator('.detail-team-card').first()).toContainText('Rivne Five');
+  await search.fill('FOX');
+  await expect(page.locator('.detail-team-card')).toHaveCount(1);
+  await expect(page.locator('.detail-team-card').first()).toContainText('Fox Academy');
+  await search.fill('відсутня');
+  await expect(page.locator('#detailTeams')).toContainText('Не знайдено команд за запитом');
+  await expect(page.locator('#detailTeamsCount')).toHaveText('3 / 16');
+  await search.fill('');
+  await sort.selectOption('-name');
+  await expect(page.locator('.detail-team-card').first()).toContainText('Rivne Five');
+  await expect(page.locator('.detail-team-card').last()).toContainText('Fox Academy');
+  await sort.selectOption('name');
+  await expect(page.locator('.detail-team-card').first()).toContainText('Fox Academy');
+  await expectNoHorizontalOverflow(page,'team search and sort');
+});
+
 test('closed registration, one image and empty teams remain clear and usable',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await mockServices(page);
   await page.goto('/tournament.html?id=2');
   await expect(page.locator('#tournamentHero h1')).toHaveText('Rivne Autumn Cup');
-  await expect(page.locator('.detail-meta-status')).toHaveText('LIVE');
+  await expect(page.locator('.detail-status-pill')).toHaveText('LIVE');
   await expect(page.locator('.detail-registration-closed')).toBeVisible();
   await expect(page.locator('.detail-registration-closed')).toContainText('Реєстрація зараз недоступна');
   await expect(page.locator('.detail-apply')).toHaveCount(0);
   await expect(page.locator('#detailTeamsCount')).toHaveText('0 / 8');
   await expect(page.locator('#detailTeams')).toContainText('Підтверджених команд ще немає');
+  await expect(page.locator('.detail-teams-toolbar')).toBeHidden();
+  await expect(page.locator('.detail-progress-track')).toHaveAttribute('aria-valuenow','0');
   await expect(page.locator('#rulesContent')).toHaveText('Правила кубка');
 
   const first=page.locator('.public-bracket-image').first();
@@ -141,14 +173,34 @@ test('both bracket images and empty rules work without hiding either slot',async
     const slot=page.locator('.public-bracket-image').nth(index);
     await expect(slot.locator('img')).toHaveAttribute('alt',`Сітка ${index+1} турніру AHLTV Open Tour: Season 04`);
     await expect(slot.locator('a')).toHaveCount(2);
-    for(const link of await slot.locator('a').all()){
-      await expect(link).toHaveAttribute('href',url);
-      await expect(link).toHaveAttribute('target','_blank');
-      await expect(link).toHaveAttribute('rel','noopener noreferrer');
-    }
+    await expect(slot.locator('.bracket-zoom')).toHaveAttribute('href',url);
+    const link=slot.locator('.bracket-open-btn');
+    await expect(link).toHaveAttribute('href',url);
+    await expect(link).toHaveAttribute('target','_blank');
+    await expect(link).toHaveAttribute('rel','noopener noreferrer');
     const box=await slot.boundingBox();
     expect(box.width).toBeGreaterThan(300);
   }
+  const dialog=page.locator('#bracketLightbox');
+  const firstPreview=page.locator('.public-bracket-image').first().locator('.bracket-zoom');
+  await firstPreview.click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute('aria-hidden','false');
+  await expect(dialog).not.toHaveAttribute('inert','');
+  await expect(dialog.locator('img')).toHaveAttribute('src','https://example.com/first.png');
+  await expect(dialog.locator('img')).toHaveAttribute('alt','Сітка 1 турніру AHLTV Open Tour: Season 04');
+  await expect(page.locator('#bracketLightboxClose')).toBeFocused();
+  expect(await page.evaluate(()=>getComputedStyle(document.body).overflow)).toBe('hidden');
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#bracketLightboxClose')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(dialog).toHaveAttribute('inert','');
+  await expect(firstPreview).toBeFocused();
+  await page.locator('.public-bracket-image').nth(1).locator('.bracket-zoom').click();
+  await expect(dialog.locator('img')).toHaveAttribute('src','https://example.com/second.png');
+  await dialog.click({position:{x:5,y:5}});
+  await expect(dialog).toBeHidden();
   await expect(page.locator('#rulesContent')).toContainText('Правила для цього турніру ще не додані');
   await expectNoHorizontalOverflow(page,'two images');
 });
@@ -170,13 +222,35 @@ test('registration availability follows both status and the registration flag',a
     ['finished','ЗАВЕРШЕНО',false]
   ]){
     await page.goto(`/tournament.html?id=1&variant=${variant}`);
-    await expect(page.locator('.detail-meta-status')).toHaveText(status);
+    await expect(page.locator('.detail-status-pill')).toHaveText(status);
     await expect(page.locator('.detail-apply')).toHaveCount(open?1:0);
     await expect(page.locator('.detail-registration-closed')).toHaveCount(open?0:1);
     if(open)await expect(page.locator('.detail-apply')).toHaveAttribute('href','apply.html?tournament=1');
     else await expect(page.locator('.detail-registration-closed')).toBeVisible();
     if(variant==='upcoming')await expect(page.locator('.tournament-meta')).toContainText('Дату не вказано');
   }
+});
+
+test('chosen title font, countdown, progress and formatted rules are preserved',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await mockServices(page,{patch:`
+    Object.assign(window.__mock.tables.tournaments[0],{
+      name_font:'unbounded',status:'upcoming',starts_at:'2099-01-01T12:00:00Z',
+      rules_text:'- Чесна гра\\n- Поважай суперників\\n\\n1. Перший матч\\n2. Фінал'
+    });
+  `});
+  await page.goto('/tournament.html?id=1');
+  const title=page.locator('#tournamentHero h1');
+  await expect(title).toHaveText('AHLTV Open Tour: Season 04');
+  expect(await title.evaluate(el=>getComputedStyle(el).fontFamily)).toContain('Unbounded');
+  expect(await title.evaluate(el=>getComputedStyle(el).fontWeight)).toBe('800');
+  await expect(page.locator('.detail-font-badge')).toHaveText('Unbounded');
+  await expect(page.locator('.tournament-meta')).toContainText('до початку');
+  await expect(page.locator('.detail-progress-track')).toHaveAttribute('aria-valuenow','19');
+  await expect(page.locator('.rules-list')).toHaveCount(2);
+  await expect(page.locator('.rules-list').first().locator('li')).toHaveText(['Чесна гра','Поважай суперників']);
+  await expect(page.locator('.rules-list').nth(1).locator('li')).toHaveText(['Перший матч','Фінал']);
+  await expectNoHorizontalOverflow(page,'custom font and rules');
 });
 
 test('real tournament and team logos remain visible with descriptive alternatives',async({page})=>{
@@ -188,7 +262,7 @@ test('real tournament and team logos remain visible with descriptive alternative
   await page.goto('/tournament.html?id=1');
   await expect(page.locator('.detail-logo')).toHaveClass(/has-logo/);
   await expect(page.locator('.detail-logo img')).toHaveAttribute('alt','Логотип AHLTV Open Tour: Season 04');
-  const team=page.locator('.detail-team-row').filter({hasText:'Rivne Five'});
+  const team=page.locator('.detail-team-card').filter({hasText:'Rivne Five'});
   await expect(team.locator('.detail-team-logo')).toHaveClass(/has-logo/);
   await expect(team.locator('img')).toHaveAttribute('alt','Логотип Rivne Five');
   await expect(team.locator('img')).toHaveAttribute('src','https://example.com/team.png');
@@ -206,7 +280,8 @@ test('long details wrap without clipping on phones, landscape and desktop',async
     });
   `});
   await page.goto('/tournament.html?id=1&mock=long');
-  await expect(page.locator('.detail-team-name').first()).toContainText('ДужеДовгаНазваКомандиБезПробілів');
+  const longName=page.locator('.detail-team-name').filter({hasText:'ДужеДовгаНазваКомандиБезПробілів'});
+  await expect(longName).toBeVisible();
   await expect(page.locator('#rulesContent p')).toHaveCount(2);
   await expect(page.locator('#rulesContent p').first().locator('br')).toHaveCount(1);
 
@@ -214,10 +289,11 @@ test('long details wrap without clipping on phones, landscape and desktop',async
     await page.setViewportSize({width,height:844});
     await expectNoHorizontalOverflow(page,`${width}px`);
     for(const selector of ['.detail-heading h1','.detail-heading p','.tournament-meta','.detail-team-name','#rulesContent']){
-      const size=await page.locator(selector).first().evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflow,wrap:getComputedStyle(el).overflowWrap}));
+      const locator=selector==='.detail-team-name'?longName:page.locator(selector).first();
+      const size=await locator.evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflow,wrap:getComputedStyle(el).overflowWrap}));
       expect(size.scroll,`${width}px ${selector}`).toBeLessThanOrEqual(size.client+1);
     }
-    const nameStyle=await page.locator('.detail-team-name').first().evaluate(el=>({whiteSpace:getComputedStyle(el).whiteSpace,wrap:getComputedStyle(el).overflowWrap,box:el.getBoundingClientRect().toJSON()}));
+    const nameStyle=await longName.evaluate(el=>({whiteSpace:getComputedStyle(el).whiteSpace,wrap:getComputedStyle(el).overflowWrap,box:el.getBoundingClientRect().toJSON()}));
     expect(nameStyle.whiteSpace).toBe('normal');
     expect(nameStyle.wrap).toBe('anywhere');
     expect(nameStyle.box.height).toBeGreaterThan(30);
@@ -232,12 +308,13 @@ test('long details wrap without clipping on phones, landscape and desktop',async
     await expect(page.locator('.detail-back')).toBeHidden();
     await expect(page.locator('.tournament-detail-page .page-topline')).toBeVisible();
     await expect(page.locator('.detail-apply')).toBeVisible();
-    const logo=await page.locator('.detail-logo').boundingBox();
-    expect(logo.width).toBe(92);
+    const logoWidth=await page.locator('.detail-logo').evaluate(el=>parseFloat(getComputedStyle(el).width));
+    expect(logoWidth).toBe(92);
     const teamColumns=await page.locator('.detail-teams').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
     expect(teamColumns).toBe(2);
     for(const selector of ['.detail-heading p','.detail-team-name','#rulesContent']){
-      const size=await page.locator(selector).first().evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth}));
+      const locator=selector==='.detail-team-name'?longName:page.locator(selector).first();
+      const size=await locator.evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth}));
       expect(size.scroll,`${width}px ${selector}`).toBeLessThanOrEqual(size.client+1);
     }
     await expectNoHorizontalOverflow(page,`${width}px desktop`);
@@ -252,6 +329,9 @@ test('missing or failed data has an understandable state; a team error does not 
   await expect(page.locator('#tournamentHero h1')).toHaveText('AHLTV Open Tour: Season 04');
   await expect(page.locator('#detailTeamsCount')).toHaveText('—');
   await expect(page.locator('#detailTeams')).toContainText('Не вдалося завантажити команди');
+  await expect(page.locator('.detail-teams-toolbar')).toBeHidden();
+  await expect(page.locator('.detail-progress')).toHaveCount(0);
+  await expect(page.locator('.tournament-meta')).toContainText('до 16 команд');
   await expect(page.locator('.detail-apply')).toHaveAttribute('href','apply.html?tournament=1');
   await expect(page.locator('#rulesContent')).toHaveText('Чесна гра');
 

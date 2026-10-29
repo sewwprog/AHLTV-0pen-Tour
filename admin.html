@@ -5,6 +5,7 @@
   <meta name="theme-color" content="#101114"><title>AHLTV — Акаунт</title>
   <script src="intro.js?v=20261027-01"></script>
   <link rel="stylesheet" href="styles.css?v=20261027-04">
+  <link rel="stylesheet" href="fonts.css?v=20261028-01">
   <link rel="stylesheet" href="mobile.css?v=20261027-02">
   <link rel="stylesheet" href="admin.css?v=20261027-02">
   <link rel="stylesheet" href="motion.css?v=20261027-01">
@@ -163,12 +164,17 @@
           <div class="form-grid">
             <label>Назва<input name="name" required maxlength="80" placeholder="AHLTV Open Tour"></label>
             <label>Коротка назва<input name="short_name" maxlength="24" placeholder="OPEN TOUR"></label>
+            <label>Шрифт назви<select name="name_font" id="tournamentNameFont"></select></label>
             <label>Гра<input name="game" value="CS2" required maxlength="30"></label>
             <label>Формат<input name="format" value="BO3" required maxlength="20"></label>
             <label>Макс. команд<input name="max_teams" type="number" min="2" max="128" value="16" required></label>
             <label>Статус<select name="status"><option value="upcoming">Незабаром</option><option value="registration" selected>Реєстрація</option><option value="live">Триває</option><option value="finished">Завершено</option></select></label>
             <label>Дата старту<input name="starts_at" type="datetime-local"></label>
             <label>Лого турніру<input id="tournamentLogoFile" name="logo_file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"></label>
+          </div>
+          <div class="tournament-name-preview" id="tournamentNamePreview">
+            <div class="tnp-label"><span>ПРЕВ'Ю НАЗВИ</span><small id="tournamentNamePreviewFont"></small></div>
+            <b id="tournamentNamePreviewText">AHLTV Open Tour</b>
           </div>
           <div class="tournament-logo-editor">
             <div class="asset-preview tournament-logo-preview" id="tournamentLogoPreview"><span>A</span></div>
