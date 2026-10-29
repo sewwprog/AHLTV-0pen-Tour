@@ -1,0 +1,123 @@
+/* Detail-page semantics and responsive layout; shared pages keep their own styles. */
+.detail-back,.detail-registration-closed{display:none}
+.tournament-detail-page [hidden]{display:none!important}
+.tournament-detail-page .panel-head h2{
+  display:flex;align-items:center;gap:8px;margin:0;
+  color:inherit;font:inherit;letter-spacing:inherit;
+}
+.tournament-detail-page .panel-head h2 svg{color:var(--primary)}
+.tournament-detail-hero>.loading-panel,.tournament-detail-hero>.empty-state{grid-column:1/-1}
+.detail-hero-copy p,.rules-content{overflow-wrap:anywhere}
+.detail-team-card{min-width:0}
+.detail-team-card>b{min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:7px;overflow:visible;white-space:normal;line-height:1.4}
+.detail-team-card .detail-team-name{
+  flex:0 1 auto;min-width:0;padding:0;border:0;border-radius:0;background:none;
+  color:inherit;text-align:left;font:inherit;overflow-wrap:anywhere;
+}
+.detail-teams .empty-state{grid-column:1/-1}
+
+@media(max-width:700px){
+  .tournament-detail-page{padding-top:5px}
+  .tournament-detail-page>.page-topline{display:none}
+  .detail-back{
+    width:max-content;max-width:100%;min-height:44px;display:inline-flex;align-items:center;gap:9px;
+    margin-bottom:4px;color:#c8c5c0;text-decoration:none;font-size:12px;font-weight:800;
+  }
+  .detail-back svg{width:16px;height:16px;color:#f28f67;transform:rotate(180deg)}
+  .detail-back:focus-visible,.detail-tabs a:focus-visible,.detail-apply:focus-visible,
+  .bracket-zoom:focus-visible,.bracket-open-btn:focus-visible,.bracket-lightbox-close:focus-visible{
+    outline:2px solid #ff9469;outline-offset:2px;
+  }
+
+  /* The summary gets the full width instead of squeezing it beside the logo. */
+  .tournament-detail-hero{
+    grid-template-columns:54px minmax(0,1fr);
+    grid-template-areas:"logo heading" "meta meta" "action action";
+    align-items:start;gap:15px 13px;padding:18px;
+  }
+  .tournament-detail-hero.has-progress{grid-template-areas:"logo heading" "meta meta" "progress progress" "action action"}
+  .detail-logo{grid-area:logo;align-self:start;width:54px;height:54px;font-size:24px}
+  .detail-hero-copy{display:contents}
+  .detail-heading{grid-area:heading;min-width:0}
+  .detail-hero-copy small{font-size:10px;line-height:1.4}
+  .detail-hero-title-row{gap:5px}
+  .detail-hero-copy h1{min-width:0;margin:6px 0 3px;font-size:clamp(20px,5.6vw,24px);line-height:1.18;letter-spacing:-.045em}
+  .detail-status-pill{max-width:100%;line-height:1.35;overflow-wrap:anywhere}
+  .detail-status-pill>span{flex:0 0 7px}
+  .detail-hero-copy p{margin:9px 0 0;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+  .detail-hero-copy p:empty{display:none}
+  .tournament-detail-page .tournament-meta{grid-area:meta;gap:6px;min-width:0}
+  .tournament-detail-page .tournament-meta span{
+    max-width:100%;min-width:0;min-height:32px;padding:5px 9px;
+    color:#d1cec8;font-size:11px;line-height:1.35;overflow-wrap:anywhere;
+  }
+  .tournament-detail-page .tournament-meta svg{width:15px;height:15px;flex:0 0 15px;color:#a9a49e}
+  .detail-progress{grid-area:progress;width:100%;min-width:0;margin:0}
+  .detail-progress span{color:#beb9b3;font-size:11px}
+  .detail-apply{grid-area:action;width:100%;min-height:48px;font-size:12px}
+  .detail-registration-closed{
+    grid-area:action;display:flex;align-items:center;gap:8px;min-height:38px;
+    padding:9px 11px;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-control);
+    background:rgba(255,255,255,.025);color:#aaa7a1;font-size:11px;line-height:1.4;
+  }
+  .detail-registration-closed svg{width:15px;height:15px;flex:0 0 15px;color:#a39c95}
+
+  /* Equal-size links stay within reach and show which section is being read. */
+  .tournament-detail-page .detail-tabs{top:71px;gap:4px;padding:5px}
+  .tournament-detail-page .detail-tabs a{
+    flex:1 1 0;min-width:0;min-height:46px;justify-content:center;gap:6px;padding:0 5px;
+    font-size:11px;line-height:1.2;white-space:nowrap;
+  }
+  .tournament-detail-page .detail-tabs a svg{width:15px;height:15px;flex:0 0 15px}
+  .tournament-detail-page .detail-tabs a[aria-current="location"]{
+    background:rgba(248,118,67,.11);color:#ffad88;box-shadow:inset 0 0 0 1px rgba(248,118,67,.18);
+  }
+  #teamsSection,#bracketSection,#rulesSection{scroll-margin-top:145px}
+  .tournament-detail-page .panel-head{min-height:48px;padding:0 15px}
+  .tournament-detail-page .panel-head h2{font-size:11px}
+  #detailTeamsCount{color:#cfcbc5;font-size:11px}
+
+  /* Search and sorting stay usable with one hand; names never get truncated. */
+  .detail-teams-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:12px 12px 10px}
+  .detail-teams-search{min-width:0}
+  .detail-teams-search input,.detail-teams-toolbar select{min-height:44px;border-radius:var(--radius-control);font-size:16px}
+  .detail-teams-toolbar select{width:auto;min-width:88px;max-width:110px;padding:0 8px}
+  .detail-teams{gap:8px;padding:0 12px 12px}
+  .detail-team-card{gap:11px;padding:11px 12px;border-radius:var(--radius-card)}
+  .detail-team-card .detail-team-logo{
+    width:36px;height:36px;min-width:36px;flex:0 0 36px;display:grid;place-items:center;
+    overflow:hidden;padding:0;border-radius:var(--radius-card);background:#111215;
+  }
+  .detail-team-card .detail-team-logo.has-logo{padding:3px}
+  .detail-team-card .detail-team-logo.has-logo img{width:100%;height:100%;object-fit:contain}
+  .detail-team-card>b small{color:#a49f99;font-size:10px;line-height:1.4}
+  .detail-teams .empty-state{padding:28px 18px;line-height:1.5}
+
+  /* Empty slots are compact; available images get their own full-width preview. */
+  .public-bracket-gallery{gap:8px;padding:10px}
+  .public-bracket-gallery.has-two{grid-template-columns:1fr}
+  .public-bracket-gallery.has-two.all-empty{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .public-bracket-gallery .public-bracket-image{gap:0}
+  .public-bracket-image-head{min-height:37px}
+  .public-bracket-image-head span{font-size:10px}
+  .public-bracket-image-head b{display:none}
+  .public-bracket-gallery .public-bracket-image.is-empty{min-height:0;padding:0}
+  .public-bracket-empty{min-height:86px;gap:5px;padding:12px 7px}
+  .public-bracket-empty svg{width:20px;height:20px}
+  .public-bracket-empty b{display:none}
+  .public-bracket-empty span{font-size:11px;line-height:1.4}
+  .public-bracket-gallery:not(.all-empty) .public-bracket-empty{min-height:62px;display:flex;justify-content:center;gap:9px}
+  .public-bracket-gallery .public-bracket-image.has-image{padding:0 0 10px}
+  .public-bracket-gallery .public-bracket-image.has-image>a:first-of-type{
+    width:100%;min-height:0;display:block;padding:10px 10px 0;
+  }
+  .public-bracket-gallery .public-bracket-image img{width:100%;height:auto;max-height:360px;object-fit:contain;border-radius:var(--radius-control)}
+  .public-bracket-gallery .bracket-open-btn{width:calc(100% - 20px);min-height:44px;margin:10px 10px 0;font-size:11px}
+
+  .bracket-lightbox-close{top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right))}
+  .rules-content{padding:18px 16px;font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+  .rules-content.is-empty{padding:0}
+  .rules-content .empty-state{padding:28px 18px;font-size:13px}
+  .rules-content .rules-list{padding-left:0;color:inherit}
+  .rules-content .rules-list:last-child{margin-bottom:0}
+}

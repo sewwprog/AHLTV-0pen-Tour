@@ -6,9 +6,10 @@
   <meta name="theme-color" content="#101114">
   <title>AHLTV — Турнір</title>
   <script src="intro.js?v=20261027-01"></script>
-  <link rel="stylesheet" href="styles.css?v=20261027-04">
+  <link rel="stylesheet" href="styles.css?v=20261029-01">
   <link rel="stylesheet" href="fonts.css?v=20261028-01">
   <link rel="stylesheet" href="mobile.css?v=20261027-02">
+  <link rel="stylesheet" href="tournament.css?v=20261029-02">
   <link rel="stylesheet" href="motion.css?v=20261027-01">
 </head>
 <body>
@@ -45,6 +46,7 @@
 
 <main class="shell tournament-detail-page">
   <div class="page-topline"><span><a href="./">ТУРНІРИ</a> <b>/</b> ДЕТАЛІ ТУРНІРУ</span><span>THE COMPETITION <b>✳</b></span></div>
+  <a class="detail-back" href="./#tournamentsSection"><i data-lucide="arrow-right"></i><span>Усі турніри</span></a>
   <section id="tournamentHero" class="panel tournament-detail-hero">
     <div class="loading-panel">Завантаження турніру...</div>
   </section>
@@ -55,10 +57,10 @@
     <a href="#rulesSection"><i data-lucide="scroll-text"></i><span>Правила</span></a>
   </nav>
 
-  <section id="teamsSection" class="panel">
-    <div class="panel-head"><span><i data-lucide="users"></i> КОМАНДИ</span><strong id="detailTeamsCount"></strong></div>
-    <div class="detail-teams-toolbar">
-      <label class="detail-teams-search"><i data-lucide="search"></i><input id="detailTeamSearch" type="search" placeholder="Пошук команди" aria-label="Пошук команди" autocomplete="off"></label>
+  <section id="teamsSection" class="panel" aria-labelledby="teamsHeading">
+    <div class="panel-head"><h2 id="teamsHeading"><i data-lucide="users"></i> КОМАНДИ</h2><strong id="detailTeamsCount"></strong></div>
+    <div class="detail-teams-toolbar" hidden>
+      <label class="detail-teams-search"><i data-lucide="search"></i><input id="detailTeamSearch" type="search" placeholder="Пошук" aria-label="Пошук команди" autocomplete="off"></label>
       <select id="detailTeamSort" aria-label="Сортувати команди">
         <option value="name">А — Я</option>
         <option value="-name">Я — А</option>
@@ -67,20 +69,20 @@
     <div id="detailTeams" class="detail-teams"></div>
   </section>
 
-  <section id="bracketSection" class="panel">
-    <div class="panel-head"><span><i data-lucide="git-branch"></i> ТУРНІРНА СІТКА</span><strong>BRACKET</strong></div>
+  <section id="bracketSection" class="panel" aria-labelledby="bracketHeading">
+    <div class="panel-head"><h2 id="bracketHeading"><i data-lucide="git-branch"></i> ТУРНІРНА СІТКА</h2><strong>BRACKET</strong></div>
     <div id="bracketRoot" class="bracket-scroll"></div>
   </section>
 
-  <section id="rulesSection" class="panel">
-    <div class="panel-head"><span><i data-lucide="scroll-text"></i> ПРАВИЛА</span></div>
+  <section id="rulesSection" class="panel" aria-labelledby="rulesHeading">
+    <div class="panel-head"><h2 id="rulesHeading"><i data-lucide="scroll-text"></i> ПРАВИЛА</h2></div>
     <div id="rulesContent" class="rules-content"></div>
   </section>
 </main>
 
-<div class="bracket-lightbox" id="bracketLightbox" role="dialog" aria-modal="true" aria-label="Повний перегляд сітки" aria-hidden="true">
+<div class="bracket-lightbox" id="bracketLightbox" role="dialog" aria-modal="true" aria-label="Повний перегляд сітки" aria-hidden="true" inert>
   <button class="bracket-lightbox-close" id="bracketLightboxClose" type="button" aria-label="Закрити перегляд"><i data-lucide="x"></i></button>
-  <img id="bracketLightboxImg" src="" alt="Сітка турніру">
+  <img id="bracketLightboxImg" alt="Сітка турніру">
 </div>
 <footer class="site-footer">
   <div class="shell">
@@ -89,7 +91,7 @@
   </div>
 </footer>
 
-<script type="module" src="ui.js?v=20261027-03"></script>
-<script type="module" src="tournament.js?v=20261027-01"></script>
+<script type="module" src="ui.js?v=20261029-01"></script>
+<script type="module" src="tournament.js?v=20261029-02"></script>
 </body>
 </html>
